@@ -3,7 +3,7 @@ import {Cell, Universe} from 'sandtable';
 // Import the WebAssembly memory at the top of the file.
 import {memory} from 'sandtable/sandtable_bg';
 
-const CELL_SIZE = 3;  // px
+const CELL_SIZE = 1;  // px
 const DEAD_COLOR = '#FFFFFF';
 const ALIVE_COLOR = '#000000';
 
@@ -16,8 +16,8 @@ const height = universe.height();
 // Give the canvas room for all of our cells and a 1px border
 // around each of them.
 const canvas = document.getElementById('game-of-life-canvas');
-canvas.height = (CELL_SIZE + 1) * height + 1;
-canvas.width = (CELL_SIZE + 1) * width + 1;
+canvas.height = (CELL_SIZE) * height;
+canvas.width = (CELL_SIZE) * width;
 
 const ctx = canvas.getContext('2d');
 
@@ -72,42 +72,20 @@ const getIndex = (row, column) => {
   return row * width + column;
 };
 
+const image = ctx.createImageData(width, height);
+
+
 const drawCells = () => {
   const cellsPtr = universe.cells();
   const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
-
-  ctx.beginPath();
-  // Alive cells.
-  ctx.fillStyle = ALIVE_COLOR;
-  for (let row = 0; row < height; row++) {
-    for (let col = 0; col < width; col++) {
-      const idx = getIndex(row, col);
-      if (cells[idx] !== Cell.Alive) {
-        continue;
-      }
-
-      ctx.fillRect(
-          col * (CELL_SIZE + 1) + 1, row * (CELL_SIZE + 1) + 1, CELL_SIZE,
-          CELL_SIZE);
-    }
+  for (let i = 0; i < width * height; i += 1) {
+    const color = cells[i] ? 0 : 0xFF;
+    image.data[i * 4] = color;
+    image.data[i * 4 + 1] = color;
+    image.data[i * 4 + 2] = color;
+    image.data[i * 4 + 3] = 0xFF;
   }
-
-  // Dead cells.
-  ctx.fillStyle = DEAD_COLOR;
-  for (let row = 0; row < height; row++) {
-    for (let col = 0; col < width; col++) {
-      const idx = getIndex(row, col);
-      if (cells[idx] !== Cell.Dead) {
-        continue;
-      }
-
-      ctx.fillRect(
-          col * (CELL_SIZE + 1) + 1, row * (CELL_SIZE + 1) + 1, CELL_SIZE,
-          CELL_SIZE);
-    }
-  }
-
-  ctx.stroke();
+  ctx.putImageData(image, 0, 0);
 };
 
 const renderLoop = () => {
