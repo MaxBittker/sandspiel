@@ -59,7 +59,7 @@ canvas.addEventListener('click', event => {
   const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), height - 1);
   const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), width - 1);
 
-  universe.toggle_cell(row, col);
+  //   universe.toggle_cell(row, col);
 
   drawCells();
 });
@@ -75,9 +75,9 @@ const image = ctx.createImageData(width, height);
 
 const drawCells = () => {
   const cellsPtr = universe.cells();
-  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height);
-  for (let i = 0; i < width * height; i += 1) {
-    const color = cells[i] ? 0 : 0xFF;
+  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height * 3);
+  for (let i = 0; i < width * height * 3; i += 1) {
+    const color = cells[i * 3] ? 0 : 0xFF;
     image.data[i * 4] = color;
     image.data[i * 4 + 1] = color;
     image.data[i * 4 + 2] = color;

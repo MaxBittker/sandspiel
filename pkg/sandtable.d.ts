@@ -1,5 +1,5 @@
 /* tslint:disable */
-export enum Cell {Dead,Alive,}
+export enum Species {Empty,Powder,}
 export class Universe {
 free(): void;
 
@@ -13,6 +13,8 @@ free(): void;
 
 static  new(): Universe;
 
- toggle_cell(arg0: number, arg1: number): void;
+}
+export class Cell {
+free(): void;
 
 }

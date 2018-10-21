@@ -3,7 +3,7 @@ import * as wasm from './sandtable_bg';
 
 /**
 */
-export const Cell = Object.freeze({ Dead:0,Alive:1, });
+export const Species = Object.freeze({ Empty:0,Powder:1, });
 
 const __wbg_random_86efc8986c8a8805_target = Math.random.bind(Math) || function() {
     throw new Error(`wasm-bindgen: Math.random.bind(Math) does not exist`);
@@ -64,14 +64,22 @@ export class Universe {
     static new() {
         return Universe.__wrap(wasm.universe_new());
     }
-    /**
-    * @param {number} arg0
-    * @param {number} arg1
-    * @returns {void}
-    */
-    toggle_cell(arg0, arg1) {
-        return wasm.universe_toggle_cell(this.ptr, arg0, arg1);
+}
+
+function freeCell(ptr) {
+
+    wasm.__wbg_cell_free(ptr);
+}
+/**
+*/
+export class Cell {
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        freeCell(ptr);
     }
+
 }
 
 let cachedTextDecoder = new TextDecoder('utf-8');
