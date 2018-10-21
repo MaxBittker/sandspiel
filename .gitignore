@@ -2,4 +2,4 @@
 **/*.rs.bk
 Cargo.lock
 wasm-pack.log
-/pkg
+**/pkg

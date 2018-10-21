@@ -26,6 +26,7 @@ const isPaused = () => {
 };
 
 const playPauseButton = document.getElementById('play-pause');
+const tickButton = document.getElementById('tick');
 
 const play = () => {
   playPauseButton.textContent = '⏸';
@@ -44,6 +45,12 @@ playPauseButton.addEventListener('click', event => {
   } else {
     pause();
   }
+});
+
+tickButton.addEventListener('click', event => {
+  console.log('tick')
+  universe.tick();
+  drawCells();
 });
 
 
@@ -75,13 +82,15 @@ const image = ctx.createImageData(width, height);
 
 const drawCells = () => {
   const cellsPtr = universe.cells();
-  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height * 3);
-  for (let i = 0; i < width * height * 3; i += 1) {
-    const color = cells[i * 3] ? 0xFF : 0x0;
-    const ra = cells[(i * 3) + 1];
+  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height * 4);
+  for (let i = 0; i < width * height * 4; i += 1) {
+    let ci = i * 4;
+    const color = cells[i * 4] ? 0xFF : 0x0;
+    const ra = cells[(i * 4) + 1];
+    const rb = cells[(i * 4) + 2];
     image.data[i * 4] = color;
     image.data[i * 4 + 1] = ra;
-    image.data[i * 4 + 2] = ra;
+    image.data[i * 4 + 2] = rb;
     image.data[i * 4 + 3] = 0xFF;
   }
   ctx.putImageData(image, 0, 0);
@@ -135,7 +144,6 @@ const fps = new class {
   Frames per Second:
            latest = ${Math.round(fps)}
   avg of last 100 = ${Math.round(mean)}
-  min of last 100 = ${Math.round(min)}
   max of last 100 = ${Math.round(max)}
   `.trim();
   }
