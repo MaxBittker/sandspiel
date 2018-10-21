@@ -3,7 +3,7 @@ import * as wasm from './sandtable_bg';
 
 /**
 */
-export const Species = Object.freeze({ Empty:0,Powder:1, });
+export const Species = Object.freeze({ Empty:0,Wall:1,Powder:2, });
 
 const __wbg_random_86efc8986c8a8805_target = Math.random.bind(Math) || function() {
     throw new Error(`wasm-bindgen: Math.random.bind(Math) does not exist`);

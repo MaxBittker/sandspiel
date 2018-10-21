@@ -77,10 +77,11 @@ const drawCells = () => {
   const cellsPtr = universe.cells();
   const cells = new Uint8Array(memory.buffer, cellsPtr, width * height * 3);
   for (let i = 0; i < width * height * 3; i += 1) {
-    const color = cells[i * 3] ? 0 : 0xFF;
+    const color = cells[i * 3] ? 0xFF : 0x0;
+    const ra = cells[(i * 3) + 1];
     image.data[i * 4] = color;
-    image.data[i * 4 + 1] = color;
-    image.data[i * 4 + 2] = color;
+    image.data[i * 4 + 1] = ra;
+    image.data[i * 4 + 2] = ra;
     image.data[i * 4 + 3] = 0xFF;
   }
   ctx.putImageData(image, 0, 0);

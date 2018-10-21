@@ -1,5 +1,5 @@
 /* tslint:disable */
-export enum Species {Empty,Powder,}
+export enum Species {Empty,Wall,Powder,}
 export class Universe {
 free(): void;
 
