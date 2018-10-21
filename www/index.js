@@ -4,8 +4,6 @@ import {Cell, Universe} from 'sandtable';
 import {memory} from 'sandtable/sandtable_bg';
 
 const CELL_SIZE = 1;  // px
-const DEAD_COLOR = '#FFFFFF';
-const ALIVE_COLOR = '#000000';
 
 
 // Construct the universe, and get its width and height.

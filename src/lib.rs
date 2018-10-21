@@ -81,8 +81,8 @@ impl Universe {
     }
 
     pub fn new() -> Universe {
-        let width = 800;
-        let height = 800;
+        let width = 900;
+        let height = 400;
 
         let cells = (0..width * height)
             .map(|i| {
@@ -109,7 +109,12 @@ impl Universe {
 //private methods
 impl Universe {
     fn get_index(&self, row: u32, column: u32) -> usize {
-        (row * self.width + column) as usize
+        ((row * self.width) + column) as usize
+    }
+
+    fn get_cell(&self, row: u32, column: u32) -> u8 {
+        let i = self.get_index(row, column);
+        return self.cells[i] as u8;
     }
 
     fn live_neighbor_count(&self, row: u32, column: u32) -> u8 {
@@ -131,29 +136,21 @@ impl Universe {
             column + 1
         };
 
-        let nw = self.get_index(north, west);
-        count += self.cells[nw] as u8;
+        count += self.get_cell(north, west) as u8;
 
-        let n = self.get_index(north, column);
-        count += self.cells[n] as u8;
+        count += self.get_cell(north, column) as u8;
 
-        let ne = self.get_index(north, east);
-        count += self.cells[ne] as u8;
+        count += self.get_cell(north, east) as u8;
 
-        let w = self.get_index(row, west);
-        count += self.cells[w] as u8;
+        count += self.get_cell(row, west) as u8;
 
-        let e = self.get_index(row, east);
-        count += self.cells[e] as u8;
+        count += self.get_cell(row, east) as u8;
 
-        let sw = self.get_index(south, west);
-        count += self.cells[sw] as u8;
+        count += self.get_cell(south, west) as u8;
 
-        let s = self.get_index(south, column);
-        count += self.cells[s] as u8;
+        count += self.get_cell(south, column) as u8;
 
-        let se = self.get_index(south, east);
-        count += self.cells[se] as u8;
+        count += self.get_cell(south, east) as u8;
 
         count
     }
