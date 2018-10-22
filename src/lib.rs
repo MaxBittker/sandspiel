@@ -21,6 +21,7 @@ pub enum Species {
     Empty = 0,
     Wall = 1,
     Powder = 2,
+    Water = 3,
 }
 // type      ra        rb
 // 0000.0000|0000.0000|0000.0000
@@ -49,8 +50,8 @@ static EMPTY_CELL: Cell = Cell {
 
 #[wasm_bindgen]
 pub struct Universe {
-    width: u32,
-    height: u32,
+    width: i32,
+    height: i32,
     cells: Vec<Cell>,
     generation: u8,
 }
@@ -76,26 +77,26 @@ impl Universe {
         // self.cells = next;
     }
 
-    pub fn width(&self) -> u32 {
+    pub fn width(&self) -> i32 {
         self.width
     }
 
-    pub fn height(&self) -> u32 {
+    pub fn height(&self) -> i32 {
         self.height
     }
 
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
-    pub fn paint(&mut self, x: u32, y: u32, size: u32) {
+    pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         for dx in 0..size {
             for dy in 0..size {
                 let px = x + dx - (size / 2);
                 let py = y + dy - (size / 2);
                 let i = self.get_index(px, py);
-                if (self.get_cell(px, py).species == Species::Empty) {
+                if self.get_cell(px, py).species == Species::Empty {
                     self.cells[i] = Cell {
-                        species: Species::Powder,
+                        species: species,
                         ra: 100,
                         rb: 0,
                         clock: self.generation,
@@ -104,7 +105,7 @@ impl Universe {
             }
         }
     }
-    pub fn new(width: u32, height: u32) -> Universe {
+    pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {
                 if js_sys::Math::random() < 0.9 {
@@ -117,7 +118,8 @@ impl Universe {
                         clock: 0,
                     }
                 }
-            }).collect();
+            })
+            .collect();
 
         Universe {
             width,
@@ -127,7 +129,7 @@ impl Universe {
         }
     }
 
-    // pub fn toggle_cell(&mut self, x: u32, y: u32) {
+    // pub fn toggle_cell(&mut self, x: i32, y: i32) {
     //     let idx = self.get_index(x, y);
     //     // self.cells[idx].toggle();
     // }
@@ -135,17 +137,17 @@ impl Universe {
 
 //private methods
 impl Universe {
-    fn get_index(&self, x: u32, y: u32) -> usize {
+    fn get_index(&self, x: i32, y: i32) -> usize {
         (x + (y * self.width)) as usize
     }
 
-    fn get_cell(&self, x: u32, y: u32) -> Cell {
+    fn get_cell(&self, x: i32, y: i32) -> Cell {
         let i = self.get_index(x, y);
         return self.cells[i];
     }
 
-    fn get_neighbor_getter(x: u32, y: u32) -> impl Fn(&Universe, u32, u32) -> Cell {
-        return move |u: &Universe, dx: u32, dy: u32| {
+    fn get_neighbor_getter(x: i32, y: i32) -> impl Fn(&Universe, i32, i32) -> Cell {
+        return move |u: &Universe, dx: i32, dy: i32| {
             let nx = x + dx;
             let ny = y + dy;
             if nx > u.width - 1 || ny > u.height - 1 {
@@ -160,8 +162,8 @@ impl Universe {
         };
     }
 
-    fn get_neighbor_setter(x: u32, y: u32) -> impl Fn(&mut Universe, u32, u32, Cell) -> () {
-        return move |u: &mut Universe, dx: u32, dy: u32, v: Cell| {
+    fn get_neighbor_setter(x: i32, y: i32) -> impl Fn(&mut Universe, i32, i32, Cell) -> () {
+        return move |u: &mut Universe, dx: i32, dy: i32, v: Cell| {
             let nx = x + dx;
             let ny = y + dy;
             if nx > u.width - 1 || ny > u.height - 1 {
@@ -177,31 +179,52 @@ impl Universe {
     fn update_cell(
         &mut self,
         cell: Cell,
-        neighbor_getter: impl Fn(&Universe, u32, u32) -> Cell,
-        neighbor_setter: impl Fn(&mut Universe, u32, u32, Cell) -> (),
+        neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+        neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
     ) {
-        // let dx: i8 = wasm_rng().gen_range(-1, 1);
-        let i = (js_sys::Math::random() * 100.0) as u32;
-        let dx = (i % 3) - 1;
-
         if cell.clock - self.generation == 1 {
             return;
         };
 
-        if cell.species == Species::Powder {
-            if neighbor_getter(self, 0, 1).species == Species::Empty {
-                neighbor_setter(self, 0, 0, EMPTY_CELL);
-                neighbor_setter(self, 0, 1, cell);
-            } else if neighbor_getter(self, dx as u32, 1).species == Species::Empty {
-                neighbor_setter(self, 0, 0, EMPTY_CELL);
-                neighbor_setter(self, dx as u32, 1, cell);
-            } else {
-                neighbor_setter(self, 0, 0, cell);
+        match cell.species {
+            Species::Empty => {}
+            Species::Wall => {}
+            Species::Powder => {
+                let i = (js_sys::Math::random() * 100.0) as i32;
+                let dx = (i % 3) - 1;
+
+                if neighbor_getter(self, 0, 1).species == Species::Empty {
+                    neighbor_setter(self, 0, 0, EMPTY_CELL);
+                    neighbor_setter(self, 0, 1, cell);
+                } else if neighbor_getter(self, dx, 1).species == Species::Empty {
+                    neighbor_setter(self, 0, 0, EMPTY_CELL);
+                    neighbor_setter(self, dx, 1, cell);
+                } else {
+                    neighbor_setter(self, 0, 0, cell);
+                }
+            }
+            Species::Water => {
+                let mut i = (js_sys::Math::random() * 100.0) as i32;
+                let dx = (i % 3) - 1;
+                i = (js_sys::Math::random() * 100.0) as i32;
+
+                if neighbor_getter(self, 0, 1).species == Species::Empty {
+                    neighbor_setter(self, 0, 0, EMPTY_CELL);
+                    neighbor_setter(self, 0, 1, cell);
+                } else if neighbor_getter(self, dx, 0).species == Species::Empty {
+                    neighbor_setter(self, 0, 0, EMPTY_CELL);
+                    neighbor_setter(self, dx, 0, cell);
+                } else if neighbor_getter(self, -dx, 0).species == Species::Empty {
+                    neighbor_setter(self, 0, 0, EMPTY_CELL);
+                    neighbor_setter(self, -dx, 0, cell);
+                } else {
+                    neighbor_setter(self, 0, 0, cell);
+                }
             }
         } // neighbor_setter(self, 0, 0, cell);
     }
 }
-pub fn add_two(a: u32) -> u32 {
+pub fn add_two(a: i32) -> i32 {
     a & 1
 }
 

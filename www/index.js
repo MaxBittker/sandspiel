@@ -1,5 +1,4 @@
-import {Cell, Universe} from 'sandtable';
-
+import {Cell, Species, Universe} from 'sandtable';
 // Import the WebAssembly memory at the top of the file.
 import {memory} from 'sandtable/sandtable_bg';
 
@@ -58,8 +57,8 @@ tickButton.addEventListener('click', event => {
   drawCells();
 });
 
-
 const paint = (event) => {
+  event.preventDefault();
   if (!painting) {
     return;
   }
@@ -73,11 +72,12 @@ const paint = (event) => {
 
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
-  universe.paint(x, y, 5);
+  universe.paint(x, y, 12, Species.Water);
   drawCells();
 };
 
 let painting = false
+let lastPaint;
 canvas.addEventListener('mousedown', event => {
   painting = true;
   paint(event)
