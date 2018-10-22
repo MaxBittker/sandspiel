@@ -148,6 +148,9 @@ impl Universe {
 
     fn get_neighbor_getter(x: i32, y: i32) -> impl Fn(&Universe, i32, i32) -> Cell {
         return move |u: &Universe, dx: i32, dy: i32| {
+            if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
+                panic!("oob set");
+            }
             let nx = x + dx;
             let ny = y + dy;
             if nx > u.width - 1 || ny > u.height - 1 {
@@ -164,8 +167,12 @@ impl Universe {
 
     fn get_neighbor_setter(x: i32, y: i32) -> impl Fn(&mut Universe, i32, i32, Cell) -> () {
         return move |u: &mut Universe, dx: i32, dy: i32, v: Cell| {
+            if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
+                panic!("oob set");
+            }
             let nx = x + dx;
             let ny = y + dy;
+
             if nx > u.width - 1 || ny > u.height - 1 {
                 return;
             }
