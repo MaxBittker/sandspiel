@@ -5,9 +5,9 @@ import {memory} from 'sandtable/sandtable_bg';
 
 const CELL_SIZE = 1;  // px
 
-
+let t = 0;
 // Construct the universe, and get its width and height.
-const universe = Universe.new();
+const universe = Universe.new(600, 450);
 const width = universe.width();
 const height = universe.height();
 
@@ -48,7 +48,8 @@ playPauseButton.addEventListener('click', event => {
 });
 
 tickButton.addEventListener('click', event => {
-  console.log('tick')
+  console.log('tick: ' + t)
+  t += 1;
   universe.tick();
   drawCells();
 });
@@ -101,6 +102,7 @@ const renderLoop = () => {
 
   universe.tick();
   drawCells();
+  t += 1;
 
   animationId = requestAnimationFrame(renderLoop);
 };

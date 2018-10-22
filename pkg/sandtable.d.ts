@@ -15,6 +15,6 @@ free(): void;
 
  cells(): number;
 
-static  new(): Universe;
+static  new(arg0: number, arg1: number): Universe;
 
 }

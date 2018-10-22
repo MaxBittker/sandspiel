@@ -13,7 +13,8 @@ default = ["console_error_panic_hook"]
 cfg-if = "0.1.2"
 wasm-bindgen = "0.2"
 js-sys = "0.2"
-rand = "0.5"
+wbg-rand = "0.4"
+# srand = "0.6.0-pre.0"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires

@@ -15,24 +15,35 @@
       left: 0;
       width: 100%;
       height: 100%;
+      background-color: #03010f;
     }
 
     canvas {
       position: absolute;
-      top: 0;
-      left: 0;
+      bottom: 0;
+      right: 5px;
+      left: 5px;
       z-index: -1;
-      width: 100%;
+      width: calc(100% - 10px);
       image-rendering: pixelated;
       image-rendering: -moz-crisp-edges;
+      /* margin: 5px; */
     }
 
+    button {
+      height: 45px;
+      min-width: 45px;
+      line-height: 20px;
+      background-color: aliceblue;
+      border: 4px solid blue;
+      border-radius: 9px;
+    }
 
 
     #fps {
       padding: 4px;
       background-color: aliceblue;
-      display: inline;
+      display: inline-block;
       white-space: pre;
       font-family: monospace;
     }

@@ -1,12 +1,12 @@
 extern crate cfg_if;
 extern crate js_sys;
-extern crate rand;
 extern crate wasm_bindgen;
+extern crate wbg_rand;
 
 mod utils;
 
-// use rand::prelude::*;
 use wasm_bindgen::prelude::*;
+// use wbg_rand::{wasm_rng, Rng};
 
 #[wasm_bindgen]
 extern "C" {
@@ -46,8 +46,8 @@ impl Cell {
 
 static EMPTY_CELL: Cell = Cell {
     species: Species::Empty,
-    ra: 100,
-    rb: 100,
+    ra: 40,
+    rb: 40,
     clock: 0,
 };
 
@@ -64,8 +64,8 @@ impl Universe {
     pub fn tick(&mut self) {
         // let mut next = self.cells.clone();
 
-        for x in 0..self.height {
-            for y in 0..self.width {
+        for x in 0..self.width {
+            for y in 0..self.height {
                 let cell = self.get_cell(x, y);
                 // let live_neighbors = self.live_neighbor_count(x, y);
                 self.update_cell(
@@ -76,7 +76,7 @@ impl Universe {
                 // next[idx] = next_cell;
             }
         }
-        self.generation += 1;
+        self.generation = self.generation.wrapping_add(1);
         // self.cells = next;
     }
 
@@ -92,19 +92,11 @@ impl Universe {
         self.cells.as_ptr()
     }
 
-    pub fn new() -> Universe {
-        let width: u32 = 500;
-        let height: u32 = 500;
-
+    pub fn new(width: u32, height: u32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {
                 if js_sys::Math::random() < 0.9 {
-                    Cell {
-                        species: Species::Empty,
-                        ra: 0,
-                        rb: 0,
-                        clock: 0,
-                    }
+                    EMPTY_CELL
                 } else {
                     Cell {
                         species: Species::Powder,
@@ -132,7 +124,7 @@ impl Universe {
 //private methods
 impl Universe {
     fn get_index(&self, x: u32, y: u32) -> usize {
-        ((x * self.width) + y) as usize
+        (x + (y * self.width)) as usize
     }
 
     fn get_cell(&self, x: u32, y: u32) -> Cell {
@@ -160,13 +152,13 @@ impl Universe {
         return move |u: &mut Universe, dx: u32, dy: u32, v: Cell| {
             let nx = x + dx;
             let ny = y + dy;
-            if nx > u.height - 1 || nx > u.width - 1 {
+            if nx > u.width - 1 || ny > u.height - 1 {
                 return;
             }
             let i = u.get_index((nx) % u.width, (ny) % u.height);
             // v.clock += 1;
             u.cells[i] = v;
-            u.cells[i].clock += 1;
+            u.cells[i].clock = u.cells[i].clock.wrapping_add(1);
         };
     }
 
@@ -176,17 +168,21 @@ impl Universe {
         neighbor_getter: impl Fn(&Universe, u32, u32) -> Cell,
         neighbor_setter: impl Fn(&mut Universe, u32, u32, Cell) -> (),
     ) {
-        // let dx: u32 = 0;
-        if cell.clock > self.generation {
+        // let dx: i8 = wasm_rng().gen_range(-1, 1);
+        let i = (js_sys::Math::random() * 100.0) as u32;
+        let dx = (i % 3) - 1;
+
+        if cell.clock - self.generation == 1 {
             return;
         };
+
         if cell.species == Species::Powder {
             if neighbor_getter(self, 0, 1).species == Species::Empty {
                 neighbor_setter(self, 0, 0, EMPTY_CELL);
                 neighbor_setter(self, 0, 1, cell);
-            } else if neighbor_getter(self, 1, 1).species == Species::Empty {
+            } else if neighbor_getter(self, dx as u32, 1).species == Species::Empty {
                 neighbor_setter(self, 0, 0, EMPTY_CELL);
-                neighbor_setter(self, 1, 1, cell);
+                neighbor_setter(self, dx as u32, 1, cell);
             } else {
                 neighbor_setter(self, 0, 0, cell);
             }

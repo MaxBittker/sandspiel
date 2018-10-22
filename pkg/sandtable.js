@@ -75,10 +75,12 @@ export class Universe {
         return wasm.universe_cells(this.ptr);
     }
     /**
+    * @param {number} arg0
+    * @param {number} arg1
     * @returns {Universe}
     */
-    static new() {
-        return Universe.__wrap(wasm.universe_new());
+    static new(arg0, arg1) {
+        return Universe.__wrap(wasm.universe_new(arg0, arg1));
     }
 }
 
