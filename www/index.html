@@ -21,28 +21,36 @@
     canvas {
       position: absolute;
       bottom: 0;
-      right: 5px;
-      left: 5px;
-      z-index: -1;
-      width: calc(100% - 10px);
+      right: 0px;
+      left: 0px;
+      z-index: 1;
+      width: calc(100% - 0px);
       image-rendering: pixelated;
       image-rendering: -moz-crisp-edges;
       /* margin: 5px; */
     }
 
     button {
+      z-index: 2;
+
       height: 45px;
       min-width: 45px;
       line-height: 20px;
       background-color: aliceblue;
-      border: 4px solid blue;
+      border: 4px solid #55f;
       border-radius: 9px;
     }
 
 
     #fps {
+      z-index: 2;
+
+      position: absolute;
+      right: 0;
+      top: 0;
       padding: 4px;
-      background-color: aliceblue;
+      background-color: rgba(255, 255, 255, 0.8);
+      text-align: right;
       display: inline-block;
       white-space: pre;
       font-family: monospace;

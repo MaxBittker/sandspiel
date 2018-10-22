@@ -6,8 +6,13 @@ import {memory} from 'sandtable/sandtable_bg';
 const CELL_SIZE = 1;  // px
 
 let t = 0;
+let ratio = 2;
+let screen_width = window.innerWidth / ratio;
+let screen_height = window.innerHeight / ratio;
+let pixels = screen_width * screen_height;
+
 // Construct the universe, and get its width and height.
-const universe = Universe.new(600, 450);
+const universe = Universe.new(screen_width, screen_height);
 const width = universe.width();
 const height = universe.height();
 
@@ -64,11 +69,23 @@ canvas.addEventListener('click', event => {
   const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
   const canvasTop = (event.clientY - boundingRect.top) * scaleY;
 
-  const row = Math.min(Math.floor(canvasTop / (CELL_SIZE + 1)), height - 1);
-  const col = Math.min(Math.floor(canvasLeft / (CELL_SIZE + 1)), width - 1);
+  const x = Math.min(Math.floor(canvasLeft), width - 1);
+  const y = Math.min(Math.floor(canvasTop), height - 1);
+  universe.paint(x, y, 2);
+  drawCells();
+});
+canvas.addEventListener('mousemove', event => {
+  const boundingRect = canvas.getBoundingClientRect();
 
-  //   universe.toggle_cell(row, col);
+  const scaleX = canvas.width / boundingRect.width;
+  const scaleY = canvas.height / boundingRect.height;
 
+  const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
+  const canvasTop = (event.clientY - boundingRect.top) * scaleY;
+
+  const x = Math.min(Math.floor(canvasLeft), width - 1);
+  const y = Math.min(Math.floor(canvasTop), height - 1);
+  universe.paint(x, y, 2);
   drawCells();
 });
 
@@ -143,8 +160,8 @@ const fps = new class {
 
     // Render the statistics.
     this.fps.textContent = `
-  Frames per Second:
-           latest = ${Math.round(fps)}
+    #Pixels: ${pixels.toLocaleString()}
+  FPS:      latest = ${Math.round(fps)}
   avg of last 100 = ${Math.round(mean)}
   max of last 100 = ${Math.round(max)}
   `.trim();

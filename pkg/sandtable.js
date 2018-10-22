@@ -13,22 +13,6 @@ export function __wbg_random_86efc8986c8a8805() {
     return __wbg_random_86efc8986c8a8805_target();
 }
 
-function freeCell(ptr) {
-
-    wasm.__wbg_cell_free(ptr);
-}
-/**
-*/
-export class Cell {
-
-    free() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-        freeCell(ptr);
-    }
-
-}
-
 function freeUniverse(ptr) {
 
     wasm.__wbg_universe_free(ptr);
@@ -77,11 +61,36 @@ export class Universe {
     /**
     * @param {number} arg0
     * @param {number} arg1
+    * @param {number} arg2
+    * @returns {void}
+    */
+    paint(arg0, arg1, arg2) {
+        return wasm.universe_paint(this.ptr, arg0, arg1, arg2);
+    }
+    /**
+    * @param {number} arg0
+    * @param {number} arg1
     * @returns {Universe}
     */
     static new(arg0, arg1) {
         return Universe.__wrap(wasm.universe_new(arg0, arg1));
     }
+}
+
+function freeCell(ptr) {
+
+    wasm.__wbg_cell_free(ptr);
+}
+/**
+*/
+export class Cell {
+
+    free() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+        freeCell(ptr);
+    }
+
 }
 
 let cachedTextDecoder = new TextDecoder('utf-8');

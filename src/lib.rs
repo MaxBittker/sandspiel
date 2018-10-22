@@ -35,19 +35,15 @@ pub struct Cell {
     clock: u8,
 }
 
-impl Cell {
-    // fn toggle(&mut self) {
-    //     *self = match *self {
-    //         Cell::Dead => Cell::Alive,
-    //         Cell::Alive => Cell::Dead,
-    //     };
-    // }
-}
+// impl Cell {
+// fn toggle(&mut self) {
+//     *self = match *self {
+//         Cell::Dead => Cell::Alive,
 
 static EMPTY_CELL: Cell = Cell {
     species: Species::Empty,
-    ra: 40,
-    rb: 40,
+    ra: 0,
+    rb: 0,
     clock: 0,
 };
 
@@ -91,7 +87,15 @@ impl Universe {
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
-
+    pub fn paint(&mut self, x: u32, y: u32, size: u32) {
+        let i = self.get_index(x, y);
+        self.cells[i] = Cell {
+            species: Species::Powder,
+            ra: 100,
+            rb: 0,
+            clock: self.generation,
+        }
+    }
     pub fn new(width: u32, height: u32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {
