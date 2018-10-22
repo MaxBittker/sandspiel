@@ -1,12 +1,8 @@
 <meta charset="utf-8"/>
 
-# 🦀🕸️ `wasm-pack-template`
+# SandTable
+A falling sand game built with rust + webgl
 
-A template for kick starting a Rust and WebAssembly project using
-[`wasm-pack`](https://github.com/rustwasm/wasm-pack).
-
-This template is designed for compiling Rust libraries into WebAssembly and
-publishing the resulting package to NPM.
 
 * Want to use the published NPM package in a Website? [Check out
   `create-wasm-app`.](https://github.com/rustwasm/create-wasm-app)

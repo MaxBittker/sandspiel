@@ -206,7 +206,7 @@ impl Universe {
             Species::Water => {
                 let mut i = (js_sys::Math::random() * 100.0) as i32;
                 let dx = (i % 3) - 1;
-                i = (js_sys::Math::random() * 100.0) as i32;
+                // i = (js_sys::Math::random() * 100.0) as i32;
 
                 if neighbor_getter(self, 0, 1).species == Species::Empty {
                     neighbor_setter(self, 0, 0, EMPTY_CELL);
@@ -214,9 +214,9 @@ impl Universe {
                 } else if neighbor_getter(self, dx, 0).species == Species::Empty {
                     neighbor_setter(self, 0, 0, EMPTY_CELL);
                     neighbor_setter(self, dx, 0, cell);
-                } else if neighbor_getter(self, -dx, 0).species == Species::Empty {
+                } else if neighbor_getter(self, -dx * 2, 0).species == Species::Empty {
                     neighbor_setter(self, 0, 0, EMPTY_CELL);
-                    neighbor_setter(self, -dx, 0, cell);
+                    neighbor_setter(self, -dx * 2, 0, cell);
                 } else {
                     neighbor_setter(self, 0, 0, cell);
                 }

@@ -1,6 +1,6 @@
 import {Species} from 'sandtable';
 
-import {drawCells, height, renderLoop, universe, width} from './index.js'
+import {height, renderLoop, universe, width} from './index.js'
 
 let ratio = 2;
 let screen_width = window.innerWidth / ratio;
@@ -37,7 +37,6 @@ playPauseButton.addEventListener('click', event => {
 
 tickButton.addEventListener('click', event => {
   universe.tick();
-  drawCells();
 });
 
 const paint = (event) => {
@@ -56,7 +55,6 @@ const paint = (event) => {
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
   universe.paint(x, y, 12, Species.Water);
-  drawCells();
 };
 
 let painting = false
