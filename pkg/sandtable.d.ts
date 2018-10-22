@@ -1,5 +1,9 @@
 /* tslint:disable */
 export enum Species {Empty,Wall,Powder,}
+export class Cell {
+free(): void;
+
+}
 export class Universe {
 free(): void;
 
@@ -14,9 +18,5 @@ free(): void;
  paint(arg0: number, arg1: number, arg2: number): void;
 
 static  new(arg0: number, arg1: number): Universe;
-
-}
-export class Cell {
-free(): void;
 
 }

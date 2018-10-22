@@ -32,7 +32,7 @@
 
     button {
       z-index: 2;
-
+      position: relative;
       height: 45px;
       min-width: 45px;
       line-height: 20px;
@@ -54,6 +54,9 @@
       display: inline-block;
       white-space: pre;
       font-family: monospace;
+      user-select: none;
+      /* Standard */
+
     }
   </style>
 
@@ -62,6 +65,7 @@
 <body>
   <button id="play-pause"></button>
   <button id="tick">tick</button>
+  <button id="size">1</button>
   <div id="fps"></div>
 
   <canvas id="game-of-life-canvas"></canvas>

@@ -3,7 +3,6 @@ import {Cell, Universe} from 'sandtable';
 // Import the WebAssembly memory at the top of the file.
 import {memory} from 'sandtable/sandtable_bg';
 
-const CELL_SIZE = 1;  // px
 
 let t = 0;
 let ratio = 2;
@@ -16,11 +15,11 @@ const universe = Universe.new(screen_width, screen_height);
 const width = universe.width();
 const height = universe.height();
 
-// Give the canvas room for all of our cells and a 1px border
-// around each of them.
+
+
 const canvas = document.getElementById('game-of-life-canvas');
-canvas.height = (CELL_SIZE) * height;
-canvas.width = (CELL_SIZE) * width;
+canvas.height = height;
+canvas.width = width;
 
 const ctx = canvas.getContext('2d');
 
@@ -60,7 +59,10 @@ tickButton.addEventListener('click', event => {
 });
 
 
-canvas.addEventListener('click', event => {
+const paint = (event) => {
+  if (!painting) {
+    return;
+  }
   const boundingRect = canvas.getBoundingClientRect();
 
   const scaleX = canvas.width / boundingRect.width;
@@ -71,32 +73,20 @@ canvas.addEventListener('click', event => {
 
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
-  universe.paint(x, y, 2);
+  universe.paint(x, y, 5);
   drawCells();
-});
-canvas.addEventListener('mousemove', event => {
-  const boundingRect = canvas.getBoundingClientRect();
-
-  const scaleX = canvas.width / boundingRect.width;
-  const scaleY = canvas.height / boundingRect.height;
-
-  const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
-  const canvasTop = (event.clientY - boundingRect.top) * scaleY;
-
-  const x = Math.min(Math.floor(canvasLeft), width - 1);
-  const y = Math.min(Math.floor(canvasTop), height - 1);
-  universe.paint(x, y, 2);
-  drawCells();
-});
-
-
-
-const getIndex = (row, column) => {
-  return row * width + column;
 };
 
-const image = ctx.createImageData(width, height);
+let painting = false
+canvas.addEventListener('mousedown', event => {
+  painting = true;
+  paint(event)
+});
+canvas.addEventListener('mouseup', event => {painting = false});
+canvas.addEventListener('mousemove', event => {paint(event)});
 
+
+const image = ctx.createImageData(width, height);
 
 const drawCells = () => {
   const cellsPtr = universe.cells();

@@ -88,12 +88,20 @@ impl Universe {
         self.cells.as_ptr()
     }
     pub fn paint(&mut self, x: u32, y: u32, size: u32) {
-        let i = self.get_index(x, y);
-        self.cells[i] = Cell {
-            species: Species::Powder,
-            ra: 100,
-            rb: 0,
-            clock: self.generation,
+        for dx in 0..size {
+            for dy in 0..size {
+                let px = x + dx - (size / 2);
+                let py = y + dy - (size / 2);
+                let i = self.get_index(px, py);
+                if (self.get_cell(px, py).species == Species::Empty) {
+                    self.cells[i] = Cell {
+                        species: Species::Powder,
+                        ra: 100,
+                        rb: 0,
+                        clock: self.generation,
+                    }
+                }
+            }
         }
     }
     pub fn new(width: u32, height: u32) -> Universe {
