@@ -35,6 +35,11 @@ void main() {
     hue = 0.1;
   } else if (type == 3.) {
     hue = 0.6;
+  } else if (type == 4.) {
+    hue = 0.5;
+    saturation = 0.5;
+  } else if (type == 5.) {
+    hue = 0.05;
   }
   color = hsv2rgb(vec3(hue, saturation, lightness));
 

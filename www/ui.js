@@ -1,30 +1,30 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from 'react';
+import ReactDOM from 'react-dom';
 
-import { Species } from "sandtable";
+import {Species} from 'sandtable';
 
-import { height, renderLoop, universe, width } from "./index.js";
+import {height, renderLoop, universe, width} from './index.js';
 
 let ratio = 2;
 let screen_width = window.innerWidth / ratio;
 let screen_height = window.innerHeight / ratio;
 let pixels = screen_width * screen_height;
 
-const canvas = document.getElementById("game-of-life-canvas");
+const canvas = document.getElementById('game-of-life-canvas');
 
 let painting = false;
 let lastPaint = null;
-canvas.addEventListener("mousedown", event => {
+canvas.addEventListener('mousedown', event => {
   event.preventDefault();
   painting = true;
   paint(event);
 });
-canvas.addEventListener("mouseup", event => {
+canvas.addEventListener('mouseup', event => {
   event.preventDefault();
   lastPaint = null;
   painting = false;
 });
-canvas.addEventListener("mousemove", event => {
+canvas.addEventListener('mousemove', event => {
   paint(event);
 });
 
@@ -44,27 +44,23 @@ const paint = event => {
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
   universe.paint(
-    x,
-    y,
-    sizeMap[window.UI.state.size],
-    window.UI.state.selectedElement
-  );
-  lastPaint = { x, y };
+      x, y, sizeMap[window.UI.state.size], window.UI.state.selectedElement);
+  lastPaint = {x, y};
 };
 
 const ElementButton = (name, selectedElement, setElement) => {
   let elementID = Species[name];
   return (
     <button
-      className={elementID == selectedElement ? "selected" : ""}
+      className={elementID == selectedElement ? 'selected' : ''}
       key={name}
       onClick={() => {
         setElement(elementID);
       }}
     >
-      {"  "}
+      {'  '}
       {name}
-      {"  "}
+      {'  '}
     </button>
   );
 };
@@ -97,7 +93,7 @@ class Index extends React.Component {
     return (
       <div>
         <button onClick={() => this.playPause()}>{paused ? "▶" : "⏸"}</button>
-        <button onClick={() => universe.tick()}>tick</button>
+        {paused && <button onClick={() => universe.tick()}>tick</button>}
         <button
           style={{ minWidth: "80px" }}
           onClick={e => this.bumpSize(e, 1)}
@@ -122,12 +118,12 @@ ReactDOM.render(
       window.UI = UI;
     }}
   />,
-  document.getElementById("ui")
+  document.getElementById('ui')
 );
 
 const fps = new class {
   constructor() {
-    this.fps = document.getElementById("fps");
+    this.fps = document.getElementById('fps');
     this.frames = [];
     this.lastFrameTimeStamp = performance.now();
   }

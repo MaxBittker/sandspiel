@@ -22,7 +22,10 @@ pub enum Species {
     Wall = 1,
     Powder = 2,
     Water = 3,
+    Gas = 4,
+    Clone = 5,
 }
+
 // type      ra        rb
 // 0000.0000|0000.0000|0000.0000
 // 24
@@ -106,7 +109,7 @@ impl Universe {
                 if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
                         species: species,
-                        ra: 100,
+                        ra: (dx * dy) as u8,
                         rb: 0,
                         clock: self.generation,
                     }
@@ -162,7 +165,7 @@ impl Universe {
             }
             let nx = x + dx;
             let ny = y + dy;
-            if nx > u.width - 1 || ny > u.height - 1 {
+            if nx < 0 || nx > u.width - 1 || ny < 0 || ny > u.height - 1 {
                 return Cell {
                     species: Species::Wall,
                     ra: 0,
@@ -188,7 +191,7 @@ impl Universe {
             let i = u.get_index((nx) % u.width, (ny) % u.height);
             // v.clock += 1;
             u.cells[i] = v;
-            u.cells[i].clock = u.cells[i].clock.wrapping_add(1);
+            u.cells[i].clock = u.generation.wrapping_add(1);
         };
     }
 
@@ -230,11 +233,66 @@ impl Universe {
                 } else if neighbor_getter(self, dx, 0).species == Species::Empty {
                     neighbor_setter(self, 0, 0, EMPTY_CELL);
                     neighbor_setter(self, dx, 0, cell);
-                } else if neighbor_getter(self, -dx * 2, 0).species == Species::Empty {
+                } else if neighbor_getter(self, -dx, 0).species == Species::Empty {
                     neighbor_setter(self, 0, 0, EMPTY_CELL);
-                    neighbor_setter(self, -dx * 2, 0, cell);
+                    neighbor_setter(self, -dx, 0, cell);
                 } else {
                     neighbor_setter(self, 0, 0, cell);
+                }
+            }
+            Species::Gas => {
+                let mut i = (js_sys::Math::random() * 100.0) as i32;
+                let dx = (i % 3) - 1;
+                i = (js_sys::Math::random() * 100.0) as i32;
+                let dy = (i % 3) - 1;
+
+                if neighbor_getter(self, dx, dy).species == Species::Empty {
+                    neighbor_setter(self, 0, 0, EMPTY_CELL);
+                    neighbor_setter(self, dx, dy, cell);
+                } else {
+                    neighbor_setter(self, 0, 0, cell);
+                }
+            }
+            Species::Clone => {
+                let mut clone_species = unsafe { transmute(cell.rb as u8) };
+
+                for dx in [-1, 0, 1].iter().cloned() {
+                    for dy in [-1, 0, 1].iter().cloned() {
+                        if cell.rb == 0 {
+                            let nbr_species = neighbor_getter(self, dx, dy).species;
+                            if nbr_species != Species::Empty && nbr_species != Species::Clone {
+                                clone_species = nbr_species;
+                                neighbor_setter(
+                                    self,
+                                    0,
+                                    0,
+                                    Cell {
+                                        species: cell.species,
+                                        ra: 200,
+                                        rb: clone_species as u8,
+                                        clock: 0,
+                                    },
+                                );
+
+                                break;
+                            }
+                        } else {
+                            if neighbor_getter(self, dx, dy).species == Species::Empty {
+                                neighbor_setter(
+                                    self,
+                                    dx,
+                                    dy,
+                                    Cell {
+                                        species: clone_species,
+                                        ra: 0,
+                                        rb: 0,
+                                        clock: 0,
+                                    },
+                                );
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         } // neighbor_setter(self, 0, 0, cell);
