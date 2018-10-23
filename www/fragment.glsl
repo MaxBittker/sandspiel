@@ -28,6 +28,9 @@ void main() {
     lightness = 0.0;
   } else if (type == 1.) {
     hue = 0.1;
+    saturation = 0.1;
+    lightness = 0.4;
+
   } else if (type == 2.) {
     hue = 0.1;
   } else if (type == 3.) {

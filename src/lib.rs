@@ -89,12 +89,21 @@ impl Universe {
         self.cells.as_ptr()
     }
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
-        for dx in 0..size {
-            for dy in 0..size {
-                let px = x + dx - (size / 2);
-                let py = y + dy - (size / 2);
+        let radius = size / 2;
+        for dx in -radius..radius + 1 {
+            for dy in -radius..radius + 1 {
+                if dx * dx + dy * dy > radius * radius {
+                    continue;
+                };
+                let px = x + dx;
+                let py = y + dy;
+
                 let i = self.get_index(px, py);
-                if self.get_cell(px, py).species == Species::Empty {
+
+                if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
+                    continue;
+                }
+                if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
                         species: species,
                         ra: 100,

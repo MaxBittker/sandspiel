@@ -12,8 +12,6 @@ let pixels = screen_width * screen_height;
 
 const canvas = document.getElementById('game-of-life-canvas');
 
-let selectedElement = Species.Water;
-
 const paint = event => {
   event.preventDefault();
   if (!painting) {
@@ -29,7 +27,8 @@ const paint = event => {
 
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
-  universe.paint(x, y, 12, selectedElement);
+  universe.paint(
+      x, y, sizeMap[window.UI.state.size], window.UI.state.selectedElement);
 };
 
 let painting = false;
@@ -90,25 +89,28 @@ const fps = new class {
 }
 ();
 
-const ElementButton = (name, setElement) => {
+const ElementButton = (name, selectedElement, setElement) => {
   let elementID = Species[name];
   return (
     <button
       className={elementID == selectedElement ? 'selected' : ''}
       key={name}
       onClick={() => {
-    selectedElement = elementID;
-    setElement(elementID);
+        setElement(elementID);
       }}
     >
-      {name}
+      {' '}
+      {name}{' '}
     </button>
   );
 };
+
+let sizeMap = [1, 3, 5, 8, 13, 21, 34, 55, 89];
+
 class Index extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { paused: false, size: 4, selectedElement: selectedElement };
+    this.state = { paused: false, size: 4, selectedElement: Species.Water };
   }
 
   playPause() {
@@ -120,22 +122,44 @@ class Index extends React.Component {
     }
     this.setState({ paused: !this.state.paused });
   }
-
+  bumpSize(event, d) {
+    console.log(d);
+    event.preventDefault();
+    this.setState({
+      size: (this.state.size + d + sizeMap.length) % sizeMap.length
+    });
+  }
   render() {
+    let { size, paused, selectedElement } = this.state;
     return (
       <div>
-        <button onClick={() => this.playPause()}>
-          {this.state.paused ? "⏸" : "▶"}
-        </button>
+        <button onClick={() => this.playPause()}>{paused ? "▶" : "⏸"}</button>
         <button onClick={() => universe.tick()}>tick</button>
+        <button
+          style={{ minWidth: "80px" }}
+          onClick={e => this.bumpSize(e, 1)}
+          onContextMenu={e => this.bumpSize(e, -1)}
+        >
+          Size:
+          {sizeMap[size]}
+        </button>
         {Object.keys(Species).map(n =>
-          ElementButton(n, id => this.setState({ selectedElement, id }))
+          ElementButton(n, selectedElement, id =>
+            this.setState({ selectedElement: id })
+          )
         )}
       </div>
     );
-}
+  }
 }
 
-ReactDOM.render(<Index />, document.getElementById('ui'));
+ReactDOM.render(
+  <Index
+    ref={UI => {
+      window.UI = UI;
+    }}
+  />,
+  document.getElementById('ui')
+);
 
-export {fps};
+export { fps };
