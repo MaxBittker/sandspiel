@@ -1,9 +1,7 @@
 import { Cell, Species, Universe } from "sandtable";
-// Import the WebAssembly memory at the top of the file.
-import { memory } from "sandtable/sandtable_bg";
 
 import { startWebGL } from "./render";
-import { fps, play } from "./ui";
+import { fps } from "./ui";
 
 let ratio = 2;
 let screen_width = window.innerWidth / ratio;
