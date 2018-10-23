@@ -5,6 +5,7 @@ extern crate wbg_rand;
 
 mod utils;
 
+use wasm_bindgen::__rt::core::intrinsics::transmute;
 use wasm_bindgen::prelude::*;
 // use wbg_rand::{wasm_rng, Rng};
 
@@ -24,6 +25,7 @@ pub enum Species {
     Water = 3,
     Gas = 4,
     Clone = 5,
+    Fire = 6,
 }
 
 // type      ra        rb
@@ -109,7 +111,7 @@ impl Universe {
                 if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
                         species: species,
-                        ra: (dx * dy) as u8,
+                        ra: 50 + (dx * dy) as u8,
                         rb: 0,
                         clock: self.generation,
                     }
@@ -284,7 +286,7 @@ impl Universe {
                                     dy,
                                     Cell {
                                         species: clone_species,
-                                        ra: 0,
+                                        ra: 50,
                                         rb: 0,
                                         clock: 0,
                                     },
@@ -293,6 +295,37 @@ impl Universe {
                             }
                         }
                     }
+                }
+            }
+            Species::Fire => {
+                let ra = cell.ra;
+                let mut degraded = cell.clone();
+                degraded.ra = ra - 1;
+
+                let mut i = (js_sys::Math::random() * 100.0) as i32;
+                let dx = (i % 3) - 1;
+                i = (js_sys::Math::random() * 100.0) as i32;
+                let dy = (i % 3) - 1;
+                if neighbor_getter(self, dx, dy).species == Species::Gas {
+                    neighbor_setter(
+                        self,
+                        dx,
+                        dy,
+                        Cell {
+                            species: Species::Fire,
+                            ra: (150 + (dx + dy) * 10) as u8,
+                            rb: 0,
+                            clock: 0,
+                        },
+                    );
+                }
+                if ra < 5 {
+                    neighbor_setter(self, 0, 0, EMPTY_CELL);
+                } else if neighbor_getter(self, dx, -1).species == Species::Empty {
+                    neighbor_setter(self, 0, 0, EMPTY_CELL);
+                    neighbor_setter(self, dx, -1, degraded);
+                } else {
+                    neighbor_setter(self, 0, 0, degraded);
                 }
             }
         } // neighbor_setter(self, 0, 0, cell);
