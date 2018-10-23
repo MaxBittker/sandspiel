@@ -1,9 +1,9 @@
-import {Cell, Species, Universe} from 'sandtable';
+import { Cell, Species, Universe } from "sandtable";
 // Import the WebAssembly memory at the top of the file.
-import {memory} from 'sandtable/sandtable_bg';
+import { memory } from "sandtable/sandtable_bg";
 
-import {startWebGL} from './render'
-import {fps, play} from './ui'
+import { startWebGL } from "./render";
+import { fps, play } from "./ui";
 
 let ratio = 2;
 let screen_width = window.innerWidth / ratio;
@@ -15,23 +15,16 @@ const universe = Universe.new(screen_width, screen_height);
 const width = universe.width();
 const height = universe.height();
 
-const canvas = document.getElementById('game-of-life-canvas');
+const canvas = document.getElementById("game-of-life-canvas");
 canvas.height = height;
 canvas.width = width;
-console.log(Species)
+
 const renderLoop = () => {
-  fps.render();  // new
+  fps.render(); // new
   universe.tick();
   window.animationId = requestAnimationFrame(renderLoop);
 };
 
-startWebGL({canvas, universe})
+startWebGL({ canvas, universe });
 renderLoop();
-export {
-  renderLoop,
-  canvas,
-  width,
-  height,
-  universe,
-  ratio,
-}
+export { renderLoop, canvas, width, height, universe, ratio };
