@@ -7,6 +7,8 @@
   <style>
     * {
       margin: 0;
+      font-family: monospace;
+
     }
 
     body {
@@ -27,7 +29,6 @@
       width: calc(100% - 0px);
       image-rendering: pixelated;
       image-rendering: -moz-crisp-edges;
-      /* margin: 5px; */
     }
 
     button {
@@ -36,15 +37,22 @@
       height: 45px;
       min-width: 45px;
       line-height: 20px;
-      background-color: aliceblue;
-      border: 4px solid #55f;
-      border-radius: 9px;
+      background-color: black;
+      color: aliceblue;
+      border: 2px solid aliceblue;
     }
 
+    button:focus {
+      outline: none;
+    }
+
+    button.selected {
+      background-color: #118;
+      border-color: goldenrod;
+    }
 
     #fps {
       z-index: 2;
-
       position: absolute;
       right: 0;
       top: 0;
@@ -55,17 +63,19 @@
       white-space: pre;
       font-family: monospace;
       user-select: none;
-      /* Standard */
+    }
 
+    #controls {
+      display: flex;
     }
   </style>
 
 </head>
 
 <body>
-  <button id="play-pause"></button>
-  <button id="tick">tick</button>
-  <button id="size">1</button>
+  <div id="ui">
+
+  </div>
   <div id="fps"></div>
 
   <canvas id="game-of-life-canvas"></canvas>

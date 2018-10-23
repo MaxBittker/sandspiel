@@ -20,14 +20,20 @@ void main() {
   vec4 data = texture2D(data, textCoord);
   float type = data.r * 255.;
   float hue = 0.0;
-  if (type == 1.) {
+  float saturation = 0.6;
+  float lightness = 0.3 + data.g * 0.5;
+
+  if (type == 0.) {
+    hue = 0.1;
+    lightness = 0.0;
+  } else if (type == 1.) {
     hue = 0.1;
   } else if (type == 2.) {
     hue = 0.1;
   } else if (type == 3.) {
     hue = 0.6;
   }
-  color = hsv2rgb(vec3(hue, 0.9, 0.2 + data.g * 0.8));
+  color = hsv2rgb(vec3(hue, saturation, lightness));
 
   gl_FragColor = vec4(color, 1.0);
 }

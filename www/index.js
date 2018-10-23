@@ -18,8 +18,7 @@ const height = universe.height();
 const canvas = document.getElementById('game-of-life-canvas');
 canvas.height = height;
 canvas.width = width;
-
-
+console.log(Species)
 const renderLoop = () => {
   fps.render();  // new
   universe.tick();
@@ -27,9 +26,7 @@ const renderLoop = () => {
 };
 
 startWebGL({canvas, universe})
-play();
-
-
+renderLoop();
 export {
   renderLoop,
   canvas,
