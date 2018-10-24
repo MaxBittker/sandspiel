@@ -2,6 +2,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const path = require("path");
 const dist = path.resolve(__dirname, "dist");
 const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
 module.exports = {
   entry: "./js/bootstrap.js",
@@ -10,7 +11,8 @@ module.exports = {
   mode: "development",
   plugins: [
     new WasmPackPlugin({ crateDirectory: path.resolve(__dirname, "crate") }),
-    new CopyWebpackPlugin(["index.html"])
+    new CopyWebpackPlugin(["index.html"]),
+    new HtmlWebpackPlugin({ template: "index.html" })
   ],
   module: {
     rules: [

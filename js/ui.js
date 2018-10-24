@@ -1,35 +1,51 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React from "react";
+import ReactDOM from "react-dom";
 
-import {Species} from '../crate/pkg';
+import { Species } from "../crate/pkg";
 
-import {height, renderLoop, universe, width} from './index.js';
+import { height, renderLoop, universe, width } from "./index.js";
 
 let ratio = 2;
 let screen_width = window.innerWidth / ratio;
 let screen_height = window.innerHeight / ratio;
 let pixels = screen_width * screen_height;
 
-const canvas = document.getElementById('game-of-life-canvas');
+const canvas = document.getElementById("game-of-life-canvas");
 
 let painting = false;
 let lastPaint = null;
-canvas.addEventListener('mousedown', event => {
+canvas.addEventListener("mousedown", event => {
   event.preventDefault();
   painting = true;
   paint(event);
 });
-canvas.addEventListener('mouseup', event => {
+canvas.addEventListener("mouseup", event => {
   event.preventDefault();
   lastPaint = null;
   painting = false;
 });
-canvas.addEventListener('mousemove', event => {
+canvas.addEventListener("mousemove", event => {
+  event.preventDefault();
   paint(event);
 });
 
-const paint = event => {
+canvas.addEventListener("touchstart", event => {
+  painting = true;
+  handleTouches(event);
+});
+canvas.addEventListener("touchend", event => {
+  lastPaint = null;
+  painting = false;
+});
+canvas.addEventListener("touchmove", event => {
+  handleTouches(event);
+});
+const handleTouches = event => {
   event.preventDefault();
+  Array.from(event.touches).forEach(paint);
+};
+
+const paint = event => {
   if (!painting) {
     return;
   }
@@ -44,23 +60,27 @@ const paint = event => {
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
   universe.paint(
-      x, y, sizeMap[window.UI.state.size], window.UI.state.selectedElement);
-  lastPaint = {x, y};
+    x,
+    y,
+    sizeMap[window.UI.state.size],
+    window.UI.state.selectedElement
+  );
+  lastPaint = { x, y };
 };
 
 const ElementButton = (name, selectedElement, setElement) => {
   let elementID = Species[name];
   return (
     <button
-      className={elementID == selectedElement ? 'selected' : ''}
+      className={elementID == selectedElement ? "selected" : ""}
       key={name}
       onClick={() => {
         setElement(elementID);
       }}
     >
-      {'  '}
+      {"  "}
       {name}
-      {'  '}
+      {"  "}
     </button>
   );
 };
@@ -92,7 +112,9 @@ class Index extends React.Component {
     let { size, paused, selectedElement } = this.state;
     return (
       <div>
-        <button onClick={() => this.playPause()}>{paused ? "▶" : "⏸"}</button>
+        <button onClick={() => this.playPause()}>
+          {paused ? "\u25B6\uFE0F" : "\u23F8\uFE0F"}
+        </button>
         {paused && <button onClick={() => universe.tick()}>tick</button>}
         <button
           style={{ minWidth: "80px" }}
@@ -118,12 +140,12 @@ ReactDOM.render(
       window.UI = UI;
     }}
   />,
-  document.getElementById('ui')
+  document.getElementById("ui")
 );
 
 const fps = new class {
   constructor() {
-    this.fps = document.getElementById('fps');
+    this.fps = document.getElementById("fps");
     this.frames = [];
     this.lastFrameTimeStamp = performance.now();
   }
@@ -138,7 +160,7 @@ const fps = new class {
 
     // Save only the latest 100 timings.
     this.frames.push(fps);
-    if (this.frames.length > 100) {
+    if (this.frames.length > 30) {
       this.frames.shift();
     }
 
@@ -155,10 +177,8 @@ const fps = new class {
 
     // Render the statistics.
     this.fps.textContent = `
-      #Pixels: ${pixels.toLocaleString()}
-    FPS:      latest = ${Math.round(fps)}
-    avg of last 100 = ${Math.round(mean)}
-    max of last 100 = ${Math.round(max)}
+ ${(pixels / 1000).toFixed(0)}Kpx
+ FPS:${Math.round(mean)}
     `.trim();
   }
 }();
