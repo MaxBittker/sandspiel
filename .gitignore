@@ -6,3 +6,8 @@ wasm-pack.log
 pkg/
 bin/
 node_modules
+dist
+crate/pkg
+crate/target
+crate/wasm-pack.log
+crate/Cargo.lock
