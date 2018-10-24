@@ -14,7 +14,6 @@ let startWebGL = ({ canvas, universe }) => {
 
   let drawTriangle = regl({
     frag: fsh,
-
     uniforms: {
       t: ({ tick }) => tick,
       data: () => dataTexture({ width, height, data: cells }),

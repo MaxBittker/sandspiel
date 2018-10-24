@@ -9,6 +9,7 @@ let screen_height = window.innerHeight / ratio;
 // let pixels = screen_width * screen_height;
 
 // Construct the universe, and get its width and height.
+
 const universe = Universe.new(screen_width, screen_height);
 const width = universe.width();
 const height = universe.height();
