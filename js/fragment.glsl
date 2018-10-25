@@ -8,6 +8,8 @@ varying vec2 uv;
 
 // clang-format off
 #pragma glslify: hsv2rgb = require('glsl-hsv2rgb')
+#pragma glslify: snoise3 = require(glsl-noise/simplex/3d)
+
 // clang-format on
 
 void main() {
@@ -22,7 +24,7 @@ void main() {
   float hue = 0.0;
   float saturation = 0.6;
   float lightness = 0.3 + data.g * 0.5;
-
+  float noise = snoise3(vec3(uv * resolution, t * 0.1));
   if (type == 0.) {
     hue = 0.1;
     lightness = 0.0;
@@ -40,9 +42,19 @@ void main() {
     saturation = 0.5;
   } else if (type == 5.) {
     hue = 0.05;
-  } else if (type == 6.) {
+  } else if (type == 6.) { // fire
     hue = (data.g * 0.1);
-    lightness = 0.5 + data.g * 0.5;
+    lightness = 0.5 + data.g * 0.5 + (0.5 * noise);
+  } else if (type == 7.) {
+    hue = (data.g * 0.1);
+    saturation = 0.3;
+    lightness = 0.3 + data.g * 0.5;
+  } else if (type == 8.) { // lava
+    hue = (data.g * 0.1);
+    lightness = 0.7 + data.g * 0.5 + (0.5 * noise);
+  } else if (type == 9.) {
+    hue = 0.6;
+    saturation = 0.3;
   }
   color = hsv2rgb(vec3(hue, saturation, lightness));
 

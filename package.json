@@ -40,6 +40,7 @@
   "dependencies": {
     "gh-pages": "^2.0.1",
     "glsl-hsv2rgb": "^1.0.0",
+    "glsl-noise": "0.0.0",
     "http-server": "^0.11.1",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",
