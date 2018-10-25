@@ -3,17 +3,11 @@ extern crate js_sys;
 extern crate wasm_bindgen;
 extern crate wbg_rand;
 
+// mod species;
 mod utils;
 
 use wasm_bindgen::__rt::core::intrinsics::transmute;
 use wasm_bindgen::prelude::*;
-// use wbg_rand::{wasm_rng, Rng};
-
-#[wasm_bindgen]
-extern "C" {
-    #[wasm_bindgen(js_namespace = performance)]
-    fn now() -> f64;
-}
 
 #[wasm_bindgen]
 #[repr(u8)]
@@ -41,11 +35,6 @@ pub struct Cell {
     clock: u8,
 }
 
-// impl Cell {
-// fn toggle(&mut self) {
-//     *self = match *self {
-//         Cell::Dead => Cell::Alive,
-
 static EMPTY_CELL: Cell = Cell {
     species: Species::Empty,
     ra: 0,
@@ -53,6 +42,155 @@ static EMPTY_CELL: Cell = Cell {
     clock: 0,
 };
 
+pub fn update_powder(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let i = (js_sys::Math::random() * 100.0) as i32;
+    let dx = (i % 3) - 1;
+
+    let nbr = neighbor_getter(u, 0, 1);
+    if nbr.species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, 0, 1, cell);
+    } else if nbr.species == Species::Water {
+        neighbor_setter(u, 0, 0, nbr);
+        neighbor_setter(u, 0, 1, cell);
+    } else if neighbor_getter(u, dx, 1).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, dx, 1, cell);
+    } else {
+        neighbor_setter(u, 0, 0, cell);
+    }
+}
+
+pub fn update_water(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let dx = (i % 3) - 1;
+    // i = (js_sys::Math::random() * 100.0) as i32;
+
+    if neighbor_getter(u, 0, 1).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, 0, 1, cell);
+    } else if neighbor_getter(u, dx, 0).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, dx, 0, cell);
+    } else if neighbor_getter(u, -dx, 0).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, -dx, 0, cell);
+    } else {
+        neighbor_setter(u, 0, 0, cell);
+    }
+}
+
+pub fn update_gas(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let dx = (i % 3) - 1;
+    i = (js_sys::Math::random() * 100.0) as i32;
+    let dy = (i % 3) - 1;
+
+    if neighbor_getter(u, dx, dy).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, dx, dy, cell);
+    } else {
+        neighbor_setter(u, 0, 0, cell);
+    }
+}
+pub fn update_clone(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let mut clone_species = unsafe { transmute(cell.rb as u8) };
+
+    for dx in [-1, 0, 1].iter().cloned() {
+        for dy in [-1, 0, 1].iter().cloned() {
+            if cell.rb == 0 {
+                let nbr_species = neighbor_getter(u, dx, dy).species;
+                if nbr_species != Species::Empty && nbr_species != Species::Clone {
+                    clone_species = nbr_species;
+                    neighbor_setter(
+                        u,
+                        0,
+                        0,
+                        Cell {
+                            species: cell.species,
+                            ra: 200,
+                            rb: clone_species as u8,
+                            clock: 0,
+                        },
+                    );
+
+                    break;
+                }
+            } else {
+                if neighbor_getter(u, dx, dy).species == Species::Empty {
+                    neighbor_setter(
+                        u,
+                        dx,
+                        dy,
+                        Cell {
+                            species: clone_species,
+                            ra: 50,
+                            rb: 0,
+                            clock: 0,
+                        },
+                    );
+                    break;
+                }
+            }
+        }
+    }
+}
+pub fn update_fire(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let ra = cell.ra;
+    let mut degraded = cell.clone();
+    degraded.ra = ra - 1;
+
+    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let dx = (i % 3) - 1;
+    i = (js_sys::Math::random() * 100.0) as i32;
+    let dy = (i % 3) - 1;
+    if neighbor_getter(u, dx, dy).species == Species::Gas {
+        neighbor_setter(
+            u,
+            dx,
+            dy,
+            Cell {
+                species: Species::Fire,
+                ra: (150 + (dx + dy) * 10) as u8,
+                rb: 0,
+                clock: 0,
+            },
+        );
+    }
+    if ra < 5 || neighbor_getter(u, dx, dy).species == Species::Water {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+    } else if neighbor_getter(u, dx, -1).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, dx, -1, degraded);
+    } else {
+        neighbor_setter(u, 0, 0, degraded);
+    }
+}
 #[wasm_bindgen]
 pub struct Universe {
     width: i32,
@@ -69,13 +207,11 @@ impl Universe {
         for x in 0..self.width {
             for y in 0..self.height {
                 let cell = self.get_cell(x, y);
-                // let live_neighbors = self.live_neighbor_count(x, y);
                 self.update_cell(
                     cell,
                     Universe::get_neighbor_getter(x, y),
                     Universe::get_neighbor_setter(x, y),
                 )
-                // next[idx] = next_cell;
             }
         }
         self.generation = self.generation.wrapping_add(1);
@@ -210,141 +346,25 @@ impl Universe {
         match cell.species {
             Species::Empty => {}
             Species::Wall => {}
-            Species::Powder => {
-                let i = (js_sys::Math::random() * 100.0) as i32;
-                let dx = (i % 3) - 1;
-
-                let nbr = neighbor_getter(self, 0, 1);
-                if nbr.species == Species::Empty {
-                    neighbor_setter(self, 0, 0, EMPTY_CELL);
-                    neighbor_setter(self, 0, 1, cell);
-                } else if nbr.species == Species::Water {
-                    neighbor_setter(self, 0, 0, nbr);
-                    neighbor_setter(self, 0, 1, cell);
-                } else if neighbor_getter(self, dx, 1).species == Species::Empty {
-                    neighbor_setter(self, 0, 0, EMPTY_CELL);
-                    neighbor_setter(self, dx, 1, cell);
-                } else {
-                    neighbor_setter(self, 0, 0, cell);
-                }
-            }
-            Species::Water => {
-                let mut i = (js_sys::Math::random() * 100.0) as i32;
-                let dx = (i % 3) - 1;
-                // i = (js_sys::Math::random() * 100.0) as i32;
-
-                if neighbor_getter(self, 0, 1).species == Species::Empty {
-                    neighbor_setter(self, 0, 0, EMPTY_CELL);
-                    neighbor_setter(self, 0, 1, cell);
-                } else if neighbor_getter(self, dx, 0).species == Species::Empty {
-                    neighbor_setter(self, 0, 0, EMPTY_CELL);
-                    neighbor_setter(self, dx, 0, cell);
-                } else if neighbor_getter(self, -dx, 0).species == Species::Empty {
-                    neighbor_setter(self, 0, 0, EMPTY_CELL);
-                    neighbor_setter(self, -dx, 0, cell);
-                } else {
-                    neighbor_setter(self, 0, 0, cell);
-                }
-            }
-            Species::Gas => {
-                let mut i = (js_sys::Math::random() * 100.0) as i32;
-                let dx = (i % 3) - 1;
-                i = (js_sys::Math::random() * 100.0) as i32;
-                let dy = (i % 3) - 1;
-
-                if neighbor_getter(self, dx, dy).species == Species::Empty {
-                    neighbor_setter(self, 0, 0, EMPTY_CELL);
-                    neighbor_setter(self, dx, dy, cell);
-                } else {
-                    neighbor_setter(self, 0, 0, cell);
-                }
-            }
-            Species::Clone => {
-                let mut clone_species = unsafe { transmute(cell.rb as u8) };
-
-                for dx in [-1, 0, 1].iter().cloned() {
-                    for dy in [-1, 0, 1].iter().cloned() {
-                        if cell.rb == 0 {
-                            let nbr_species = neighbor_getter(self, dx, dy).species;
-                            if nbr_species != Species::Empty && nbr_species != Species::Clone {
-                                clone_species = nbr_species;
-                                neighbor_setter(
-                                    self,
-                                    0,
-                                    0,
-                                    Cell {
-                                        species: cell.species,
-                                        ra: 200,
-                                        rb: clone_species as u8,
-                                        clock: 0,
-                                    },
-                                );
-
-                                break;
-                            }
-                        } else {
-                            if neighbor_getter(self, dx, dy).species == Species::Empty {
-                                neighbor_setter(
-                                    self,
-                                    dx,
-                                    dy,
-                                    Cell {
-                                        species: clone_species,
-                                        ra: 50,
-                                        rb: 0,
-                                        clock: 0,
-                                    },
-                                );
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
-            Species::Fire => {
-                let ra = cell.ra;
-                let mut degraded = cell.clone();
-                degraded.ra = ra - 1;
-
-                let mut i = (js_sys::Math::random() * 100.0) as i32;
-                let dx = (i % 3) - 1;
-                i = (js_sys::Math::random() * 100.0) as i32;
-                let dy = (i % 3) - 1;
-                if neighbor_getter(self, dx, dy).species == Species::Gas {
-                    neighbor_setter(
-                        self,
-                        dx,
-                        dy,
-                        Cell {
-                            species: Species::Fire,
-                            ra: (150 + (dx + dy) * 10) as u8,
-                            rb: 0,
-                            clock: 0,
-                        },
-                    );
-                }
-                if ra < 5 || neighbor_getter(self, dx, dy).species == Species::Water {
-                    neighbor_setter(self, 0, 0, EMPTY_CELL);
-                } else if neighbor_getter(self, dx, -1).species == Species::Empty {
-                    neighbor_setter(self, 0, 0, EMPTY_CELL);
-                    neighbor_setter(self, dx, -1, degraded);
-                } else {
-                    neighbor_setter(self, 0, 0, degraded);
-                }
-            }
-        } // neighbor_setter(self, 0, 0, cell);
+            Species::Powder => update_powder(self, cell, neighbor_getter, neighbor_setter),
+            Species::Water => update_water(self, cell, neighbor_getter, neighbor_setter),
+            Species::Gas => update_gas(self, cell, neighbor_getter, neighbor_setter),
+            Species::Clone => update_clone(self, cell, neighbor_getter, neighbor_setter),
+            Species::Fire => update_fire(self, cell, neighbor_getter, neighbor_setter),
+        }
     }
 }
-pub fn add_two(a: i32) -> i32 {
-    a & 1
-}
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+// pub fn add_two(a: i32) -> i32 {
+//     a & 1
+// }
 
-    #[test]
-    fn it_adds_two() {
-        assert_eq!(1, add_two(6));
-    }
-}
+// #[cfg(test)]
+// mod tests {
+//     use super::*;
+
+//     #[test]
+//     fn it_adds_two() {
+//         assert_eq!(1, add_two(6));
+//     }
+// }
