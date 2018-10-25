@@ -214,8 +214,12 @@ impl Universe {
                 let i = (js_sys::Math::random() * 100.0) as i32;
                 let dx = (i % 3) - 1;
 
-                if neighbor_getter(self, 0, 1).species == Species::Empty {
+                let nbr = neighbor_getter(self, 0, 1);
+                if nbr.species == Species::Empty {
                     neighbor_setter(self, 0, 0, EMPTY_CELL);
+                    neighbor_setter(self, 0, 1, cell);
+                } else if nbr.species == Species::Water {
+                    neighbor_setter(self, 0, 0, nbr);
                     neighbor_setter(self, 0, 1, cell);
                 } else if neighbor_getter(self, dx, 1).species == Species::Empty {
                     neighbor_setter(self, 0, 0, EMPTY_CELL);
@@ -319,7 +323,7 @@ impl Universe {
                         },
                     );
                 }
-                if ra < 5 {
+                if ra < 5 || neighbor_getter(self, dx, dy).species == Species::Water {
                     neighbor_setter(self, 0, 0, EMPTY_CELL);
                 } else if neighbor_getter(self, dx, -1).species == Species::Empty {
                     neighbor_setter(self, 0, 0, EMPTY_CELL);

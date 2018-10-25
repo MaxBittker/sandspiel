@@ -12,12 +12,38 @@ let pixels = screen_width * screen_height;
 
 const canvas = document.getElementById("game-of-life-canvas");
 
+const eventDistance = (a, b) => {
+  return Math.sqrt(
+    Math.pow(a.clientX - b.clientX, 2) + Math.pow(a.clientY - b.clientY, 2),
+    2
+  );
+};
+
+const magnitude = a => {
+  return Math.sqrt(Math.pow(a.clientX, 2) + Math.pow(a.clientY, 2), 2);
+};
+
+const norm = a => {
+  let mag = magnitude(a);
+  return { clientX: a.clientX / mag, clientY: a.clientY / mag };
+};
+const scale = (a, s) => {
+  return { clientX: a.clientX * s, clientY: a.clientY * s };
+};
+const add = (a, b) => {
+  return { clientX: a.clientX + b.clientX, clientY: a.clientY + b.clientY };
+};
+const sub = (a, b) => {
+  return { clientX: a.clientX - b.clientX, clientY: a.clientY - b.clientY };
+};
+
 let painting = false;
 let lastPaint = null;
 canvas.addEventListener("mousedown", event => {
   event.preventDefault();
   painting = true;
   paint(event);
+  lastPaint = event;
 });
 canvas.addEventListener("mouseup", event => {
   event.preventDefault();
@@ -26,7 +52,27 @@ canvas.addEventListener("mouseup", event => {
 });
 canvas.addEventListener("mousemove", event => {
   event.preventDefault();
-  paint(event);
+  let startEvent = { clientX: event.clientX, clientY: event.clientY };
+  if (!painting) {
+    return;
+  }
+  let size = sizeMap[window.UI.state.size];
+  let i = 0;
+  paint(startEvent);
+  while (eventDistance(startEvent, lastPaint) > size) {
+    let d = eventDistance(startEvent, lastPaint);
+    startEvent = add(
+      startEvent,
+      scale(norm(sub(lastPaint, event)), Math.min(size, d))
+    );
+    i++;
+    if (i > 1000) {
+      break;
+    }
+    paint(startEvent);
+  }
+
+  lastPaint = event;
 });
 
 canvas.addEventListener("touchstart", event => {
@@ -65,7 +111,7 @@ const paint = event => {
     sizeMap[window.UI.state.size],
     window.UI.state.selectedElement
   );
-  lastPaint = { x, y };
+  // lastPaint = { x, y };
 };
 
 const ElementButton = (name, selectedElement, setElement) => {
@@ -113,7 +159,7 @@ class Index extends React.Component {
     return (
       <div>
         <button onClick={() => this.playPause()}>
-          {paused ? "\u25B6\uFE0F" : "\u23F8\uFE0F"}
+          {paused ? "\u25B6\uFE0E" : "\u23F8\uFE0E"}
         </button>
         {paused && <button onClick={() => universe.tick()}>tick</button>}
         <button
