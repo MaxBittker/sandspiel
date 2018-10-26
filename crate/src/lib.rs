@@ -172,9 +172,7 @@ pub fn update_fire(
     let dx = (i % 3) - 1;
     i = (js_sys::Math::random() * 100.0) as i32;
     let dy = (i % 3) - 1;
-    if neighbor_getter(u, dx, dy).species == Species::Gas
-        || neighbor_getter(u, dx, dy).species == Species::Wood
-    {
+    if neighbor_getter(u, dx, dy).species == Species::Gas {
         neighbor_setter(
             u,
             dx,
@@ -206,9 +204,7 @@ pub fn update_lava(
     let dx = (i % 3) - 1;
     i = (js_sys::Math::random() * 100.0) as i32;
     let dy = (i % 3) - 1;
-    if neighbor_getter(u, dx, dy).species == Species::Gas
-        || neighbor_getter(u, dx, dy).species == Species::Wood
-    {
+    if neighbor_getter(u, dx, dy).species == Species::Gas {
         neighbor_setter(
             u,
             dx,
@@ -252,6 +248,78 @@ pub fn update_wood(
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
+    let rb = cell.rb;
+
+    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let dx = (i % 3) - 1;
+    i = (js_sys::Math::random() * 100.0) as i32;
+    let dy = (i % 3) - 1;
+    let nbr_species = neighbor_getter(u, dx, dy).species;
+    if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
+        neighbor_setter(
+            u,
+            0,
+            0,
+            Cell {
+                species: Species::Wood,
+                ra: cell.ra,
+                rb: 90,
+                clock: 0,
+            },
+        );
+    }
+
+    if rb > 1 {
+        neighbor_setter(
+            u,
+            0,
+            0,
+            Cell {
+                species: Species::Wood,
+                ra: cell.ra,
+                rb: rb - 1,
+                clock: 0,
+            },
+        );
+        if rb % 4 == 0 && nbr_species == Species::Empty {
+            neighbor_setter(
+                u,
+                dx,
+                dy,
+                Cell {
+                    species: Species::Fire,
+                    ra: 50,
+                    rb: 0,
+                    clock: 0,
+                },
+            )
+        }
+        if nbr_species == Species::Water {
+            neighbor_setter(
+                u,
+                0,
+                0,
+                Cell {
+                    species: Species::Wood,
+                    ra: 50,
+                    rb: 0,
+                    clock: 0,
+                },
+            )
+        }
+    } else if rb == 1 {
+        neighbor_setter(
+            u,
+            0,
+            0,
+            Cell {
+                species: Species::Empty,
+                ra: cell.ra,
+                rb: 90,
+                clock: 0,
+            },
+        );
+    }
 }
 pub fn update_ice(
     u: &mut Universe,
