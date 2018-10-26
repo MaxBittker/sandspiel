@@ -59,11 +59,11 @@ canvas.addEventListener("mousemove", event => {
   let size = sizeMap[window.UI.state.size];
   let i = 0;
   paint(startEvent);
-  while (eventDistance(startEvent, lastPaint) > size) {
+  while (eventDistance(startEvent, lastPaint) > size / 2) {
     let d = eventDistance(startEvent, lastPaint);
     startEvent = add(
       startEvent,
-      scale(norm(sub(lastPaint, event)), Math.min(size, d))
+      scale(norm(sub(lastPaint, event)), Math.min(size / 2, d))
     );
     i++;
     if (i > 1000) {

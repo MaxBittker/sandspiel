@@ -331,15 +331,26 @@ pub fn update_ice(
     let dx = (i % 3) - 1;
     i = (js_sys::Math::random() * 100.0) as i32;
     let dy = (i % 3) - 1;
-    if neighbor_getter(u, dx, dy).species == Species::Fire
-        || neighbor_getter(u, dx, dy).species == Species::Lava
-    {
+    let nbr_species = neighbor_getter(u, dx, dy).species;
+    if nbr_species == Species::Fire || nbr_species == Species::Lava {
         neighbor_setter(
             u,
             0,
             0,
             Cell {
                 species: Species::Water,
+                ra: cell.ra,
+                rb: cell.rb,
+                clock: 0,
+            },
+        );
+    } else if (nbr_species == Species::Water && i < 10) {
+        neighbor_setter(
+            u,
+            dx,
+            dy,
+            Cell {
+                species: Species::Ice,
                 ra: cell.ra,
                 rb: cell.rb,
                 clock: 0,
