@@ -39,19 +39,24 @@ const sub = (a, b) => {
 
 let painting = false;
 let lastPaint = null;
+let repeat = null;
 canvas.addEventListener("mousedown", event => {
   event.preventDefault();
   painting = true;
+  clearInterval(repeat);
+  repeat = window.setInterval(() => paint(event), 100);
   paint(event);
   lastPaint = event;
 });
 canvas.addEventListener("mouseup", event => {
   event.preventDefault();
   lastPaint = null;
+  clearInterval(repeat);
   painting = false;
 });
 canvas.addEventListener("mousemove", event => {
-  event.preventDefault();
+  clearInterval(repeat);
+  repeat = window.setInterval(() => paint(event), 100);
   let startEvent = { clientX: event.clientX, clientY: event.clientY };
   if (!painting) {
     return;

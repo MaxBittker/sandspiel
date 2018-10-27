@@ -23,6 +23,7 @@ pub enum Species {
     Wood = 7,
     Lava = 8,
     Ice = 9,
+    Sink = 10,
 }
 
 // type      ra        rb
@@ -358,6 +359,24 @@ pub fn update_ice(
         );
     }
 }
+
+pub fn update_sink(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let dx = (i % 3) - 1;
+    i = (js_sys::Math::random() * 100.0) as i32;
+    let dy = (i % 3) - 1;
+
+    if neighbor_getter(u, dx, dy).species != Species::Empty {
+        neighbor_setter(u, dx, dy, EMPTY_CELL);
+        neighbor_setter(u, 0, 0, cell);
+    }
+}
+
 #[wasm_bindgen]
 pub struct Universe {
     width: i32,
@@ -425,7 +444,7 @@ impl Universe {
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {
-                if js_sys::Math::random() < 0.9 {
+                if js_sys::Math::random() < 0.9 || i < width * height / 2 {
                     EMPTY_CELL
                 } else {
                     Cell {
@@ -521,6 +540,7 @@ impl Universe {
             Species::Wood => update_wood(self, cell, neighbor_getter, neighbor_setter),
             Species::Lava => update_lava(self, cell, neighbor_getter, neighbor_setter),
             Species::Ice => update_ice(self, cell, neighbor_getter, neighbor_setter),
+            Species::Sink => update_sink(self, cell, neighbor_getter, neighbor_setter),
         }
     }
 }
