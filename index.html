@@ -37,8 +37,8 @@
     button {
       z-index: 2;
       position: relative;
-      height: 45px;
-      min-width: 45px;
+      height: 30px;
+      min-width: 30px;
       line-height: 20px;
       background-color: black;
       color: aliceblue;
@@ -50,18 +50,21 @@
     }
 
     button.selected {
-      background-color: #118;
+      background-color: white;
+      color: black;
       border-color: white;
     }
 
 
     #fps {
+      pointer-events: none;
+
       z-index: 2;
       position: absolute;
       right: 0;
-      top: 0;
-      padding: 4px;
-      background-color: rgba(255, 255, 255, 0.8);
+      bottom: 0;
+      padding: 2px;
+      background-color: rgba(255, 255, 255, 0.4);
       text-align: right;
       display: inline-block;
       white-space: pre;

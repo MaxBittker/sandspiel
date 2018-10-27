@@ -168,7 +168,7 @@ class Index extends React.Component {
           onContextMenu={e => this.bumpSize(e, -1)}
         >
           Size:
-          {sizeMap[size]}
+          {size + 1}
         </button>
         {Object.keys(Species).map(n =>
           ElementButton(n, selectedElement, id =>
