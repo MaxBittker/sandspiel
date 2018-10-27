@@ -1,34 +1,18 @@
 <meta charset="utf-8"/>
-
 # SandTable
-A falling sand game built with rust + webgl
 
+"Imagine the cool phenomenon when the wind blows the falling leaves. This game simulates the phenomenon with powder (dots)!" -DAN-BALL
 
-* Want to use the published NPM package in a Website? [Check out
-  `create-wasm-app`.](https://github.com/rustwasm/create-wasm-app)
-* Want to make a monorepo-style Website without publishing to NPM? Check out
-  [`rust-webpack-template`](https://github.com/rustwasm/rust-webpack-template)
-  and/or
-  [`rust-parcel-template`](https://github.com/rustwasm/rust-parcel-template).
+This is a [falling sand](https://en.wikipedia.org/wiki/Falling-sand_game) game built in rust (via wasm), webgl, and some JS glueing things together.
 
-## 🔋 Batteries Included
+The goal is to produce an cellular automata enviroment that's interesting to play with and supports the sharing and forking of fun creations with other players.
+Ultimately, i want the platform to support editing and uploading of your own elements via a programable cellular automata API.
 
-* [`wasm-bindgen`](https://github.com/rustwasm/wasm-bindgen) for communicating
-  between WebAssembly and JavaScript.
-* [`console_error_panic_hook`](https://github.com/rustwasm/console_error_panic_hook)
-  for logging panic messages to the developer console.
-* [`wee_alloc`](https://github.com/rustwasm/wee_alloc), an allocator optimized
-  for small code size.
-
-
-### 🛠️ Build with `wasm-pack build`
+### 🛠️ Build:
 
 ```
-wasm-pack build
+wasm-pack build;
+npm run start
 ```
 
-### 🔬 Test in Headless Browsers with `wasm-pack test`
-
-```
-wasm-pack test --headless --firefox
-```
+a successor to my previous efforts in [javascript](https://github.com/MaxBittker/dust) and [lua](https://github.com/MaxBittker/sand-toy)

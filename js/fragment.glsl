@@ -56,7 +56,7 @@ void main() {
     hue = 0.6;
     saturation = 0.4;
     lightness = 0.7 + data.g * 0.5;
-  } else if (type == 10.) { // ice
+  } else if (type == 10.) { // sink
     hue = 0.9;
     saturation = 0.4;
     lightness = 1.0;
