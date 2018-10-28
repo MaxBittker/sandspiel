@@ -59,7 +59,6 @@ static EMPTY_CELL: Cell = Cell {
 pub fn update_powder(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -84,7 +83,6 @@ pub fn update_powder(
 pub fn update_water(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -109,7 +107,6 @@ pub fn update_water(
 pub fn update_gas(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -139,7 +136,6 @@ pub fn update_gas(
 pub fn update_clone(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -187,7 +183,6 @@ pub fn update_clone(
 pub fn update_fire(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -224,7 +219,6 @@ pub fn update_fire(
 pub fn update_lava(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -273,7 +267,6 @@ pub fn update_lava(
 pub fn update_wood(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -353,7 +346,6 @@ pub fn update_wood(
 pub fn update_ice(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -392,7 +384,6 @@ pub fn update_ice(
 pub fn update_plant(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -524,7 +515,6 @@ pub fn update_plant(
 pub fn update_sink(
     u: &mut Universe,
     cell: Cell,
-    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -581,10 +571,8 @@ impl Universe {
         for x in 0..self.width {
             for y in 0..self.height {
                 let cell = self.get_cell(x, y);
-                let wind = self.get_wind(x, y);
                 self.update_cell(
                     cell,
-                    wind,
                     Universe::get_neighbor_getter(x, y),
                     Universe::get_neighbor_setter(x, y),
                 )
@@ -756,7 +744,6 @@ impl Universe {
     fn update_cell(
         &mut self,
         cell: Cell,
-        wind: Wind,
         neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
         neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
     ) {
@@ -767,16 +754,16 @@ impl Universe {
         match cell.species {
             Species::Empty => {}
             Species::Wall => {}
-            Species::Powder => update_powder(self, cell, wind, neighbor_getter, neighbor_setter),
-            Species::Water => update_water(self, cell, wind, neighbor_getter, neighbor_setter),
-            Species::Gas => update_gas(self, cell, wind, neighbor_getter, neighbor_setter),
-            Species::Clone => update_clone(self, cell, wind, neighbor_getter, neighbor_setter),
-            Species::Fire => update_fire(self, cell, wind, neighbor_getter, neighbor_setter),
-            Species::Wood => update_wood(self, cell, wind, neighbor_getter, neighbor_setter),
-            Species::Lava => update_lava(self, cell, wind, neighbor_getter, neighbor_setter),
-            Species::Ice => update_ice(self, cell, wind, neighbor_getter, neighbor_setter),
-            Species::Sink => update_sink(self, cell, wind, neighbor_getter, neighbor_setter),
-            Species::Plant => update_plant(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Powder => update_powder(self, cell, neighbor_getter, neighbor_setter),
+            Species::Water => update_water(self, cell, neighbor_getter, neighbor_setter),
+            Species::Gas => update_gas(self, cell, neighbor_getter, neighbor_setter),
+            Species::Clone => update_clone(self, cell, neighbor_getter, neighbor_setter),
+            Species::Fire => update_fire(self, cell, neighbor_getter, neighbor_setter),
+            Species::Wood => update_wood(self, cell, neighbor_getter, neighbor_setter),
+            Species::Lava => update_lava(self, cell, neighbor_getter, neighbor_setter),
+            Species::Ice => update_ice(self, cell, neighbor_getter, neighbor_setter),
+            Species::Sink => update_sink(self, cell, neighbor_getter, neighbor_setter),
+            Species::Plant => update_plant(self, cell, neighbor_getter, neighbor_setter),
         }
     }
 }

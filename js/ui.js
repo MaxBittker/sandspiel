@@ -2,10 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import { Species } from "../crate/pkg";
+import { ratio } from "./constants";
 
 import { height, renderLoop, universe, width } from "./index.js";
-
-let ratio = 4;
 let screen_width = window.innerWidth / ratio;
 let screen_height = window.innerHeight / ratio;
 let pixels = screen_width * screen_height;

@@ -23,10 +23,10 @@
 import * as dat from "dat.gui";
 import { memory } from "../crate/pkg/sandtable_bg";
 import { compileShaders } from "./fluidShaders";
+import { ratio } from "./constants";
 const canvas = document.getElementById("fluid-canvas");
 const sandCanvas = document.getElementById("sand-canvas");
 
-let ratio = 4;
 function startFluid({ universe }) {
   canvas.width = universe.width();
   canvas.height = universe.height();
@@ -528,7 +528,7 @@ function startFluid({ universe }) {
     gl.uniform1i(gradienSubtractProgram.uniforms.uVelocity, velocity.read[2]);
     blit(velocity.write[1]);
 
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.FLOAT, winds);
+    gl.readPixels(0, 0, width, height, ext.formatRGBA.format, gl.FLOAT, winds);
     velocity.swap();
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);

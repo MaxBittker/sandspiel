@@ -3,8 +3,8 @@ import { Cell, Species, Universe } from "../crate/pkg";
 import { startWebGL } from "./render";
 import { fps } from "./ui";
 import { startFluid } from "./fluid";
+import { ratio } from "./constants";
 
-let ratio = 4;
 let screen_width = window.innerWidth / ratio;
 let screen_height = window.innerHeight / ratio;
 // let pixels = screen_width * screen_height;

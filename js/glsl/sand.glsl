@@ -68,6 +68,6 @@ void main() {
 
   gl_FragColor = vec4(color, 1.0);
   if (color == vec3(0)) {
-    gl_FragColor.a = 0.8;
+    gl_FragColor.a = 0.5;
   }
 }
