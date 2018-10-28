@@ -4,7 +4,7 @@ import { startWebGL } from "./render";
 import { fps } from "./ui";
 import { startFluid } from "./fluid";
 
-let ratio = 2;
+let ratio = 4;
 let screen_width = window.innerWidth / ratio;
 let screen_height = window.innerHeight / ratio;
 // let pixels = screen_width * screen_height;

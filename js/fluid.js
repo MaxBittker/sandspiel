@@ -26,6 +26,7 @@ import { compileShaders } from "./fluidShaders";
 const canvas = document.getElementById("fluid-canvas");
 const sandCanvas = document.getElementById("sand-canvas");
 
+let ratio = 4;
 function startFluid({ universe }) {
   canvas.width = universe.width();
   canvas.height = universe.height();
@@ -410,6 +411,12 @@ function startFluid({ universe }) {
 
   let lastTime = Date.now();
   multipleSplats(parseInt(Math.random() * 20) + 5);
+
+  let windsPtr = universe.winds();
+  const width = universe.width();
+  const height = universe.height();
+  const winds = new Float32Array(memory.buffer, windsPtr, width * height * 4);
+
   update();
 
   function update() {
@@ -449,7 +456,7 @@ function startFluid({ universe }) {
 
     for (let i = 0; i < pointers.length; i++) {
       const pointer = pointers[i];
-      if (pointer.moved) {
+      if (pointer.moved && window.UI.state.selectedElement < 0) {
         splat(pointer.x, pointer.y, pointer.dx, pointer.dy, pointer.color);
         pointer.moved = false;
       }
@@ -520,6 +527,8 @@ function startFluid({ universe }) {
     gl.uniform1i(gradienSubtractProgram.uniforms.uPressure, pressure.read[2]);
     gl.uniform1i(gradienSubtractProgram.uniforms.uVelocity, velocity.read[2]);
     blit(velocity.write[1]);
+
+    gl.readPixels(0, 0, width, height, gl.RGBA, gl.FLOAT, winds);
     velocity.swap();
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -530,27 +539,6 @@ function startFluid({ universe }) {
     // gl.copyTexImage2D(winds)
     blit(null);
 
-    let windsPtr = universe.winds();
-    const width = universe.width();
-    const height = universe.height();
-    const winds = new Uint8Array(memory.buffer, windsPtr, width * height * 4);
-    // winds[0] = 100;
-    // const abv = new Uint8Array(width * height * 4);
-    // console.log(ext);
-    // console.log(gl.checkFramebufferStatus(gl.FRAMEBUFFER));
-    gl.readPixels(
-      0,
-      0,
-      width,
-      height,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE, // ext.formatRGBA.format,
-      // ext.halfFloatTexType,
-      winds
-    );
-    // debugger;
-    // console.log(abv);
-    // abv[100] && console.log(abv[100]);
     requestAnimationFrame(update);
   }
 
@@ -567,7 +555,10 @@ function startFluid({ universe }) {
       1.0 - y / canvas.height
     );
     gl.uniform3f(splatProgram.uniforms.color, dx, -dy, 1.0);
-    gl.uniform1f(splatProgram.uniforms.radius, config.SPLAT_RADIUS);
+    gl.uniform1f(
+      splatProgram.uniforms.radius,
+      (window.UI.state.size + 1) / 700
+    );
     blit(velocity.write[1]);
     velocity.swap();
 
@@ -584,11 +575,7 @@ function startFluid({ universe }) {
 
   function multipleSplats(amount) {
     for (let i = 0; i < amount; i++) {
-      const color = [
-        Math.random() * 10,
-        Math.random() * 10,
-        Math.random() * 10
-      ];
+      const color = [1, 1, 1];
       const x = canvas.width * Math.random();
       const y = canvas.height * Math.random();
       const dx = 1000 * (Math.random() - 0.5);
@@ -610,10 +597,10 @@ function startFluid({ universe }) {
 
   sandCanvas.addEventListener("mousemove", e => {
     pointers[0].moved = pointers[0].down;
-    pointers[0].dx = (e.offsetX / 2 - pointers[0].x) * 10.0;
-    pointers[0].dy = (e.offsetY / 2 - pointers[0].y) * 10.0;
-    pointers[0].x = e.offsetX / 2;
-    pointers[0].y = e.offsetY / 2;
+    pointers[0].dx = (e.offsetX / ratio - pointers[0].x) * 10.0;
+    pointers[0].dy = (e.offsetY / ratio - pointers[0].y) * 10.0;
+    pointers[0].x = e.offsetX / ratio;
+    pointers[0].y = e.offsetY / ratio;
   });
 
   sandCanvas.addEventListener(
@@ -624,10 +611,10 @@ function startFluid({ universe }) {
       for (let i = 0; i < touches.length; i++) {
         let pointer = pointers[i];
         pointer.moved = pointer.down;
-        pointer.dx = (touches[i].pageX / 2 - pointer.x) * 10.0;
-        pointer.dy = (touches[i].pageY / 2 - pointer.y) * 10.0;
-        pointer.x = touches[i].pageX / 2;
-        pointer.y = touches[i].pageY / 2;
+        pointer.dx = (touches[i].pageX / ratio - pointer.x) * 10.0;
+        pointer.dy = (touches[i].pageY / ratio - pointer.y) * 10.0;
+        pointer.x = touches[i].pageX / ratio;
+        pointer.y = touches[i].pageY / ratio;
       }
     },
     false
@@ -635,11 +622,7 @@ function startFluid({ universe }) {
 
   sandCanvas.addEventListener("mousedown", () => {
     pointers[0].down = true;
-    pointers[0].color = [
-      Math.random() + 0.2,
-      Math.random() + 0.2,
-      Math.random() + 0.2
-    ];
+    pointers[0].color = [1.0, 1.0, 1.0];
   });
 
   sandCanvas.addEventListener("touchstart", e => {
@@ -650,13 +633,9 @@ function startFluid({ universe }) {
 
       pointers[i].id = touches[i].identifier;
       pointers[i].down = true;
-      pointers[i].x = touches[i].pageX / 2;
-      pointers[i].y = touches[i].pageY / 2;
-      pointers[i].color = [
-        Math.random() + 0.2,
-        Math.random() + 0.2,
-        Math.random() + 0.2
-      ];
+      pointers[i].x = touches[i].pageX / ratio;
+      pointers[i].y = touches[i].pageY / ratio;
+      pointers[i].color = [1.0, 1.0, 1.0];
     }
   });
 

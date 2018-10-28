@@ -31,12 +31,12 @@ pub enum Species {
 
 #[wasm_bindgen]
 #[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Wind {
-    dx: i8,
-    dy: i8,
-    g: i8,
-    a: i8,
+    dx: f32,
+    dy: f32,
+    g: f32,
+    a: f32,
 }
 
 #[wasm_bindgen]
@@ -527,23 +527,38 @@ pub struct Universe {
 
 #[wasm_bindgen]
 impl Universe {
+    pub fn reset(&mut self) {
+        for x in 0..self.width {
+            for y in 0..self.height {
+                let idx = self.get_index(x, y);
+                self.cells[idx] = EMPTY_CELL;
+            }
+        }
+    }
     pub fn tick(&mut self) {
         // let mut next = self.cells.clone();
-        // let dx = (self.winds[(self.width * self.height / 2) as usize].dx as u8) + 128;
-        // let js: JsValue = (dx as i8).into();
+        // let dx = self.winds[(self.width * self.height / 2) as usize].dx;
+        // let js: JsValue = (dx).into();
         // console::log_2(&"dx: ".into(), &js);
 
         for x in 0..self.width {
             for y in 0..self.height {
                 let cell = self.get_cell(x, y);
                 let wind = self.get_wind(x, y);
-                // let idx = self.get_index(x, y);
-                // self.cells[idx] = Cell {
-                // species: Species::Fire,
-                // ra: (self.winds[idx].dx / 2) as u8,
-                // rb: 0,
-                // clock: 0,
-                // }
+                self.blow_wind(
+                    cell,
+                    wind,
+                    Universe::get_neighbor_getter(x, y),
+                    Universe::get_neighbor_setter(x, y),
+                )
+            }
+        }
+        self.generation = self.generation.wrapping_add(1);
+
+        for x in 0..self.width {
+            for y in 0..self.height {
+                let cell = self.get_cell(x, y);
+                let wind = self.get_wind(x, y);
                 self.update_cell(
                     cell,
                     wind,
@@ -567,9 +582,11 @@ impl Universe {
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
+
     pub fn winds(&self) -> *const Wind {
         self.winds.as_ptr()
     }
+
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let radius = size / 2;
         for dx in -radius..radius + 1 {
@@ -596,6 +613,7 @@ impl Universe {
             }
         }
     }
+
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {
@@ -613,10 +631,10 @@ impl Universe {
             .collect();
         let winds = (0..width * height)
             .map(|_i| Wind {
-                dx: 0,
-                dy: 0,
-                g: 0,
-                a: 0,
+                dx: 0.,
+                dy: 0.,
+                g: 0.,
+                a: 0.,
             })
             .collect();
         Universe {
@@ -627,11 +645,6 @@ impl Universe {
             generation: 0,
         }
     }
-
-    // pub fn toggle_cell(&mut self, x: i32, y: i32) {
-    //     let idx = self.get_index(x, y);
-    //     // self.cells[idx].toggle();
-    // }
 }
 
 //private methods
@@ -685,7 +698,38 @@ impl Universe {
             u.cells[i].clock = u.generation.wrapping_add(1);
         };
     }
-
+    fn blow_wind(
+        &mut self,
+        cell: Cell,
+        wind: Wind,
+        neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+        neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+    ) {
+        if cell.clock - self.generation == 1 {
+            return;
+        }
+        let mut dx = 0;
+        let mut dy = 0;
+        if wind.dx > 50.0 {
+            dx = 1;
+        }
+        if wind.dy > 50.0 {
+            dy = -1;
+        }
+        if wind.dx < -50.0 {
+            dx = -1;
+        }
+        if wind.dy < -50.0 {
+            dy = 1;
+        }
+        if neighbor_getter(self, dx, dy).species == Species::Empty {
+            neighbor_setter(self, 0, 0, EMPTY_CELL);
+            neighbor_setter(self, dx, dy, cell);
+            return;
+        } else {
+            // neighbor_setter(self, 0, 0, cell);
+        }
+    }
     fn update_cell(
         &mut self,
         cell: Cell,
@@ -696,27 +740,7 @@ impl Universe {
         if cell.clock - self.generation == 1 {
             return;
         }
-        // let mut dx = 0;
-        // let mut dy = 0;
-        // if wind.dx + 127 > 20 {
-        //     dx = 1;
-        // }
-        // if wind.dy + 127 > 20 {
-        //     dy = -1;
-        // }
-        // if wind.dx + 127 < -20 {
-        //     dx = -1;
-        // }
-        // if wind.dy + 127 < -20 {
-        //     dy = 1;
-        // }
-        // if neighbor_getter(self, dx, dy).species == Species::Empty {
-        //     neighbor_setter(self, 0, 0, EMPTY_CELL);
-        //     neighbor_setter(self, dx, dy, cell);
-        //     return;
-        // } else {
-        //     // neighbor_setter(self, 0, 0, cell);
-        // }
+
         match cell.species {
             Species::Empty => {}
             Species::Wall => {}

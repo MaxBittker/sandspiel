@@ -5,7 +5,7 @@ import { Species } from "../crate/pkg";
 
 import { height, renderLoop, universe, width } from "./index.js";
 
-let ratio = 2;
+let ratio = 4;
 let screen_width = window.innerWidth / ratio;
 let screen_height = window.innerHeight / ratio;
 let pixels = screen_width * screen_height;
@@ -110,6 +110,7 @@ const paint = event => {
 
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
+  if (window.UI.state.selectedElement < 0) return;
   universe.paint(
     x,
     y,
@@ -159,14 +160,18 @@ class Index extends React.Component {
       size: (this.state.size + d + sizeMap.length) % sizeMap.length
     });
   }
+  reset() {
+    universe.reset();
+  }
   render() {
     let { size, paused, selectedElement } = this.state;
     return (
       <div>
+        <button onClick={() => this.reset()}>Reset</button>
         <button onClick={() => this.playPause()}>
           {paused ? "\u25B6\uFE0E" : "⏸\uFE0E"}
         </button>
-        {paused && <button onClick={() => universe.tick()}>tick</button>}
+        {paused && <button onClick={() => universe.tick()}>Tick</button>}
         <button
           style={{ minWidth: "80px" }}
           onClick={e => this.bumpSize(e, 1)}
@@ -180,6 +185,15 @@ class Index extends React.Component {
             this.setState({ selectedElement: id })
           )
         )}
+        <button
+          className={-1 == selectedElement ? "selected" : ""}
+          key={name}
+          onClick={() => {
+            this.setState({ selectedElement: -1 });
+          }}
+        >
+          Wind
+        </button>
       </div>
     );
   }
