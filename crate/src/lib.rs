@@ -409,12 +409,35 @@ pub fn update_plant(
             0,
             0,
             Cell {
-                species: Species::Wood,
+                species: Species::Plant,
                 ra: cell.ra,
-                rb: 10,
+                rb: 20,
                 clock: 0,
             },
         );
+    }
+    if nbr_species == Species::Wood {
+        i = (js_sys::Math::random() * 100.0) as i32;
+        let dx = (i % 3) - 1;
+        i = (js_sys::Math::random() * 100.0) as i32;
+        let dy = (i % 3) - 1;
+        i = (js_sys::Math::random() * 100.0) as i32;
+
+        let drift = (i % 15) - 7;
+        let newra = (cell.ra as i32 + drift) as u8;
+        if neighbor_getter(u, dx, dy).species == Species::Empty {
+            neighbor_setter(
+                u,
+                dx,
+                dy,
+                Cell {
+                    species: Species::Plant,
+                    ra: newra,
+                    rb: 0,
+                    clock: 0,
+                },
+            );
+        }
     }
     if nbr_species == Species::Water && neighbor_getter(u, -dx, dy).species == Species::Empty
         || neighbor_getter(u, -dx, dy).species == Species::Water
