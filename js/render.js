@@ -1,7 +1,7 @@
 const reglBuilder = require("regl");
 import { memory } from "../crate/pkg/sandtable_bg";
 
-let fsh = require("./fragment.glsl");
+let fsh = require("./glsl/sand.glsl");
 
 let startWebGL = ({ canvas, universe }) => {
   const regl = reglBuilder({ canvas });
