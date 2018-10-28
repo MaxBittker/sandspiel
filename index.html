@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
 
 <head>
   <meta charset="utf-8">
@@ -24,9 +24,11 @@
     canvas {
       position: absolute;
       bottom: 0;
+      top: 0;
       right: 0px;
       left: 0px;
       z-index: 1;
+      height: 100%;
       width: calc(100% - 0px);
       image-rendering: -moz-crisp-edges;
       image-rendering: -webkit-optimize-contrast;
@@ -35,8 +37,12 @@
 
     }
 
-    button {
+    #sand-canvas {
       z-index: 2;
+    }
+
+    button {
+      z-index: 3;
       position: relative;
       height: 30px;
       min-width: 30px;
@@ -60,7 +66,7 @@
     #fps {
       pointer-events: none;
 
-      z-index: 2;
+      z-index: 3;
       position: absolute;
       right: 0;
       bottom: 0;
@@ -76,6 +82,10 @@
     #controls {
       display: flex;
     }
+
+    .dg {
+      /* z-index: 5 !important; */
+    }
   </style>
 
 </head>
@@ -86,7 +96,8 @@
   </div>
   <div id="fps"></div>
 
-  <canvas id="game-of-life-canvas"></canvas>
+  <canvas id="sand-canvas"></canvas>
+  <canvas id="fluid-canvas"></canvas>
 
 <script type="text/javascript" src="bundle.js"></script></body>
 
