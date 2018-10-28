@@ -599,11 +599,11 @@ impl Universe {
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {
-                if js_sys::Math::random() < 0.9 || i < width * height / 2 {
+                if js_sys::Math::random() < 0.9 || i < width * height / 3 {
                     EMPTY_CELL
                 } else {
                     Cell {
-                        species: Species::Gas,
+                        species: Species::Powder,
                         ra: 50 + (i % 200) as u8,
                         rb: 100,
                         clock: 0,
