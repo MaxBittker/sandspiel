@@ -16,3 +16,6 @@ npm run start
 ```
 
 a successor to my previous efforts in [javascript](https://github.com/MaxBittker/dust) and [lua](https://github.com/MaxBittker/sand-toy)
+
+Fluid simulation code adopted from
+https://github.com/PavelDoGreat/WebGL-Fluid-Simulation

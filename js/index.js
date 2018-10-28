@@ -2,6 +2,7 @@ import { Cell, Species, Universe } from "../crate/pkg";
 
 import { startWebGL } from "./render";
 import { fps } from "./ui";
+import { startFluid } from "./fluid";
 
 let ratio = 2;
 let screen_width = window.innerWidth / ratio;
@@ -14,7 +15,7 @@ const universe = Universe.new(screen_width, screen_height);
 const width = universe.width();
 const height = universe.height();
 
-const canvas = document.getElementById("game-of-life-canvas");
+const canvas = document.getElementById("sand-canvas");
 canvas.height = height;
 canvas.width = width;
 
@@ -25,5 +26,6 @@ const renderLoop = () => {
 };
 
 startWebGL({ canvas, universe });
+startFluid({ universe });
 renderLoop();
 export { renderLoop, canvas, width, height, universe, ratio };

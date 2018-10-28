@@ -10,7 +10,7 @@ let screen_width = window.innerWidth / ratio;
 let screen_height = window.innerHeight / ratio;
 let pixels = screen_width * screen_height;
 
-const canvas = document.getElementById("game-of-life-canvas");
+const canvas = document.getElementById("sand-canvas");
 
 const eventDistance = (a, b) => {
   return Math.sqrt(

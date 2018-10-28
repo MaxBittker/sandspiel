@@ -60,8 +60,14 @@ void main() {
     hue = 0.9;
     saturation = 0.4;
     lightness = 1.0;
+  } else if (type == 11.) { // plant
+    hue = 0.4;
+    saturation = 0.4;
   }
   color = hsv2rgb(vec3(hue, saturation, lightness));
 
   gl_FragColor = vec4(color, 1.0);
+  if (color == vec3(0)) {
+    gl_FragColor.a = 0.8;
+  }
 }

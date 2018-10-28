@@ -2,12 +2,14 @@ extern crate cfg_if;
 extern crate js_sys;
 extern crate wasm_bindgen;
 extern crate wbg_rand;
+extern crate web_sys;
 
 // mod species;
 mod utils;
 
 use wasm_bindgen::__rt::core::intrinsics::transmute;
 use wasm_bindgen::prelude::*;
+use web_sys::console;
 
 #[wasm_bindgen]
 #[repr(u8)]
@@ -24,11 +26,19 @@ pub enum Species {
     Lava = 8,
     Ice = 9,
     Sink = 10,
+    Plant = 11,
 }
 
-// type      ra        rb
-// 0000.0000|0000.0000|0000.0000
-// 24
+#[wasm_bindgen]
+#[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Wind {
+    dx: i8,
+    dy: i8,
+    g: i8,
+    a: i8,
+}
+
 #[wasm_bindgen]
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -49,6 +59,7 @@ static EMPTY_CELL: Cell = Cell {
 pub fn update_powder(
     u: &mut Universe,
     cell: Cell,
+    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -73,6 +84,7 @@ pub fn update_powder(
 pub fn update_water(
     u: &mut Universe,
     cell: Cell,
+    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -97,14 +109,26 @@ pub fn update_water(
 pub fn update_gas(
     u: &mut Universe,
     cell: Cell,
+    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
     let mut i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
+    let mut dx = (i % 3) - 1;
     i = (js_sys::Math::random() * 100.0) as i32;
-    let dy = (i % 3) - 1;
-
+    let mut dy = (i % 3) - 1;
+    // if wind.dx + 128 > 20 {
+    //     dx = 1;
+    // }
+    // if wind.dy + 128 > 20 {
+    //     dy = -1;
+    // }
+    // if wind.dx + 128 < -20 {
+    //     dx = -1;
+    // }
+    // if wind.dy + 128 < -20 {
+    //     dy = 1;
+    // }
     if neighbor_getter(u, dx, dy).species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         neighbor_setter(u, dx, dy, cell);
@@ -115,6 +139,7 @@ pub fn update_gas(
 pub fn update_clone(
     u: &mut Universe,
     cell: Cell,
+    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -162,12 +187,13 @@ pub fn update_clone(
 pub fn update_fire(
     u: &mut Universe,
     cell: Cell,
+    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
     let ra = cell.ra;
     let mut degraded = cell.clone();
-    degraded.ra = ra - 1;
+    degraded.ra = ra - 2;
 
     let mut i = (js_sys::Math::random() * 100.0) as i32;
     let dx = (i % 3) - 1;
@@ -198,6 +224,7 @@ pub fn update_fire(
 pub fn update_lava(
     u: &mut Universe,
     cell: Cell,
+    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -246,6 +273,7 @@ pub fn update_lava(
 pub fn update_wood(
     u: &mut Universe,
     cell: Cell,
+    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -325,6 +353,7 @@ pub fn update_wood(
 pub fn update_ice(
     u: &mut Universe,
     cell: Cell,
+    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -345,7 +374,7 @@ pub fn update_ice(
                 clock: 0,
             },
         );
-    } else if (nbr_species == Species::Water && i < 10) {
+    } else if nbr_species == Species::Water && i < 10 {
         neighbor_setter(
             u,
             dx,
@@ -360,9 +389,119 @@ pub fn update_ice(
     }
 }
 
+pub fn update_plant(
+    u: &mut Universe,
+    cell: Cell,
+    wind: Wind,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let rb = cell.rb;
+
+    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let dx = (i % 3) - 1;
+    i = (js_sys::Math::random() * 100.0) as i32;
+    let dy = (i % 3) - 1;
+    let nbr_species = neighbor_getter(u, dx, dy).species;
+    if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
+        neighbor_setter(
+            u,
+            0,
+            0,
+            Cell {
+                species: Species::Wood,
+                ra: cell.ra,
+                rb: 10,
+                clock: 0,
+            },
+        );
+    }
+    if nbr_species == Species::Water && neighbor_getter(u, -dx, dy).species == Species::Empty
+        || neighbor_getter(u, -dx, dy).species == Species::Water
+    {
+        i = (js_sys::Math::random() * 100.0) as i32;
+        let drift = (i % 15) - 7;
+        let newra = (cell.ra as i32 + drift) as u8;
+        neighbor_setter(
+            u,
+            dx,
+            dy,
+            Cell {
+                species: Species::Plant,
+                ra: newra,
+                rb: 0,
+                clock: 0,
+            },
+        );
+        neighbor_setter(
+            u,
+            -dx,
+            dy,
+            Cell {
+                species: Species::Empty,
+                ra: newra,
+                rb: 0,
+                clock: 0,
+            },
+        );
+    }
+
+    if rb > 1 {
+        neighbor_setter(
+            u,
+            0,
+            0,
+            Cell {
+                species: Species::Plant,
+                ra: cell.ra,
+                rb: rb - 1,
+                clock: 0,
+            },
+        );
+        if nbr_species == Species::Empty {
+            neighbor_setter(
+                u,
+                dx,
+                dy,
+                Cell {
+                    species: Species::Fire,
+                    ra: 50,
+                    rb: 0,
+                    clock: 0,
+                },
+            )
+        }
+        if nbr_species == Species::Water {
+            neighbor_setter(
+                u,
+                0,
+                0,
+                Cell {
+                    species: Species::Plant,
+                    ra: 50,
+                    rb: 0,
+                    clock: 0,
+                },
+            )
+        }
+    } else if rb == 1 {
+        neighbor_setter(
+            u,
+            0,
+            0,
+            Cell {
+                species: Species::Empty,
+                ra: cell.ra,
+                rb: 90,
+                clock: 0,
+            },
+        );
+    }
+}
 pub fn update_sink(
     u: &mut Universe,
     cell: Cell,
+    wind: Wind,
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
@@ -382,6 +521,7 @@ pub struct Universe {
     width: i32,
     height: i32,
     cells: Vec<Cell>,
+    winds: Vec<Wind>,
     generation: u8,
 }
 
@@ -389,12 +529,24 @@ pub struct Universe {
 impl Universe {
     pub fn tick(&mut self) {
         // let mut next = self.cells.clone();
+        // let dx = (self.winds[(self.width * self.height / 2) as usize].dx as u8) + 128;
+        // let js: JsValue = (dx as i8).into();
+        // console::log_2(&"dx: ".into(), &js);
 
         for x in 0..self.width {
             for y in 0..self.height {
                 let cell = self.get_cell(x, y);
+                let wind = self.get_wind(x, y);
+                // let idx = self.get_index(x, y);
+                // self.cells[idx] = Cell {
+                // species: Species::Fire,
+                // ra: (self.winds[idx].dx / 2) as u8,
+                // rb: 0,
+                // clock: 0,
+                // }
                 self.update_cell(
                     cell,
+                    wind,
                     Universe::get_neighbor_getter(x, y),
                     Universe::get_neighbor_setter(x, y),
                 )
@@ -415,6 +567,9 @@ impl Universe {
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
+    pub fn winds(&self) -> *const Wind {
+        self.winds.as_ptr()
+    }
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let radius = size / 2;
         for dx in -radius..radius + 1 {
@@ -433,7 +588,7 @@ impl Universe {
                 if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
                         species: species,
-                        ra: 50 + (dx * dy) as u8,
+                        ra: 80 + (js_sys::Math::random() * 80.) as u8,
                         rb: 0,
                         clock: self.generation,
                     }
@@ -448,7 +603,7 @@ impl Universe {
                     EMPTY_CELL
                 } else {
                     Cell {
-                        species: Species::Powder,
+                        species: Species::Gas,
                         ra: 50 + (i % 200) as u8,
                         rb: 100,
                         clock: 0,
@@ -456,11 +611,19 @@ impl Universe {
                 }
             })
             .collect();
-
+        let winds = (0..width * height)
+            .map(|_i| Wind {
+                dx: 0,
+                dy: 0,
+                g: 0,
+                a: 0,
+            })
+            .collect();
         Universe {
             width,
             height,
             cells,
+            winds,
             generation: 0,
         }
     }
@@ -482,6 +645,10 @@ impl Universe {
         return self.cells[i];
     }
 
+    fn get_wind(&self, x: i32, y: i32) -> Wind {
+        let i = self.get_index(x, (self.height - y) - 1);
+        return self.winds[i];
+    }
     fn get_neighbor_getter(x: i32, y: i32) -> impl Fn(&Universe, i32, i32) -> Cell {
         return move |u: &Universe, dx: i32, dy: i32| {
             if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
@@ -522,25 +689,47 @@ impl Universe {
     fn update_cell(
         &mut self,
         cell: Cell,
+        wind: Wind,
         neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
         neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
     ) {
         if cell.clock - self.generation == 1 {
             return;
-        };
-
+        }
+        // let mut dx = 0;
+        // let mut dy = 0;
+        // if wind.dx + 127 > 20 {
+        //     dx = 1;
+        // }
+        // if wind.dy + 127 > 20 {
+        //     dy = -1;
+        // }
+        // if wind.dx + 127 < -20 {
+        //     dx = -1;
+        // }
+        // if wind.dy + 127 < -20 {
+        //     dy = 1;
+        // }
+        // if neighbor_getter(self, dx, dy).species == Species::Empty {
+        //     neighbor_setter(self, 0, 0, EMPTY_CELL);
+        //     neighbor_setter(self, dx, dy, cell);
+        //     return;
+        // } else {
+        //     // neighbor_setter(self, 0, 0, cell);
+        // }
         match cell.species {
             Species::Empty => {}
             Species::Wall => {}
-            Species::Powder => update_powder(self, cell, neighbor_getter, neighbor_setter),
-            Species::Water => update_water(self, cell, neighbor_getter, neighbor_setter),
-            Species::Gas => update_gas(self, cell, neighbor_getter, neighbor_setter),
-            Species::Clone => update_clone(self, cell, neighbor_getter, neighbor_setter),
-            Species::Fire => update_fire(self, cell, neighbor_getter, neighbor_setter),
-            Species::Wood => update_wood(self, cell, neighbor_getter, neighbor_setter),
-            Species::Lava => update_lava(self, cell, neighbor_getter, neighbor_setter),
-            Species::Ice => update_ice(self, cell, neighbor_getter, neighbor_setter),
-            Species::Sink => update_sink(self, cell, neighbor_getter, neighbor_setter),
+            Species::Powder => update_powder(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Water => update_water(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Gas => update_gas(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Clone => update_clone(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Fire => update_fire(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Wood => update_wood(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Lava => update_lava(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Ice => update_ice(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Sink => update_sink(self, cell, wind, neighbor_getter, neighbor_setter),
+            Species::Plant => update_plant(self, cell, wind, neighbor_getter, neighbor_setter),
         }
     }
 }
