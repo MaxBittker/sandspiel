@@ -26,6 +26,7 @@ import { compileShaders } from "./fluidShaders";
 import { ratio } from "./constants";
 const canvas = document.getElementById("fluid-canvas");
 const sandCanvas = document.getElementById("sand-canvas");
+let fluidColor = [1, 1, 1];
 
 function startFluid({ universe }) {
   canvas.width = universe.width();
@@ -215,7 +216,7 @@ function startFluid({ universe }) {
     this.dy = 0;
     this.down = false;
     this.moved = false;
-    this.color = [30, 0, 300];
+    this.color = [30, 0, 30];
   }
 
   pointers.push(new pointerPrototype());
@@ -534,7 +535,6 @@ function startFluid({ universe }) {
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
     displayProgram.bind();
     gl.uniform1i(displayProgram.uniforms.uTexture, density.read[2]);
-    gl.uniform1i(displayProgram.uniforms.uVelocity, velocity.read[2]);
 
     // gl.copyTexImage2D(winds)
     blit(null);
@@ -563,19 +563,14 @@ function startFluid({ universe }) {
     velocity.swap();
 
     gl.uniform1i(splatProgram.uniforms.uTarget, density.read[2]);
-    gl.uniform3f(
-      splatProgram.uniforms.color,
-      color[0] * 0.3,
-      color[1] * 0.3,
-      color[2] * 0.3
-    );
+    gl.uniform3f(splatProgram.uniforms.color, color[0], color[1], color[2]);
     blit(density.write[1]);
     density.swap();
   }
 
   function multipleSplats(amount) {
     for (let i = 0; i < amount; i++) {
-      const color = [1, 1, 1];
+      const color = fluidColor;
       const x = canvas.width * Math.random();
       const y = canvas.height * Math.random();
       const dx = 1000 * (Math.random() - 0.5);
@@ -622,7 +617,7 @@ function startFluid({ universe }) {
 
   sandCanvas.addEventListener("mousedown", () => {
     pointers[0].down = true;
-    pointers[0].color = [1.0, 1.0, 1.0];
+    pointers[0].color = fluidColor;
   });
 
   sandCanvas.addEventListener("touchstart", e => {
@@ -635,7 +630,7 @@ function startFluid({ universe }) {
       pointers[i].down = true;
       pointers[i].x = touches[i].pageX / ratio;
       pointers[i].y = touches[i].pageY / ratio;
-      pointers[i].color = [1.0, 1.0, 1.0];
+      pointers[i].color = fluidColor;
     }
   });
 

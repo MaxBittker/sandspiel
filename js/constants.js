@@ -1,2 +1,2 @@
-let ratio = 2;
+let ratio = 4;
 export { ratio };

@@ -27,6 +27,7 @@ pub enum Species {
     Ice = 9,
     Sink = 10,
     Plant = 11,
+    Acid = 12,
 }
 
 #[wasm_bindgen]
@@ -529,6 +530,59 @@ pub fn update_sink(
     }
 }
 
+pub fn update_acid(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let i = (js_sys::Math::random() * 100.0) as i32;
+    let dx = (i % 3) - 1;
+
+    let ra = cell.ra;
+    let mut degraded = cell.clone();
+    degraded.ra = ra - 40;
+    // i = (js_sys::Math::random() * 100.0) as i32;
+    if degraded.ra < 40 {
+        degraded = EMPTY_CELL;
+    }
+    if neighbor_getter(u, 0, 1).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, 0, 1, cell);
+    } else if neighbor_getter(u, dx, 0).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, dx, 0, cell);
+    } else if neighbor_getter(u, -dx, 0).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, -dx, 0, cell);
+    } else {
+        if neighbor_getter(u, 0, 1).species != Species::Wall
+            && neighbor_getter(u, 0, 1).species != Species::Acid
+        {
+            neighbor_setter(u, 0, 0, EMPTY_CELL);
+            neighbor_setter(u, 0, 1, degraded);
+        } else if neighbor_getter(u, dx, 0).species != Species::Wall
+            && neighbor_getter(u, dx, 0).species != Species::Acid
+        {
+            neighbor_setter(u, 0, 0, EMPTY_CELL);
+            neighbor_setter(u, dx, 0, degraded);
+        } else if neighbor_getter(u, -dx, 0).species != Species::Wall
+            && neighbor_getter(u, -dx, 0).species != Species::Acid
+        {
+            neighbor_setter(u, 0, 0, EMPTY_CELL);
+            neighbor_setter(u, -dx, 0, degraded);
+        } else if neighbor_getter(u, 0, -1).species != Species::Wall
+            && neighbor_getter(u, 0, -1).species != Species::Acid
+            && neighbor_getter(u, 0, -1).species != Species::Empty
+        {
+            neighbor_setter(u, 0, 0, EMPTY_CELL);
+            neighbor_setter(u, 0, -1, degraded);
+        } else {
+            neighbor_setter(u, 0, 0, cell);
+        }
+    }
+}
+
 #[wasm_bindgen]
 pub struct Universe {
     width: i32,
@@ -764,6 +818,7 @@ impl Universe {
             Species::Ice => update_ice(self, cell, neighbor_getter, neighbor_setter),
             Species::Sink => update_sink(self, cell, neighbor_getter, neighbor_setter),
             Species::Plant => update_plant(self, cell, neighbor_getter, neighbor_setter),
+            Species::Acid => update_acid(self, cell, neighbor_getter, neighbor_setter),
         }
     }
 }
