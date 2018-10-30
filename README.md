@@ -1,4 +1,5 @@
 <meta charset="utf-8"/>
+
 # SandTable
 
 "Imagine the cool phenomenon when the wind blows the falling leaves. This game simulates the phenomenon with powder (dots)!" -DAN-BALL
@@ -6,7 +7,7 @@
 This is a [falling sand](https://en.wikipedia.org/wiki/Falling-sand_game) game built in rust (via wasm), webgl, and some JS glueing things together.
 
 The goal is to produce an cellular automata enviroment that's interesting to play with and supports the sharing and forking of fun creations with other players.
-Ultimately, i want the platform to support editing and uploading of your own elements via a programable cellular automata API.
+Ultimately, I want the platform to support editing and uploading of your own elements via a programable cellular automata API.
 
 ### 🛠️ Build:
 
