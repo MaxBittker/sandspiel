@@ -112,9 +112,9 @@ pub fn update_gas(
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
     let mut i = (js_sys::Math::random() * 100.0) as i32;
-    let mut dx = (i % 3) - 1;
+    let dx = (i % 3) - 1;
     i = (js_sys::Math::random() * 100.0) as i32;
-    let mut dy = (i % 3) - 1;
+    let dy = (i % 3) - 1;
     // if wind.dx + 128 > 20 {
     //     dx = 1;
     // }
