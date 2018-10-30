@@ -216,7 +216,7 @@ function startFluid({ universe }) {
     this.dy = 0;
     this.down = false;
     this.moved = false;
-    this.color = [30, 0, 30];
+    this.color = [30, 300, 30];
   }
 
   pointers.push(new pointerPrototype());

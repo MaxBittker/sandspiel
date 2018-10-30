@@ -687,7 +687,7 @@ impl Universe {
                 } else {
                     Cell {
                         species: Species::Powder,
-                        ra: 50 + (i % 200) as u8,
+                        ra: 80 + (js_sys::Math::random() * 80.) as u8,
                         rb: 100,
                         clock: 0,
                     }
