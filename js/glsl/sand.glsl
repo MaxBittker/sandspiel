@@ -67,9 +67,17 @@ void main() {
     hue = 0.4;
     saturation = 0.4;
   } else if (type == 12) { // acid
-    hue = 0.15;
-    saturation = 1.0;
+    hue = 0.18;
+    saturation = 0.9;
     lightness = 0.7 + data.g * 0.5;
+  } else if (type == 13) { // acid
+    hue = 0.9;
+    saturation = 0.1;
+    // lightness = 0.2 + data.g * 0.5;
+  } else if (type == 14) { // acid
+    hue = (data.g * 1.5) + t * .0005;
+    saturation = 0.5;
+    lightness = 0.8;
   }
   color = hsv2rgb(vec3(hue, saturation, lightness));
 

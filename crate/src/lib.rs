@@ -28,6 +28,8 @@ pub enum Species {
     Sink = 10,
     Plant = 11,
     Acid = 12,
+    Stone = 13,
+    Dust = 14,
 }
 
 #[wasm_bindgen]
@@ -70,12 +72,55 @@ pub fn update_powder(
     if nbr.species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         neighbor_setter(u, 0, 1, cell);
+    } else if neighbor_getter(u, dx, 1).species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, dx, 1, cell);
+    } else {
+        neighbor_setter(u, 0, 0, cell);
+    }
+}
+
+pub fn update_dust(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let i = (js_sys::Math::random() * 100.0) as i32;
+    let dx = (i % 3) - 1;
+
+    let nbr = neighbor_getter(u, 0, 1);
+    if nbr.species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, 0, 1, cell);
     } else if nbr.species == Species::Water {
         neighbor_setter(u, 0, 0, nbr);
         neighbor_setter(u, 0, 1, cell);
     } else if neighbor_getter(u, dx, 1).species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         neighbor_setter(u, dx, 1, cell);
+    } else {
+        neighbor_setter(u, 0, 0, cell);
+    }
+}
+
+pub fn update_stone(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let nbr = neighbor_getter(u, 0, 1);
+    let nbr_species = nbr.species;
+    if nbr_species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, 0, 1, cell);
+    } else if nbr_species == Species::Water
+        || nbr_species == Species::Lava
+        || nbr_species == Species::Gas
+    {
+        neighbor_setter(u, 0, 0, nbr);
+        neighbor_setter(u, 0, 1, cell);
     } else {
         neighbor_setter(u, 0, 0, cell);
     }
@@ -170,7 +215,9 @@ pub fn update_clone(
                         dy,
                         Cell {
                             species: clone_species,
-                            ra: 50,
+                            ra: 80
+                                + (js_sys::Math::random() * 30.) as u8
+                                + ((cell.clock % 127) as i8 - 60).abs() as u8,
                             rb: 0,
                             clock: 0,
                         },
@@ -195,7 +242,9 @@ pub fn update_fire(
     let dx = (i % 3) - 1;
     i = (js_sys::Math::random() * 100.0) as i32;
     let dy = (i % 3) - 1;
-    if neighbor_getter(u, dx, dy).species == Species::Gas {
+    if neighbor_getter(u, dx, dy).species == Species::Gas
+        || neighbor_getter(u, dx, dy).species == Species::Dust
+    {
         neighbor_setter(
             u,
             dx,
@@ -246,12 +295,13 @@ pub fn update_lava(
             0,
             0,
             Cell {
-                species: Species::Wall,
+                species: Species::Stone,
                 ra: (150 + (dx + dy) * 10) as u8,
                 rb: 0,
                 clock: 0,
             },
         );
+        neighbor_setter(u, dx, dy, EMPTY_CELL);
     } else if neighbor_getter(u, 0, 1).species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         neighbor_setter(u, 0, 1, cell);
@@ -541,9 +591,9 @@ pub fn update_acid(
 
     let ra = cell.ra;
     let mut degraded = cell.clone();
-    degraded.ra = ra - 40;
+    degraded.ra = ra - 50;
     // i = (js_sys::Math::random() * 100.0) as i32;
-    if degraded.ra < 40 {
+    if degraded.ra < 50 {
         degraded = EMPTY_CELL;
     }
     if neighbor_getter(u, 0, 1).species == Species::Empty {
@@ -670,7 +720,9 @@ impl Universe {
                 if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
                         species: species,
-                        ra: 80 + (js_sys::Math::random() * 80.) as u8,
+                        ra: 80
+                            + (js_sys::Math::random() * 30.) as u8
+                            + ((self.generation % 127) as i8 - 60).abs() as u8,
                         rb: 0,
                         clock: self.generation,
                     }
@@ -809,7 +861,9 @@ impl Universe {
             Species::Empty => {}
             Species::Wall => {}
             Species::Powder => update_powder(self, cell, neighbor_getter, neighbor_setter),
+            Species::Dust => update_dust(self, cell, neighbor_getter, neighbor_setter),
             Species::Water => update_water(self, cell, neighbor_getter, neighbor_setter),
+            Species::Stone => update_stone(self, cell, neighbor_getter, neighbor_setter),
             Species::Gas => update_gas(self, cell, neighbor_getter, neighbor_setter),
             Species::Clone => update_clone(self, cell, neighbor_getter, neighbor_setter),
             Species::Fire => update_fire(self, cell, neighbor_getter, neighbor_setter),
