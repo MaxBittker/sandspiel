@@ -101,8 +101,8 @@ const paint = event => {
   }
   const boundingRect = canvas.getBoundingClientRect();
 
-  const scaleX = canvas.width / boundingRect.width;
-  const scaleY = canvas.height / boundingRect.height;
+  const scaleX = canvas.width / window.devicePixelRatio / boundingRect.width;
+  const scaleY = canvas.height / window.devicePixelRatio / boundingRect.height;
 
   const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
   const canvasTop = (event.clientY - boundingRect.top) * scaleY;
@@ -116,7 +116,6 @@ const paint = event => {
     sizeMap[window.UI.state.size],
     window.UI.state.selectedElement
   );
-  // lastPaint = { x, y };
 };
 
 const ElementButton = (name, selectedElement, setElement) => {
@@ -212,10 +211,10 @@ class Index extends React.Component {
         >
           Wind
         </button>
-        <button disabled onClick={() => this.save()}>
+        {/* <button disabled onClick={() => this.save()}>
           Save
         </button>
-        <button onClick={() => this.load()}>Load</button>
+        <button onClick={() => this.load()}>Load</button> */}
       </div>
     );
   }

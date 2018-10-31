@@ -17,8 +17,8 @@ const width = universe.width();
 const height = universe.height();
 
 const canvas = document.getElementById("sand-canvas");
-canvas.height = height;
-canvas.width = width;
+canvas.height = height * window.devicePixelRatio;
+canvas.width = width * window.devicePixelRatio;
 
 let fluid_update = startFluid({ universe });
 
