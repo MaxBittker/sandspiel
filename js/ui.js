@@ -141,7 +141,7 @@ let sizeMap = [1, 3, 5, 8, 13, 21, 34, 55, 89];
 class Index extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { paused: false, size: 4, selectedElement: Species.Water };
+    this.state = { paused: false, size: 3, selectedElement: Species.Water };
   }
 
   playPause() {
@@ -172,12 +172,31 @@ class Index extends React.Component {
         </button>
         {paused && <button onClick={() => universe.tick()}>Tick</button>}
         <button
-          style={{ minWidth: "80px" }}
+          style={{
+            borderRightWidth: "0.5px",
+            marginRight: "-3px",
+            borderBottomLeftRadius: "10px"
+          }}
+          onClick={e => this.bumpSize(e, -1)}
+        >
+          -
+        </button>
+        <button
           onClick={e => this.bumpSize(e, 1)}
           onContextMenu={e => this.bumpSize(e, -1)}
+          title="brush size"
         >
-          Size:
           {size + 1}
+        </button>
+        <button
+          style={{
+            borderLeftWidth: "0.5px",
+            marginLeft: "-3px",
+            borderBottomRightRadius: "10px"
+          }}
+          onClick={e => this.bumpSize(e, 1)}
+        >
+          +
         </button>
         {Object.keys(Species).map(n =>
           ElementButton(n, selectedElement, id =>
@@ -193,6 +212,10 @@ class Index extends React.Component {
         >
           Wind
         </button>
+        <button disabled onClick={() => this.save()}>
+          Save
+        </button>
+        <button onClick={() => this.load()}>Load</button>
       </div>
     );
   }

@@ -3,9 +3,9 @@ precision mediump sampler2D;
 varying vec2 vUv;
 uniform sampler2D uTexture;
 void main() {
-  vec3 color = texture2D(uTexture, vUv).rgb;
-  color -= vec3(0.05);
-  // gl_FragColor = texture2D(uVelocity, vUv) / 255.;
-  // gl_FragColor.xy += vec2(0.5);
+  vec3 color = texture2D(uTexture, vUv).rgb * 0.5;
+  color = min(color, 0.9);
+  color = vec3(1.0) - color;
+  color *= vec3(0.95, 0.9, 0.9);
   gl_FragColor = vec4(color, 1.0);
 }

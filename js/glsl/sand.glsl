@@ -30,8 +30,8 @@ void main() {
   if (type == 0) {
     hue = 0.1;
     saturation = 0.1;
-    lightness = 1.0;
-    a = 0.2;
+    lightness = 0.1;
+    a = 0.1;
   } else if (type == 1) {
     hue = 0.1;
     saturation = 0.1;

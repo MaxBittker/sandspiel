@@ -75,6 +75,9 @@ pub fn update_powder(
     } else if neighbor_getter(u, dx, 1).species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         neighbor_setter(u, dx, 1, cell);
+    } else if nbr.species == Species::Water {
+        neighbor_setter(u, 0, 0, nbr);
+        neighbor_setter(u, 0, 1, cell);
     } else {
         neighbor_setter(u, 0, 0, cell);
     }
@@ -110,6 +113,12 @@ pub fn update_stone(
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
+    if neighbor_getter(u, -1, -1).species == Species::Stone
+        && neighbor_getter(u, 1, -1).species == Species::Stone
+    {
+        return;
+    }
+
     let nbr = neighbor_getter(u, 0, 1);
     let nbr_species = nbr.species;
     if nbr_species == Species::Empty {
@@ -276,7 +285,9 @@ pub fn update_lava(
     let dx = (i % 3) - 1;
     i = (js_sys::Math::random() * 100.0) as i32;
     let dy = (i % 3) - 1;
-    if neighbor_getter(u, dx, dy).species == Species::Gas {
+    if neighbor_getter(u, dx, dy).species == Species::Gas
+        || neighbor_getter(u, dx, dy).species == Species::Dust
+    {
         neighbor_setter(
             u,
             dx,

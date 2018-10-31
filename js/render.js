@@ -2,6 +2,7 @@ const reglBuilder = require("regl");
 import { memory } from "../crate/pkg/sandtable_bg";
 
 let fsh = require("./glsl/sand.glsl");
+let vsh = require("./glsl/sandVertex.glsl");
 
 let startWebGL = ({ canvas, universe }) => {
   const regl = reglBuilder({ canvas });
@@ -24,15 +25,7 @@ let startWebGL = ({ canvas, universe }) => {
       backBuffer: lastFrame
     },
 
-    vert: `
-  // boring "pass-through" vertex shader
-  precision mediump float;
-  attribute vec2 position;
-  varying vec2 uv;
-  void main () {
-    uv = position;
-    gl_Position = vec4(position, 0, 1);
-  }`,
+    vert: vsh,
     attributes: {
       // Full screen triangle
       position: [[-1, 4], [-1, -1], [4, -1]]
@@ -42,7 +35,7 @@ let startWebGL = ({ canvas, universe }) => {
   });
 
   regl.frame(function(context) {
-    regl.clear({ color: [0, 0, 0, 1] });
+    regl.clear({ color: [0, 0, 0, 0] });
     drawTriangle();
     lastFrame({ copy: true });
   });

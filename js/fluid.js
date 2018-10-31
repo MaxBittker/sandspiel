@@ -86,7 +86,7 @@ function startFluid({ universe }) {
       supportLinearFiltering = gl.getExtension("OES_texture_half_float_linear");
     }
 
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    gl.clearColor(0.0, 0.0, 0.0, 0.0);
 
     const halfFloatTexType = isWebGL2
       ? gl.HALF_FLOAT
@@ -418,8 +418,6 @@ function startFluid({ universe }) {
   const height = universe.height();
   const winds = new Float32Array(memory.buffer, windsPtr, width * height * 4);
 
-  update();
-
   function update() {
     // resizeCanvas();
 
@@ -536,10 +534,7 @@ function startFluid({ universe }) {
     displayProgram.bind();
     gl.uniform1i(displayProgram.uniforms.uTexture, density.read[2]);
 
-    // gl.copyTexImage2D(winds)
     blit(null);
-
-    requestAnimationFrame(update);
   }
 
   function splat(x, y, dx, dy, color) {
@@ -644,6 +639,8 @@ function startFluid({ universe }) {
       for (let j = 0; j < pointers.length; j++)
         if (touches[i].identifier == pointers[j].id) pointers[j].down = false;
   });
+
+  return update;
 }
 
 export { startFluid };
