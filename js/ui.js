@@ -167,7 +167,7 @@ class Index extends React.Component {
       <div>
         <button onClick={() => this.reset()}>Reset</button>
         <button onClick={() => this.playPause()}>
-          {paused ? "\u25B6\uFE0E" : "⏸\uFE0E"}
+          {paused ? "\u25B6\uFE0E" : "\u23F8\uFE0E"}
         </button>
         {paused && <button onClick={() => universe.tick()}>Tick</button>}
         <button

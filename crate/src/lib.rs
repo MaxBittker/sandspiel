@@ -124,10 +124,7 @@ pub fn update_stone(
     if nbr_species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         neighbor_setter(u, 0, 1, cell);
-    } else if nbr_species == Species::Water
-        || nbr_species == Species::Lava
-        || nbr_species == Species::Gas
-    {
+    } else if nbr_species == Species::Water || nbr_species == Species::Gas {
         neighbor_setter(u, 0, 0, nbr);
         neighbor_setter(u, 0, 1, cell);
     } else {
