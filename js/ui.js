@@ -164,10 +164,25 @@ class Index extends React.Component {
   render() {
     let { size, paused, selectedElement } = this.state;
     return (
-      <div>
+      <React.Fragment>
         <button onClick={() => this.reset()}>Reset</button>
         <button onClick={() => this.playPause()}>
-          {paused ? "\u25B6\uFE0E" : "\u23F8\uFE0E"}
+          {paused ? (
+            "\u25B6\uFE0E"
+          ) : (
+            <svg height="10" width="10" id="d" viewBox="0 0 300 300">
+              <polygon
+                id="shape1"
+                points="0,0 110,0 110,300 0,300"
+                style={{ fill: "black" }}
+              />
+              <polygon
+                id="shape2"
+                points="190,0 300,0 300,300 190,300"
+                style={{ fill: "black" }}
+              />
+            </svg>
+          )}
         </button>
         {paused && <button onClick={() => universe.tick()}>Tick</button>}
         <button
@@ -215,7 +230,7 @@ class Index extends React.Component {
           Save
         </button>
         <button onClick={() => this.load()}>Load</button> */}
-      </div>
+      </React.Fragment>
     );
   }
 }

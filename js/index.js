@@ -4,9 +4,11 @@ import { startWebGL } from "./render";
 import { fps } from "./ui";
 import { startFluid } from "./fluid";
 import { ratio } from "./constants";
+const ui = document.getElementById("ui");
 
 let screen_width = window.innerWidth / ratio;
-let screen_height = window.innerHeight / ratio;
+let uiheight = ui.offsetHeight;
+let screen_height = (window.innerHeight - uiheight) / ratio;
 
 // let pixels = screen_width * screen_height;
 

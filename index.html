@@ -23,19 +23,19 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background-color: blanchedalmond;
+      background-color: #f3e7e6;
     }
 
     canvas {
       position: absolute;
       bottom: 0;
-      top: 0;
+      /* top: 0; */
       right: 0px;
       left: 0px;
       z-index: 1;
-      height: 100%;
+      /* height: 100%; */
       width: calc(100% - 0px);
-
+      /* border-top: 1px solid gainsboro; */
     }
 
     #sand-canvas {
@@ -56,12 +56,14 @@
       height: 30px;
       min-width: 30px;
       line-height: 20px;
-      background-color: black;
-      color: aliceblue;
+      background-color: aliceblue;
+      color: black;
       border: 2px solid aliceblue;
       border-color: gainsboro;
       /* margin-right: -3px; */
-      /* margin-bottom: -3px; */
+      margin-bottom: 1px;
+      flex-grow: 1;
+      max-width: 200px;
     }
 
     button:focus {
@@ -69,11 +71,16 @@
     }
 
     button.selected {
-      background-color: white;
-      color: black;
+      background-color: black;
+      color: aliceblue;
       border-color: whitesmoke;
     }
 
+    #ui {
+      background-color: rgba(00, 00, 00, 0.1);
+      display: flex;
+      flex-wrap: wrap;
+    }
 
     #fps {
       pointer-events: none;
@@ -96,6 +103,7 @@
     }
 
     .dg {
+      display: none;
       /* z-index: 5 !important; */
     }
   </style>

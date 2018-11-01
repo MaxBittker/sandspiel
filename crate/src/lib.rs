@@ -197,7 +197,10 @@ pub fn update_clone(
         for dy in [-1, 0, 1].iter().cloned() {
             if cell.rb == 0 {
                 let nbr_species = neighbor_getter(u, dx, dy).species;
-                if nbr_species != Species::Empty && nbr_species != Species::Clone {
+                if nbr_species != Species::Empty
+                    && nbr_species != Species::Clone
+                    && nbr_species != Species::Wall
+                {
                     clone_species = nbr_species;
                     neighbor_setter(
                         u,

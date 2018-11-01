@@ -26,6 +26,9 @@ import { compileShaders } from "./fluidShaders";
 import { ratio } from "./constants";
 const canvas = document.getElementById("fluid-canvas");
 const sandCanvas = document.getElementById("sand-canvas");
+
+const ui = document.getElementById("ui");
+let uiheight = ui.offsetHeight;
 let fluidColor = [1, 1, 1];
 
 function startFluid({ universe }) {
@@ -602,9 +605,9 @@ function startFluid({ universe }) {
         let pointer = pointers[i];
         pointer.moved = pointer.down;
         pointer.dx = (touches[i].pageX / ratio - pointer.x) * 10.0;
-        pointer.dy = (touches[i].pageY / ratio - pointer.y) * 10.0;
+        pointer.dy = ((touches[i].pageY - uiheight) / ratio - pointer.y) * 10.0;
         pointer.x = touches[i].pageX / ratio;
-        pointer.y = touches[i].pageY / ratio;
+        pointer.y = (touches[i].pageY - uiheight) / ratio;
       }
     },
     false
