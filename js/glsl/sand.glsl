@@ -43,8 +43,9 @@ void main() {
   } else if (type == 4) {
     hue = 0.5;
     saturation = 0.5;
-  } else if (type == 5) {
-    hue = 0.05;
+  } else if (type == 5) { // clone
+    hue = 0.9;
+    saturation = 0.3;
   } else if (type == 6) { // fire
     hue = (data.g * 0.1);
     lightness = 0.8 + data.g * 0.3;
@@ -77,6 +78,10 @@ void main() {
   } else if (type == 14) { // acid
     hue = (data.g * 1.5) + t * .0005;
     saturation = 0.5;
+    lightness = 0.8;
+  } else if (type == 15) { // mite
+    hue = 0.8;
+    saturation = 0.3;
     lightness = 0.8;
   }
   color = hsv2rgb(vec3(hue, saturation, lightness));

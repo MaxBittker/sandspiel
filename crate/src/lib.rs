@@ -30,6 +30,7 @@ pub enum Species {
     Acid = 12,
     Stone = 13,
     Dust = 14,
+    Mite = 15,
 }
 
 #[wasm_bindgen]
@@ -644,6 +645,74 @@ pub fn update_acid(
     }
 }
 
+pub fn update_mite(
+    u: &mut Universe,
+    cell: Cell,
+    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+) {
+    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let mut dx = 0;
+    if cell.ra < 20 {
+        dx = (cell.ra as i32) - 1;
+    }
+    let mut dy = 1;
+    let mut mite = cell.clone();
+
+    if cell.rb > 1 {
+        mite.rb = mite.rb.saturating_sub(1);
+        dy = -1;
+    }
+    let nbr = neighbor_getter(u, dx, dy);
+
+    let sx = (i % 3) - 1;
+    i = (js_sys::Math::random() * 100.0) as i32;
+    let sy = (i % 3) - 1;
+    let sample = neighbor_getter(u, sx, sy).species;
+    if sample == Species::Fire || sample == Species::Lava {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        return;
+    }
+    if (sample == Species::Plant || sample == Species::Wood) && i > 97 {
+        neighbor_setter(u, sx, sy, cell);
+    }
+    if sample == Species::Dust {
+        neighbor_setter(u, sx, sy, EMPTY_CELL);
+        mite.rb = (i % 50) as u8;
+    }
+    if nbr.species == Species::Empty {
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        neighbor_setter(u, dx, dy, mite);
+    } else if dy == 1 && i > 98 {
+        i = (js_sys::Math::random() * 100.0) as i32;
+        let mut ndx = (i % 3) - 1;
+        if i < 10 {
+            ndx = dx;
+        }
+
+        mite.ra = (1 + ndx) as u8;
+        mite.rb = (i % 10) as u8;
+
+        neighbor_setter(u, 0, 0, mite);
+    } else {
+        if neighbor_getter(u, -1, 0).species == Species::Mite
+            && neighbor_getter(u, 1, 0).species == Species::Mite
+            && neighbor_getter(u, 0, -1).species == Species::Mite
+        {
+            neighbor_setter(u, 0, 0, EMPTY_CELL);
+        } else {
+            if neighbor_getter(u, 0, 1).species == Species::Ice {
+                if neighbor_getter(u, dx, 0).species == Species::Empty {
+                    neighbor_setter(u, 0, 0, EMPTY_CELL);
+                    neighbor_setter(u, dx, 0, mite);
+                }
+            } else {
+                neighbor_setter(u, 0, 0, mite);
+            }
+        }
+    }
+}
+
 #[wasm_bindgen]
 pub struct Universe {
     width: i32,
@@ -751,7 +820,7 @@ impl Universe {
                     Cell {
                         species: Species::Powder,
                         ra: 80 + (js_sys::Math::random() * 80.) as u8,
-                        rb: 100,
+                        rb: 0,
                         clock: 0,
                     }
                 }
@@ -884,6 +953,7 @@ impl Universe {
             Species::Sink => update_sink(self, cell, neighbor_getter, neighbor_setter),
             Species::Plant => update_plant(self, cell, neighbor_getter, neighbor_setter),
             Species::Acid => update_acid(self, cell, neighbor_getter, neighbor_setter),
+            Species::Mite => update_mite(self, cell, neighbor_getter, neighbor_setter),
         }
     }
 }
