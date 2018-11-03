@@ -585,7 +585,6 @@ pub fn update_sink(
     let dx = (i % 3) - 1;
     i = (js_sys::Math::random() * 100.0) as i32;
     let dy = (i % 3) - 1;
-
     if neighbor_getter(u, dx, dy).species != Species::Empty {
         neighbor_setter(u, dx, dy, EMPTY_CELL);
         neighbor_setter(u, 0, 0, cell);
@@ -683,10 +682,10 @@ pub fn update_mite(
     if nbr.species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         neighbor_setter(u, dx, dy, mite);
-    } else if dy == 1 && i > 98 {
+    } else if dy == 1 && i > 80 {
         i = (js_sys::Math::random() * 100.0) as i32;
         let mut ndx = (i % 3) - 1;
-        if i < 10 {
+        if i < 6 {
             ndx = dx;
         }
 
@@ -786,7 +785,7 @@ impl Universe {
         let radius = size / 2;
         for dx in -radius..radius + 1 {
             for dy in -radius..radius + 1 {
-                if dx * dx + dy * dy > radius * radius {
+                if dx * dx + dy * dy > (radius * radius) - 1 {
                     continue;
                 };
                 let px = x + dx;
@@ -886,7 +885,7 @@ impl Universe {
             let nx = x + dx;
             let ny = y + dy;
 
-            if nx > u.width - 1 || ny > u.height - 1 {
+            if nx < 0 || nx > u.width - 1 || ny < 0 || ny > u.height - 1 {
                 return;
             }
             let i = u.get_index((nx) % u.width, (ny) % u.height);

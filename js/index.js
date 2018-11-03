@@ -4,12 +4,18 @@ import { startWebGL } from "./render";
 import { fps } from "./ui";
 import { startFluid } from "./fluid";
 import { ratio } from "./constants";
+if (window.safari) {
+  history.pushState(null, null, location.href);
+  window.onpopstate = function(event) {
+    history.go(1);
+  };
+}
+
 const ui = document.getElementById("ui");
 
 let screen_width = window.innerWidth / ratio;
 let uiheight = ui.offsetHeight;
 let screen_height = (window.innerHeight - uiheight) / ratio;
-
 // let pixels = screen_width * screen_height;
 
 // Construct the universe, and get its width and height.

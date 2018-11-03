@@ -135,7 +135,7 @@ const ElementButton = (name, selectedElement, setElement) => {
   );
 };
 
-let sizeMap = [1, 3, 5, 8, 13, 21, 34, 55, 89];
+let sizeMap = [2, 5, 7, 11, 15, 18, 25, 32, 45];
 
 class Index extends React.Component {
   constructor(props) {
