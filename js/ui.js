@@ -55,6 +55,26 @@ canvas.addEventListener("mouseup", event => {
 });
 canvas.addEventListener("mousemove", event => {
   clearInterval(repeat);
+  smoothPaint(event);
+});
+canvas.addEventListener("touchstart", event => {
+  event.preventDefault();
+  painting = true;
+  lastPaint = event;
+  handleTouches(event);
+});
+canvas.addEventListener("touchend", event => {
+  event.preventDefault();
+  lastPaint = null;
+  painting = false;
+  clearInterval(repeat);
+});
+canvas.addEventListener("touchmove", event => {
+  event.preventDefault();
+  clearInterval(repeat);
+  handleTouches(event);
+});
+function smoothPaint(event) {
   repeat = window.setInterval(() => paint(event), 100);
   let startEvent = { clientX: event.clientX, clientY: event.clientY };
   if (!painting) {
@@ -77,22 +97,15 @@ canvas.addEventListener("mousemove", event => {
   }
 
   lastPaint = event;
-});
+}
 
-canvas.addEventListener("touchstart", event => {
-  painting = true;
-  handleTouches(event);
-});
-canvas.addEventListener("touchend", event => {
-  lastPaint = null;
-  painting = false;
-});
-canvas.addEventListener("touchmove", event => {
-  handleTouches(event);
-});
 const handleTouches = event => {
-  event.preventDefault();
-  Array.from(event.touches).forEach(paint);
+  let touches = Array.from(event.touches);
+  if (touches.length == 1) {
+    smoothPaint(touches[0]);
+  } else {
+    touches.forEach(paint);
+  }
 };
 
 const paint = event => {

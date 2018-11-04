@@ -52,6 +52,33 @@ pub struct Cell {
     rb: u8,
     clock: u8,
 }
+impl Cell {
+    pub fn update(
+        &self,
+        u: &mut Universe,
+        neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
+        neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
+    ) {
+        match self.species {
+            Species::Empty => {}
+            Species::Wall => {}
+            Species::Powder => update_powder(u, *self, neighbor_getter, neighbor_setter),
+            Species::Dust => update_dust(u, *self, neighbor_getter, neighbor_setter),
+            Species::Water => update_water(u, *self, neighbor_getter, neighbor_setter),
+            Species::Stone => update_stone(u, *self, neighbor_getter, neighbor_setter),
+            Species::Gas => update_gas(u, *self, neighbor_getter, neighbor_setter),
+            Species::Clone => update_clone(u, *self, neighbor_getter, neighbor_setter),
+            Species::Fire => update_fire(u, *self, neighbor_getter, neighbor_setter),
+            Species::Wood => update_wood(u, *self, neighbor_getter, neighbor_setter),
+            Species::Lava => update_lava(u, *self, neighbor_getter, neighbor_setter),
+            Species::Ice => update_ice(u, *self, neighbor_getter, neighbor_setter),
+            Species::Sink => update_sink(u, *self, neighbor_getter, neighbor_setter),
+            Species::Plant => update_plant(u, *self, neighbor_getter, neighbor_setter),
+            Species::Acid => update_acid(u, *self, neighbor_getter, neighbor_setter),
+            Species::Mite => update_mite(u, *self, neighbor_getter, neighbor_setter),
+        }
+    }
+}
 
 static EMPTY_CELL: Cell = Cell {
     species: Species::Empty,
@@ -167,18 +194,7 @@ pub fn update_gas(
     let dx = (i % 3) - 1;
     i = (js_sys::Math::random() * 100.0) as i32;
     let dy = (i % 3) - 1;
-    // if wind.dx + 128 > 20 {
-    //     dx = 1;
-    // }
-    // if wind.dy + 128 > 20 {
-    //     dy = -1;
-    // }
-    // if wind.dx + 128 < -20 {
-    //     dx = -1;
-    // }
-    // if wind.dy + 128 < -20 {
-    //     dy = 1;
-    // }
+
     if neighbor_getter(u, dx, dy).species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         neighbor_setter(u, dx, dy, cell);
@@ -504,10 +520,9 @@ pub fn update_plant(
             dx,
             dy,
             Cell {
-                species: Species::Plant,
                 ra: newra,
                 rb: 0,
-                clock: 0,
+                ..cell
             },
         );
         neighbor_setter(
@@ -529,10 +544,9 @@ pub fn update_plant(
             0,
             0,
             Cell {
-                species: Species::Plant,
                 ra: cell.ra,
                 rb: rb - 1,
-                clock: 0,
+                ..cell
             },
         );
         if nbr_species == Species::Empty {
@@ -554,10 +568,9 @@ pub fn update_plant(
                 0,
                 0,
                 Cell {
-                    species: Species::Plant,
                     ra: 50,
                     rb: 0,
-                    clock: 0,
+                    ..cell
                 },
             )
         }
@@ -936,24 +949,26 @@ impl Universe {
             return;
         }
 
-        match cell.species {
-            Species::Empty => {}
-            Species::Wall => {}
-            Species::Powder => update_powder(self, cell, neighbor_getter, neighbor_setter),
-            Species::Dust => update_dust(self, cell, neighbor_getter, neighbor_setter),
-            Species::Water => update_water(self, cell, neighbor_getter, neighbor_setter),
-            Species::Stone => update_stone(self, cell, neighbor_getter, neighbor_setter),
-            Species::Gas => update_gas(self, cell, neighbor_getter, neighbor_setter),
-            Species::Clone => update_clone(self, cell, neighbor_getter, neighbor_setter),
-            Species::Fire => update_fire(self, cell, neighbor_getter, neighbor_setter),
-            Species::Wood => update_wood(self, cell, neighbor_getter, neighbor_setter),
-            Species::Lava => update_lava(self, cell, neighbor_getter, neighbor_setter),
-            Species::Ice => update_ice(self, cell, neighbor_getter, neighbor_setter),
-            Species::Sink => update_sink(self, cell, neighbor_getter, neighbor_setter),
-            Species::Plant => update_plant(self, cell, neighbor_getter, neighbor_setter),
-            Species::Acid => update_acid(self, cell, neighbor_getter, neighbor_setter),
-            Species::Mite => update_mite(self, cell, neighbor_getter, neighbor_setter),
-        }
+        cell.update(self, neighbor_getter, neighbor_setter);
+
+        // match cell.species {
+        //     Species::Empty => {}
+        //     Species::Wall => {}
+        //     Species::Powder => update_powder(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Dust => update_dust(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Water => update_water(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Stone => update_stone(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Gas => update_gas(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Clone => update_clone(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Fire => update_fire(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Wood => update_wood(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Lava => update_lava(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Ice => update_ice(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Sink => update_sink(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Plant => update_plant(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Acid => update_acid(self, cell, neighbor_getter, neighbor_setter),
+        //     Species::Mite => update_mite(self, cell, neighbor_getter, neighbor_setter),
+        // }
     }
 }
 
