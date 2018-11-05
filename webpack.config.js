@@ -8,7 +8,10 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 module.exports = {
   entry: "./js/bootstrap.js",
   output: { path: dist, filename: "bundle.js" },
-  devServer: { contentBase: dist },
+  devServer: {
+    contentBase: dist,
+    disableHostCheck: true
+  },
   mode: "development",
   plugins: [
     new WasmPackPlugin({ crateDirectory: path.resolve(__dirname, "crate") }),

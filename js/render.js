@@ -22,6 +22,7 @@ let startWebGL = ({ canvas, universe }) => {
         viewportWidth,
         viewportHeight
       ],
+      dpi: window.devicePixelRatio * 2,
       backBuffer: lastFrame
     },
 

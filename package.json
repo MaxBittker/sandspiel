@@ -6,7 +6,7 @@
   "scripts": {
     "build": "webpack --mode=production",
     "start": "webpack-dev-server -d",
-    "deploy": "webpack --mode=production && gh-pages -d dist"
+    "deploy": "gh-pages -d dist"
   },
   "repository": {
     "type": "git",
@@ -42,6 +42,7 @@
     "gh-pages": "^2.0.1",
     "glsl-hsv2rgb": "^1.0.0",
     "glsl-noise": "0.0.0",
+    "glsl-random": "0.0.5",
     "http-server": "^0.11.1",
     "react": "^16.6.0",
     "react-dom": "^16.6.0",

@@ -509,8 +509,9 @@ pub fn update_plant(
             );
         }
     }
-    if nbr_species == Species::Water && neighbor_getter(u, -dx, dy).species == Species::Empty
-        || neighbor_getter(u, -dx, dy).species == Species::Water
+    if nbr_species == Species::Water
+        && (neighbor_getter(u, -dx, dy).species == Species::Empty
+            || neighbor_getter(u, -dx, dy).species == Species::Water)
     {
         i = (js_sys::Math::random() * 100.0) as i32;
         let drift = (i % 15) - 7;
@@ -525,17 +526,7 @@ pub fn update_plant(
                 ..cell
             },
         );
-        neighbor_setter(
-            u,
-            -dx,
-            dy,
-            Cell {
-                species: Species::Empty,
-                ra: newra,
-                rb: 0,
-                clock: 0,
-            },
-        );
+        neighbor_setter(u, -dx, dy, EMPTY_CELL);
     }
 
     if rb > 1 {
@@ -575,17 +566,7 @@ pub fn update_plant(
             )
         }
     } else if rb == 1 {
-        neighbor_setter(
-            u,
-            0,
-            0,
-            Cell {
-                species: Species::Empty,
-                ra: cell.ra,
-                rb: 90,
-                clock: 0,
-            },
-        );
+        neighbor_setter(u, 0, 0, EMPTY_CELL);
     }
 }
 pub fn update_sink(
