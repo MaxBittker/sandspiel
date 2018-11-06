@@ -15,7 +15,7 @@ module.exports = {
   mode: "development",
   plugins: [
     new WasmPackPlugin({ crateDirectory: path.resolve(__dirname, "crate") }),
-    new CopyWebpackPlugin(["index.html"]),
+    new CopyWebpackPlugin(["index.html", "js/styles.css"]),
     new HtmlWebpackPlugin({ template: "index.html" })
   ],
   module: {

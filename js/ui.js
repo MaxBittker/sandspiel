@@ -57,6 +57,10 @@ canvas.addEventListener("mousemove", event => {
   clearInterval(repeat);
   smoothPaint(event);
 });
+canvas.addEventListener("mouseleave", event => {
+  clearInterval(repeat);
+  lastPaint = null;
+});
 canvas.addEventListener("touchstart", event => {
   event.preventDefault();
   painting = true;
@@ -83,17 +87,19 @@ function smoothPaint(event) {
   let size = sizeMap[window.UI.state.size];
   let i = 0;
   paint(startEvent);
-  while (eventDistance(startEvent, lastPaint) > size / 2) {
-    let d = eventDistance(startEvent, lastPaint);
-    startEvent = add(
-      startEvent,
-      scale(norm(sub(lastPaint, event)), Math.min(size / 2, d))
-    );
-    i++;
-    if (i > 1000) {
-      break;
+  if (lastPaint) {
+    while (eventDistance(startEvent, lastPaint) > size / 2) {
+      let d = eventDistance(startEvent, lastPaint);
+      startEvent = add(
+        startEvent,
+        scale(norm(sub(lastPaint, event)), Math.min(size / 2, d))
+      );
+      i++;
+      if (i > 1000) {
+        break;
+      }
+      paint(startEvent);
     }
-    paint(startEvent);
   }
 
   lastPaint = event;
@@ -212,6 +218,7 @@ class Index extends React.Component {
           onClick={e => this.bumpSize(e, 1)}
           onContextMenu={e => this.bumpSize(e, -1)}
           title="brush size"
+          style={{ minWidth: "5px" }}
         >
           {size + 1}
         </button>

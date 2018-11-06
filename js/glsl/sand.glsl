@@ -52,7 +52,7 @@ void main() {
     saturation = 0.3;
   } else if (type == 6) { // fire
     hue = (data.g * 0.1);
-    lightness = 0.8 + data.g * 0.3;
+    lightness = 0.8 + data.g * 0.3 + noise * 0.1;
   } else if (type == 7) { // wood
     hue = (data.g * 0.1);
     saturation = 0.3;

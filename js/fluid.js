@@ -588,12 +588,20 @@ function startFluid({ universe }) {
     }
   }
 
+  const boundingRect = sandCanvas.getBoundingClientRect();
+  const scaleX =
+    sandCanvas.width / window.devicePixelRatio / boundingRect.width;
+  const scaleY =
+    sandCanvas.height / window.devicePixelRatio / boundingRect.height;
+
   sandCanvas.addEventListener("mousemove", e => {
+    const canvasLeft = (e.clientX - boundingRect.left) * scaleX;
+    const canvasTop = (e.clientY - boundingRect.top) * scaleY;
     pointers[0].moved = pointers[0].down;
-    pointers[0].dx = (e.offsetX / ratio - pointers[0].x) * 10.0;
-    pointers[0].dy = (e.offsetY / ratio - pointers[0].y) * 10.0;
-    pointers[0].x = e.offsetX / ratio;
-    pointers[0].y = e.offsetY / ratio;
+    pointers[0].dx = (canvasLeft - pointers[0].x) * 10.0;
+    pointers[0].dy = (canvasTop - pointers[0].y) * 10.0;
+    pointers[0].x = canvasLeft;
+    pointers[0].y = canvasTop;
   });
 
   sandCanvas.addEventListener(
@@ -604,10 +612,14 @@ function startFluid({ universe }) {
       for (let i = 0; i < touches.length; i++) {
         let pointer = pointers[i];
         pointer.moved = pointer.down;
-        pointer.dx = (touches[i].pageX / ratio - pointer.x) * 10.0;
-        pointer.dy = ((touches[i].pageY - uiheight) / ratio - pointer.y) * 10.0;
-        pointer.x = touches[i].pageX / ratio;
-        pointer.y = (touches[i].pageY - uiheight) / ratio;
+
+        const canvasLeft = (touches[i].clientX - boundingRect.left) * scaleX;
+        const canvasTop = (touches[i].clientY - boundingRect.top) * scaleY;
+
+        pointer.dx = (canvasLeft - pointer.x) * 10.0;
+        pointer.dy = (canvasTop - pointer.y) * 10.0;
+        pointer.x = canvasLeft;
+        pointer.y = canvasTop;
       }
     },
     false
@@ -624,10 +636,13 @@ function startFluid({ universe }) {
     for (let i = 0; i < touches.length; i++) {
       if (i >= pointers.length) pointers.push(new pointerPrototype());
 
+      const canvasLeft = (touches[i].clientX - boundingRect.left) * scaleX;
+      const canvasTop = (touches[i].clientY - boundingRect.top) * scaleY;
+
       pointers[i].id = touches[i].identifier;
       pointers[i].down = true;
-      pointers[i].x = touches[i].pageX / ratio;
-      pointers[i].y = touches[i].pageY / ratio;
+      pointers[i].x = canvasLeft;
+      pointers[i].y = canvasTop;
       pointers[i].color = fluidColor;
     }
   });

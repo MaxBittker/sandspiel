@@ -13,20 +13,30 @@ if (window.safari) {
 
 const ui = document.getElementById("ui");
 
-let screen_width = window.innerWidth / ratio;
+let screen_width = window.innerWidth;
 let uiheight = ui.offsetHeight;
-let screen_height = (window.innerHeight - uiheight) / ratio;
-// let pixels = screen_width * screen_height;
+let screen_height = window.innerHeight - uiheight;
 
-// Construct the universe, and get its width and height.
-
-const universe = Universe.new(screen_width, screen_height);
+const universe = Universe.new(250, 250);
 const width = universe.width();
 const height = universe.height();
 
 const canvas = document.getElementById("sand-canvas");
+const canvas2 = document.getElementById("fluid-canvas");
+
 canvas.height = height * window.devicePixelRatio;
 canvas.width = width * window.devicePixelRatio;
+
+let canvasStyle = "";
+if (screen_width > screen_height) {
+  canvasStyle = `height: ${screen_height}px`;
+} else {
+  canvasStyle = `width: ${screen_width}px; bottom: ${(screen_height -
+    screen_width) /
+    2}px`;
+}
+canvas.style = canvasStyle;
+canvas2.style = canvasStyle;
 
 let fluid_update = startFluid({ universe });
 
