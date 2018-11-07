@@ -74,12 +74,12 @@ void main() {
   } else if (type == 12) { // acid
     hue = 0.18;
     saturation = 0.9;
-    lightness = 0.7 + data.g * 0.5;
-  } else if (type == 13) { // acid
+    lightness = 0.8 + data.g * 0.2 + noise * 0.05;
+  } else if (type == 13) { // stone
     hue = 0.9;
     saturation = 0.1;
     // lightness = 0.2 + data.g * 0.5;
-  } else if (type == 14) { // acid
+  } else if (type == 14) { // dust
     hue = (data.g * 1.5) + t * .0008;
     saturation = 0.5;
     lightness = 0.8;

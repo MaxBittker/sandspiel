@@ -204,34 +204,42 @@ class Index extends React.Component {
           )}
         </button>
         {paused && <button onClick={() => universe.tick()}>Tick</button>}
-        <button
-          style={{
-            borderRightWidth: "0.5px",
-            marginRight: "-3px",
-            borderBottomLeftRadius: "10px"
-          }}
-          onClick={e => this.bumpSize(e, -1)}
-        >
-          -
-        </button>
-        <button
-          onClick={e => this.bumpSize(e, 1)}
-          onContextMenu={e => this.bumpSize(e, -1)}
-          title="brush size"
-          style={{ minWidth: "5px" }}
-        >
-          {size + 1}
-        </button>
-        <button
-          style={{
-            borderLeftWidth: "0.5px",
-            marginLeft: "-3px",
-            borderBottomRightRadius: "10px"
-          }}
-          onClick={e => this.bumpSize(e, 1)}
-        >
-          +
-        </button>
+        <span>
+          <button
+            style={{
+              borderRight: "none",
+              marginRight: "-3px",
+              borderBottomLeftRadius: "10px",
+              fontSize: "25px"
+            }}
+            onClick={e => this.bumpSize(e, -1)}
+          >
+            -
+          </button>
+          <button
+            onClick={e => this.bumpSize(e, 1)}
+            onContextMenu={e => this.bumpSize(e, -1)}
+            title="brush size"
+            style={{
+              minWidth: "5px",
+              fontSize: "25px"
+            }}
+          >
+            {size + 1}
+          </button>
+          <button
+            style={{
+              borderLeftWidth: "0.5px",
+              marginLeft: "-3px",
+              borderBottomRightRadius: "10px",
+              fontSize: "25px"
+            }}
+            onClick={e => this.bumpSize(e, 1)}
+          >
+            +
+          </button>
+        </span>
+
         {Object.keys(Species).map(n =>
           ElementButton(n, selectedElement, id =>
             this.setState({ selectedElement: id })

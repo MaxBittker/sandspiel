@@ -11,12 +11,6 @@ if (window.safari) {
   };
 }
 
-const ui = document.getElementById("ui");
-
-let screen_width = window.innerWidth;
-let uiheight = ui.offsetHeight;
-let screen_height = window.innerHeight - uiheight;
-
 const universe = Universe.new(250, 250);
 const width = universe.width();
 const height = universe.height();
@@ -26,14 +20,23 @@ const canvas2 = document.getElementById("fluid-canvas");
 
 canvas.height = height * window.devicePixelRatio;
 canvas.width = width * window.devicePixelRatio;
+document.getElementById("background").addEventListener("touchmove", e => {
+  e.preventDefault();
+});
+
+const ui = document.getElementById("ui");
+
+let screen_width = window.innerWidth;
+let uiheight = ui.offsetHeight;
+let screen_height = window.innerHeight - uiheight;
 
 let canvasStyle = "";
 if (screen_width > screen_height) {
-  canvasStyle = `height: ${screen_height}px`;
+  canvasStyle = `height: ${window.innerHeight}px`;
+  ui.style = `width: ${(screen_width - window.innerHeight) / 2 -
+    7}px; margin: 3px;`;
 } else {
-  canvasStyle = `width: ${screen_width}px; bottom: ${(screen_height -
-    screen_width) /
-    2}px`;
+  canvasStyle = `width: ${screen_width}px; bottom:3px;`;
 }
 canvas.style = canvasStyle;
 canvas2.style = canvasStyle;
