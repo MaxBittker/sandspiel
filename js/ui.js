@@ -2,12 +2,8 @@ import React from "react";
 import ReactDOM from "react-dom";
 
 import { Species } from "../crate/pkg";
-import { ratio } from "./constants";
 
 import { height, renderLoop, universe, width } from "./index.js";
-let screen_width = window.innerWidth / ratio;
-let screen_height = window.innerHeight / ratio;
-let pixels = screen_width * screen_height;
 
 const canvas = document.getElementById("sand-canvas");
 
@@ -210,11 +206,11 @@ class Index extends React.Component {
               borderRight: "none",
               marginRight: "-3px",
               borderBottomLeftRadius: "10px",
-              fontSize: "25px"
+              fontSize: "20px"
             }}
             onClick={e => this.bumpSize(e, -1)}
           >
-            -
+            −
           </button>
           <button
             onClick={e => this.bumpSize(e, 1)}
@@ -222,7 +218,7 @@ class Index extends React.Component {
             title="brush size"
             style={{
               minWidth: "5px",
-              fontSize: "25px"
+              fontSize: "20px"
             }}
           >
             {size + 1}
@@ -232,7 +228,7 @@ class Index extends React.Component {
               borderLeftWidth: "0.5px",
               marginLeft: "-3px",
               borderBottomRightRadius: "10px",
-              fontSize: "25px"
+              fontSize: "20px"
             }}
             onClick={e => this.bumpSize(e, 1)}
           >
@@ -306,7 +302,6 @@ const fps = new class {
 
     // Render the statistics.
     this.fps.textContent = `
- ${(pixels / 1000).toFixed(0)}Kpx
  FPS:${Math.round(mean)}
     `.trim();
   }
