@@ -32,9 +32,16 @@ let screen_height = window.innerHeight - uiheight;
 
 let canvasStyle = "";
 if (screen_width > screen_height) {
-  canvasStyle = `height: ${window.innerHeight}px`;
-  ui.style = `width: ${(screen_width - window.innerHeight) / 2 -
-    7}px; margin: 3px;`;
+  if (screen_width - window.innerHeight < 225) {
+    canvasStyle = `height: ${window.innerHeight}px; margin:3px`;
+    ui.style = `width: ${screen_width -
+      window.innerHeight -
+      11}px; margin: 3px;`;
+  } else {
+    canvasStyle = `height: ${window.innerHeight}px`;
+    ui.style = `width: ${(screen_width - window.innerHeight) / 2 -
+      7}px; margin: 3px;`;
+  }
 } else {
   canvasStyle = `width: ${screen_width}px; bottom:3px;`;
 }

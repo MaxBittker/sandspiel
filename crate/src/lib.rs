@@ -190,14 +190,14 @@ pub fn update_gas(
     neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
     neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
 ) {
-    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let mut i = (js_sys::Math::random() * 10000.0) as i32;
     let dx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 100.0) as i32;
+    i = (js_sys::Math::random() * 10000.0) as i32;
     let dy = (i % 3) - 1;
 
-    if neighbor_getter(u, dx, dy).species == Species::Empty {
+    if neighbor_getter(u, -dx, dy).species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, dx, dy, cell);
+        neighbor_setter(u, -dx, dy, cell);
     } else {
         neighbor_setter(u, 0, 0, cell);
     }
@@ -659,15 +659,15 @@ pub fn update_mite(
     let nbr = neighbor_getter(u, dx, dy);
 
     let sx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 100.0) as i32;
+    i = (js_sys::Math::random() * 1000.0) as i32;
     let sy = (i % 3) - 1;
     let sample = neighbor_getter(u, sx, sy).species;
     if sample == Species::Fire || sample == Species::Lava {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         return;
     }
-    if (sample == Species::Plant || sample == Species::Wood) && i > 97 {
-        neighbor_setter(u, sx, sy, cell);
+    if (sample == Species::Plant || sample == Species::Wood) && i > 970 {
+        neighbor_setter(u, sx, sy, if i > 990 { cell } else { EMPTY_CELL });
     }
     if sample == Species::Dust {
         neighbor_setter(u, sx, sy, EMPTY_CELL);
@@ -676,7 +676,7 @@ pub fn update_mite(
     if nbr.species == Species::Empty {
         neighbor_setter(u, 0, 0, EMPTY_CELL);
         neighbor_setter(u, dx, dy, mite);
-    } else if dy == 1 && i > 80 {
+    } else if dy == 1 && i > 800 {
         i = (js_sys::Math::random() * 100.0) as i32;
         let mut ndx = (i % 3) - 1;
         if i < 6 {
@@ -931,38 +931,5 @@ impl Universe {
         }
 
         cell.update(self, neighbor_getter, neighbor_setter);
-
-        // match cell.species {
-        //     Species::Empty => {}
-        //     Species::Wall => {}
-        //     Species::Powder => update_powder(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Dust => update_dust(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Water => update_water(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Stone => update_stone(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Gas => update_gas(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Clone => update_clone(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Fire => update_fire(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Wood => update_wood(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Lava => update_lava(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Ice => update_ice(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Sink => update_sink(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Plant => update_plant(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Acid => update_acid(self, cell, neighbor_getter, neighbor_setter),
-        //     Species::Mite => update_mite(self, cell, neighbor_getter, neighbor_setter),
-        // }
     }
 }
-
-// pub fn add_two(a: i32) -> i32 {
-//     a & 1
-// }
-
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-
-//     #[test]
-//     fn it_adds_two() {
-//         assert_eq!(1, add_two(6));
-//     }
-// }
