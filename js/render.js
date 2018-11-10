@@ -36,9 +36,9 @@ let startWebGL = ({ canvas, universe }) => {
   });
 
   regl.frame(function(context) {
-    regl.clear({ color: [0, 0, 0, 0] });
+    // regl.clear({ color: [0, 0, 0, 0] });
     drawTriangle();
-    lastFrame({ copy: true });
+    // lastFrame({ copy: true });
   });
 };
 

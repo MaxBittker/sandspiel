@@ -150,12 +150,12 @@ const ElementButton = (name, selectedElement, setElement) => {
   );
 };
 
-let sizeMap = [2, 5, 7, 11, 15, 18, 25, 32, 45];
+let sizeMap = [2, 5, 10, 18, 30, 45];
 
 class Index extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { paused: false, size: 3, selectedElement: Species.Water };
+    this.state = { paused: false, size: 2, selectedElement: Species.Water };
   }
 
   playPause() {
@@ -167,10 +167,10 @@ class Index extends React.Component {
     }
     this.setState({ paused: !this.state.paused });
   }
-  bumpSize(event, d) {
+  setSize(event, size) {
     event.preventDefault();
     this.setState({
-      size: (this.state.size + d + sizeMap.length) % sizeMap.length
+      size
     });
   }
   reset() {
@@ -186,54 +186,25 @@ class Index extends React.Component {
             "\u25B6\uFE0E"
           ) : (
             <svg height="10" width="10" id="d" viewBox="0 0 300 300">
-              <polygon
-                id="shape1"
-                points="0,0 110,0 110,300 0,300"
-                style={{ fill: "black" }}
-              />
-              <polygon
-                id="shape2"
-                points="190,0 300,0 300,300 190,300"
-                style={{ fill: "black" }}
-              />
+              <polygon id="shape1" points="0,0 110,0 110,300 0,300" />
+              <polygon id="shape2" points="190,0 300,0 300,300 190,300" />
             </svg>
           )}
         </button>
         {paused && <button onClick={() => universe.tick()}>Tick</button>}
         <span>
-          <button
-            style={{
-              borderRight: "none",
-              marginRight: "-3px",
-              borderBottomLeftRadius: "10px",
-              fontSize: "20px"
-            }}
-            onClick={e => this.bumpSize(e, -1)}
-          >
-            −
-          </button>
-          <button
-            onClick={e => this.bumpSize(e, 1)}
-            onContextMenu={e => this.bumpSize(e, -1)}
-            title="brush size"
-            style={{
-              minWidth: "5px",
-              fontSize: "20px"
-            }}
-          >
-            {size + 1}
-          </button>
-          <button
-            style={{
-              borderLeftWidth: "0.5px",
-              marginLeft: "-3px",
-              borderBottomRightRadius: "10px",
-              fontSize: "20px"
-            }}
-            onClick={e => this.bumpSize(e, 1)}
-          >
-            +
-          </button>
+          {sizeMap.map((v, i) => (
+            <button
+              key={i}
+              className={i == this.state.size ? "selected" : ""}
+              onClick={e => this.setSize(e, i)}
+              style={{ padding: 1 }}
+            >
+              <svg height="25" width="25" id="d" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r={2 + v} />
+              </svg>
+            </button>
+          ))}
         </span>
 
         {Object.keys(Species).map(n =>
