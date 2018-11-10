@@ -54,16 +54,15 @@ button {
   position: relative;
   height: 30px;
   min-width: 30px;
-  line-height: 20px;
   font-size: 14px;
   background-color: whitesmoke;
   color: black;
   border: 2px solid whitesmoke;
   border-color: gainsboro;
-  /* margin-right: -3px; */
-  /* margin-bottom: 1px; */
   flex-grow: 1;
   max-width: 200px;
+  fill: black;
+  line-height: 0px;
 }
 
 button:focus {
@@ -74,6 +73,7 @@ button.selected {
   background-color: black;
   color: whitesmoke;
   border-color: grey;
+  fill: whitesmoke;
 }
 
 #ui {
