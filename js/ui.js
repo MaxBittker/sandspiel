@@ -200,7 +200,7 @@ class Index extends React.Component {
               onClick={e => this.setSize(e, i)}
               style={{ padding: 1 }}
             >
-              <svg height="25" width="25" id="d" viewBox="0 0 100 100">
+              <svg height="24" width="24" id="d" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r={2 + v} />
               </svg>
             </button>
