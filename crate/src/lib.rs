@@ -9,7 +9,7 @@ mod utils;
 
 use wasm_bindgen::__rt::core::intrinsics::transmute;
 use wasm_bindgen::prelude::*;
-use web_sys::console;
+// use web_sys::console;
 
 #[wasm_bindgen]
 #[repr(u8)]
@@ -52,30 +52,31 @@ pub struct Cell {
     rb: u8,
     clock: u8,
 }
+
+fn rand_dir() -> i32 {
+    let i = (js_sys::Math::random() * 1000.0) as i32;
+    (i % 3) - 1
+}
+
 impl Cell {
-    pub fn update(
-        &self,
-        u: &mut Universe,
-        neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-        neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-    ) {
+    pub fn update(&self, api: SandApi) {
         match self.species {
             Species::Empty => {}
             Species::Wall => {}
-            Species::Powder => update_powder(u, *self, neighbor_getter, neighbor_setter),
-            Species::Dust => update_dust(u, *self, neighbor_getter, neighbor_setter),
-            Species::Water => update_water(u, *self, neighbor_getter, neighbor_setter),
-            Species::Stone => update_stone(u, *self, neighbor_getter, neighbor_setter),
-            Species::Gas => update_gas(u, *self, neighbor_getter, neighbor_setter),
-            Species::Clone => update_clone(u, *self, neighbor_getter, neighbor_setter),
-            Species::Fire => update_fire(u, *self, neighbor_getter, neighbor_setter),
-            Species::Wood => update_wood(u, *self, neighbor_getter, neighbor_setter),
-            Species::Lava => update_lava(u, *self, neighbor_getter, neighbor_setter),
-            Species::Ice => update_ice(u, *self, neighbor_getter, neighbor_setter),
-            Species::Sink => update_sink(u, *self, neighbor_getter, neighbor_setter),
-            Species::Plant => update_plant(u, *self, neighbor_getter, neighbor_setter),
-            Species::Acid => update_acid(u, *self, neighbor_getter, neighbor_setter),
-            Species::Mite => update_mite(u, *self, neighbor_getter, neighbor_setter),
+            Species::Powder => update_powder(*self, api),
+            Species::Dust => update_dust(*self, api),
+            Species::Water => update_water(*self, api),
+            Species::Stone => update_stone(*self, api),
+            Species::Gas => update_gas(*self, api),
+            Species::Clone => update_clone(*self, api),
+            Species::Fire => update_fire(*self, api),
+            Species::Wood => update_wood(*self, api),
+            Species::Lava => update_lava(*self, api),
+            Species::Ice => update_ice(*self, api),
+            Species::Sink => update_sink(*self, api),
+            Species::Plant => update_plant(*self, api),
+            Species::Acid => update_acid(*self, api),
+            Species::Mite => update_mite(*self, api),
         }
     }
 }
@@ -87,140 +88,102 @@ static EMPTY_CELL: Cell = Cell {
     clock: 0,
 };
 
-pub fn update_powder(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
-    let i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
+pub fn update_powder(cell: Cell, mut api: SandApi) {
+    let dx = rand_dir();
 
-    let nbr = neighbor_getter(u, 0, 1);
+    let nbr = api.get(0, 1);
     if nbr.species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, 0, 1, cell);
-    } else if neighbor_getter(u, dx, 1).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, dx, 1, cell);
+        api.set(0, 0, EMPTY_CELL);
+        api.set(0, 1, cell);
+    } else if api.get(dx, 1).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(dx, 1, cell);
     } else if nbr.species == Species::Water {
-        neighbor_setter(u, 0, 0, nbr);
-        neighbor_setter(u, 0, 1, cell);
+        api.set(0, 0, nbr);
+        api.set(0, 1, cell);
     } else {
-        neighbor_setter(u, 0, 0, cell);
+        api.set(0, 0, cell);
     }
 }
 
-pub fn update_dust(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
-    let i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
+pub fn update_dust(cell: Cell, mut api: SandApi) {
+    let dx = rand_dir();
 
-    let nbr = neighbor_getter(u, 0, 1);
+    let nbr = api.get(0, 1);
     if nbr.species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, 0, 1, cell);
+        api.set(0, 0, EMPTY_CELL);
+        api.set(0, 1, cell);
     } else if nbr.species == Species::Water {
-        neighbor_setter(u, 0, 0, nbr);
-        neighbor_setter(u, 0, 1, cell);
-    } else if neighbor_getter(u, dx, 1).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, dx, 1, cell);
+        api.set(0, 0, nbr);
+        api.set(0, 1, cell);
+    } else if api.get(dx, 1).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(dx, 1, cell);
     } else {
-        neighbor_setter(u, 0, 0, cell);
+        api.set(0, 0, cell);
     }
 }
 
-pub fn update_stone(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
-    if neighbor_getter(u, -1, -1).species == Species::Stone
-        && neighbor_getter(u, 1, -1).species == Species::Stone
-    {
+pub fn update_stone(cell: Cell, mut api: SandApi) {
+    if api.get(-1, -1).species == Species::Stone && api.get(1, -1).species == Species::Stone {
         return;
     }
 
-    let nbr = neighbor_getter(u, 0, 1);
+    let nbr = api.get(0, 1);
     let nbr_species = nbr.species;
     if nbr_species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, 0, 1, cell);
+        api.set(0, 0, EMPTY_CELL);
+        api.set(0, 1, cell);
     } else if nbr_species == Species::Water || nbr_species == Species::Gas {
-        neighbor_setter(u, 0, 0, nbr);
-        neighbor_setter(u, 0, 1, cell);
+        api.set(0, 0, nbr);
+        api.set(0, 1, cell);
     } else {
-        neighbor_setter(u, 0, 0, cell);
+        api.set(0, 0, cell);
     }
 }
 
-pub fn update_water(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
-    let i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
+pub fn update_water(cell: Cell, mut api: SandApi) {
+    let dx = rand_dir();
     // i = (js_sys::Math::random() * 100.0) as i32;
 
-    if neighbor_getter(u, 0, 1).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, 0, 1, cell);
-    } else if neighbor_getter(u, dx, 0).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, dx, 0, cell);
-    } else if neighbor_getter(u, -dx, 0).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, -dx, 0, cell);
+    if api.get(0, 1).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(0, 1, cell);
+    } else if api.get(dx, 0).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(dx, 0, cell);
+    } else if api.get(-dx, 0).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(-dx, 0, cell);
     } else {
-        neighbor_setter(u, 0, 0, cell);
+        api.set(0, 0, cell);
     }
 }
 
-pub fn update_gas(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
-    let mut i = (js_sys::Math::random() * 10000.0) as i32;
-    let dx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 10000.0) as i32;
-    let dy = (i % 3) - 1;
+pub fn update_gas(cell: Cell, mut api: SandApi) {
+    let dx = rand_dir();
+    let dy = rand_dir();
 
-    if neighbor_getter(u, -dx, dy).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, -dx, dy, cell);
+    if api.get(-dx, dy).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(-dx, dy, cell);
     } else {
-        neighbor_setter(u, 0, 0, cell);
+        api.set(0, 0, cell);
     }
 }
-pub fn update_clone(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
+pub fn update_clone(cell: Cell, mut api: SandApi) {
     let mut clone_species = unsafe { transmute(cell.rb as u8) };
 
     for dx in [-1, 0, 1].iter().cloned() {
         for dy in [-1, 0, 1].iter().cloned() {
             if cell.rb == 0 {
-                let nbr_species = neighbor_getter(u, dx, dy).species;
+                let nbr_species = api.get(dx, dy).species;
                 if nbr_species != Species::Empty
                     && nbr_species != Species::Clone
                     && nbr_species != Species::Wall
                 {
                     clone_species = nbr_species;
-                    neighbor_setter(
-                        u,
+                    api.set(
                         0,
                         0,
                         Cell {
@@ -234,9 +197,8 @@ pub fn update_clone(
                     break;
                 }
             } else {
-                if neighbor_getter(u, dx, dy).species == Species::Empty {
-                    neighbor_setter(
-                        u,
+                if api.get(dx, dy).species == Species::Empty {
+                    api.set(
                         dx,
                         dy,
                         Cell {
@@ -254,25 +216,15 @@ pub fn update_clone(
         }
     }
 }
-pub fn update_fire(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
+pub fn update_fire(cell: Cell, mut api: SandApi) {
     let ra = cell.ra;
     let mut degraded = cell.clone();
     degraded.ra = ra - 2;
 
-    let mut i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 100.0) as i32;
-    let dy = (i % 3) - 1;
-    if neighbor_getter(u, dx, dy).species == Species::Gas
-        || neighbor_getter(u, dx, dy).species == Species::Dust
-    {
-        neighbor_setter(
-            u,
+    let dx = rand_dir();
+    let dy = rand_dir();
+    if api.get(dx, dy).species == Species::Gas || api.get(dx, dy).species == Species::Dust {
+        api.set(
             dx,
             dy,
             Cell {
@@ -283,30 +235,20 @@ pub fn update_fire(
             },
         );
     }
-    if ra < 5 || neighbor_getter(u, dx, dy).species == Species::Water {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-    } else if neighbor_getter(u, dx, -1).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, dx, -1, degraded);
+    if ra < 5 || api.get(dx, dy).species == Species::Water {
+        api.set(0, 0, EMPTY_CELL);
+    } else if api.get(dx, -1).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(dx, -1, degraded);
     } else {
-        neighbor_setter(u, 0, 0, degraded);
+        api.set(0, 0, degraded);
     }
 }
-pub fn update_lava(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
-    let mut i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 100.0) as i32;
-    let dy = (i % 3) - 1;
-    if neighbor_getter(u, dx, dy).species == Species::Gas
-        || neighbor_getter(u, dx, dy).species == Species::Dust
-    {
-        neighbor_setter(
-            u,
+pub fn update_lava(cell: Cell, mut api: SandApi) {
+    let dx = rand_dir();
+    let dy = rand_dir();
+    if api.get(dx, dy).species == Species::Gas || api.get(dx, dy).species == Species::Dust {
+        api.set(
             dx,
             dy,
             Cell {
@@ -317,9 +259,8 @@ pub fn update_lava(
             },
         );
     }
-    if neighbor_getter(u, dx, dy).species == Species::Water {
-        neighbor_setter(
-            u,
+    if api.get(dx, dy).species == Species::Water {
+        api.set(
             0,
             0,
             Cell {
@@ -329,36 +270,28 @@ pub fn update_lava(
                 clock: 0,
             },
         );
-        neighbor_setter(u, dx, dy, EMPTY_CELL);
-    } else if neighbor_getter(u, 0, 1).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, 0, 1, cell);
-    } else if neighbor_getter(u, dx, 1).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, dx, 1, cell);
-    } else if neighbor_getter(u, dx, 0).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, dx, 0, cell);
+        api.set(dx, dy, EMPTY_CELL);
+    } else if api.get(0, 1).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(0, 1, cell);
+    } else if api.get(dx, 1).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(dx, 1, cell);
+    } else if api.get(dx, 0).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(dx, 0, cell);
     } else {
-        neighbor_setter(u, 0, 0, cell);
+        api.set(0, 0, cell);
     }
 }
-pub fn update_wood(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
+pub fn update_wood(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
-    let mut i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 100.0) as i32;
-    let dy = (i % 3) - 1;
-    let nbr_species = neighbor_getter(u, dx, dy).species;
+    let dx = rand_dir();
+    let dy = rand_dir();
+    let nbr_species = api.get(dx, dy).species;
     if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
-        neighbor_setter(
-            u,
+        api.set(
             0,
             0,
             Cell {
@@ -371,8 +304,7 @@ pub fn update_wood(
     }
 
     if rb > 1 {
-        neighbor_setter(
-            u,
+        api.set(
             0,
             0,
             Cell {
@@ -383,8 +315,7 @@ pub fn update_wood(
             },
         );
         if rb % 4 == 0 && nbr_species == Species::Empty {
-            neighbor_setter(
-                u,
+            api.set(
                 dx,
                 dy,
                 Cell {
@@ -396,8 +327,7 @@ pub fn update_wood(
             )
         }
         if nbr_species == Species::Water {
-            neighbor_setter(
-                u,
+            api.set(
                 0,
                 0,
                 Cell {
@@ -409,8 +339,7 @@ pub fn update_wood(
             )
         }
     } else if rb == 1 {
-        neighbor_setter(
-            u,
+        api.set(
             0,
             0,
             Cell {
@@ -422,20 +351,14 @@ pub fn update_wood(
         );
     }
 }
-pub fn update_ice(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
-    let mut i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 100.0) as i32;
-    let dy = (i % 3) - 1;
-    let nbr_species = neighbor_getter(u, dx, dy).species;
+pub fn update_ice(cell: Cell, mut api: SandApi) {
+    let dx = rand_dir();
+    let dy = rand_dir();
+    let i = (js_sys::Math::random() * 100.0) as i32;
+
+    let nbr_species = api.get(dx, dy).species;
     if nbr_species == Species::Fire || nbr_species == Species::Lava {
-        neighbor_setter(
-            u,
+        api.set(
             0,
             0,
             Cell {
@@ -446,8 +369,7 @@ pub fn update_ice(
             },
         );
     } else if nbr_species == Species::Water && i < 10 {
-        neighbor_setter(
-            u,
+        api.set(
             dx,
             dy,
             Cell {
@@ -460,22 +382,15 @@ pub fn update_ice(
     }
 }
 
-pub fn update_plant(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
+pub fn update_plant(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
     let mut i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 100.0) as i32;
-    let dy = (i % 3) - 1;
-    let nbr_species = neighbor_getter(u, dx, dy).species;
+    let dx = rand_dir();
+    let dy = rand_dir();
+    let nbr_species = api.get(dx, dy).species;
     if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
-        neighbor_setter(
-            u,
+        api.set(
             0,
             0,
             Cell {
@@ -487,17 +402,13 @@ pub fn update_plant(
         );
     }
     if nbr_species == Species::Wood {
-        i = (js_sys::Math::random() * 100.0) as i32;
-        let dx = (i % 3) - 1;
-        i = (js_sys::Math::random() * 100.0) as i32;
-        let dy = (i % 3) - 1;
-        i = (js_sys::Math::random() * 100.0) as i32;
+        let dx = rand_dir();
+        let dy = rand_dir();
 
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
-        if neighbor_getter(u, dx, dy).species == Species::Empty {
-            neighbor_setter(
-                u,
+        if api.get(dx, dy).species == Species::Empty {
+            api.set(
                 dx,
                 dy,
                 Cell {
@@ -510,14 +421,13 @@ pub fn update_plant(
         }
     }
     if nbr_species == Species::Water
-        && (neighbor_getter(u, -dx, dy).species == Species::Empty
-            || neighbor_getter(u, -dx, dy).species == Species::Water)
+        && (api.get(-dx, dy).species == Species::Empty
+            || api.get(-dx, dy).species == Species::Water)
     {
         i = (js_sys::Math::random() * 100.0) as i32;
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
-        neighbor_setter(
-            u,
+        api.set(
             dx,
             dy,
             Cell {
@@ -526,12 +436,11 @@ pub fn update_plant(
                 ..cell
             },
         );
-        neighbor_setter(u, -dx, dy, EMPTY_CELL);
+        api.set(-dx, dy, EMPTY_CELL);
     }
 
     if rb > 1 {
-        neighbor_setter(
-            u,
+        api.set(
             0,
             0,
             Cell {
@@ -541,8 +450,7 @@ pub fn update_plant(
             },
         );
         if nbr_species == Species::Empty {
-            neighbor_setter(
-                u,
+            api.set(
                 dx,
                 dy,
                 Cell {
@@ -554,8 +462,7 @@ pub fn update_plant(
             )
         }
         if nbr_species == Species::Water {
-            neighbor_setter(
-                u,
+            api.set(
                 0,
                 0,
                 Cell {
@@ -566,33 +473,20 @@ pub fn update_plant(
             )
         }
     } else if rb == 1 {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        api.set(0, 0, EMPTY_CELL);
     }
 }
-pub fn update_sink(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
-    let mut i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 100.0) as i32;
-    let dy = (i % 3) - 1;
-    if neighbor_getter(u, dx, dy).species != Species::Empty {
-        neighbor_setter(u, dx, dy, EMPTY_CELL);
-        neighbor_setter(u, 0, 0, cell);
+pub fn update_sink(cell: Cell, mut api: SandApi) {
+    let dx = rand_dir();
+    let dy = rand_dir();
+    if api.get(dx, dy).species != Species::Empty {
+        api.set(dx, dy, EMPTY_CELL);
+        api.set(0, 0, cell);
     }
 }
 
-pub fn update_acid(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
-    let i = (js_sys::Math::random() * 100.0) as i32;
-    let dx = (i % 3) - 1;
+pub fn update_acid(cell: Cell, mut api: SandApi) {
+    let dx = rand_dir();
 
     let ra = cell.ra;
     let mut degraded = cell.clone();
@@ -601,49 +495,41 @@ pub fn update_acid(
     if degraded.ra < 50 {
         degraded = EMPTY_CELL;
     }
-    if neighbor_getter(u, 0, 1).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, 0, 1, cell);
-    } else if neighbor_getter(u, dx, 0).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, dx, 0, cell);
-    } else if neighbor_getter(u, -dx, 0).species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, -dx, 0, cell);
+    if api.get(0, 1).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(0, 1, cell);
+    } else if api.get(dx, 0).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(dx, 0, cell);
+    } else if api.get(-dx, 0).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(-dx, 0, cell);
     } else {
-        if neighbor_getter(u, 0, 1).species != Species::Wall
-            && neighbor_getter(u, 0, 1).species != Species::Acid
+        if api.get(0, 1).species != Species::Wall && api.get(0, 1).species != Species::Acid {
+            api.set(0, 0, EMPTY_CELL);
+            api.set(0, 1, degraded);
+        } else if api.get(dx, 0).species != Species::Wall && api.get(dx, 0).species != Species::Acid
         {
-            neighbor_setter(u, 0, 0, EMPTY_CELL);
-            neighbor_setter(u, 0, 1, degraded);
-        } else if neighbor_getter(u, dx, 0).species != Species::Wall
-            && neighbor_getter(u, dx, 0).species != Species::Acid
+            api.set(0, 0, EMPTY_CELL);
+            api.set(dx, 0, degraded);
+        } else if api.get(-dx, 0).species != Species::Wall
+            && api.get(-dx, 0).species != Species::Acid
         {
-            neighbor_setter(u, 0, 0, EMPTY_CELL);
-            neighbor_setter(u, dx, 0, degraded);
-        } else if neighbor_getter(u, -dx, 0).species != Species::Wall
-            && neighbor_getter(u, -dx, 0).species != Species::Acid
+            api.set(0, 0, EMPTY_CELL);
+            api.set(-dx, 0, degraded);
+        } else if api.get(0, -1).species != Species::Wall
+            && api.get(0, -1).species != Species::Acid
+            && api.get(0, -1).species != Species::Empty
         {
-            neighbor_setter(u, 0, 0, EMPTY_CELL);
-            neighbor_setter(u, -dx, 0, degraded);
-        } else if neighbor_getter(u, 0, -1).species != Species::Wall
-            && neighbor_getter(u, 0, -1).species != Species::Acid
-            && neighbor_getter(u, 0, -1).species != Species::Empty
-        {
-            neighbor_setter(u, 0, 0, EMPTY_CELL);
-            neighbor_setter(u, 0, -1, degraded);
+            api.set(0, 0, EMPTY_CELL);
+            api.set(0, -1, degraded);
         } else {
-            neighbor_setter(u, 0, 0, cell);
+            api.set(0, 0, cell);
         }
     }
 }
 
-pub fn update_mite(
-    u: &mut Universe,
-    cell: Cell,
-    neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-    neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-) {
+pub fn update_mite(cell: Cell, mut api: SandApi) {
     let mut i = (js_sys::Math::random() * 100.0) as i32;
     let mut dx = 0;
     if cell.ra < 20 {
@@ -656,26 +542,26 @@ pub fn update_mite(
         mite.rb = mite.rb.saturating_sub(1);
         dy = -1;
     }
-    let nbr = neighbor_getter(u, dx, dy);
+    let nbr = api.get(dx, dy);
 
     let sx = (i % 3) - 1;
     i = (js_sys::Math::random() * 1000.0) as i32;
     let sy = (i % 3) - 1;
-    let sample = neighbor_getter(u, sx, sy).species;
+    let sample = api.get(sx, sy).species;
     if sample == Species::Fire || sample == Species::Lava {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
+        api.set(0, 0, EMPTY_CELL);
         return;
     }
     if (sample == Species::Plant || sample == Species::Wood) && i > 970 {
-        neighbor_setter(u, sx, sy, if i > 990 { cell } else { EMPTY_CELL });
+        api.set(sx, sy, if i > 990 { cell } else { EMPTY_CELL });
     }
     if sample == Species::Dust {
-        neighbor_setter(u, sx, sy, EMPTY_CELL);
+        api.set(sx, sy, EMPTY_CELL);
         mite.rb = (i % 50) as u8;
     }
     if nbr.species == Species::Empty {
-        neighbor_setter(u, 0, 0, EMPTY_CELL);
-        neighbor_setter(u, dx, dy, mite);
+        api.set(0, 0, EMPTY_CELL);
+        api.set(dx, dy, mite);
     } else if dy == 1 && i > 800 {
         i = (js_sys::Math::random() * 100.0) as i32;
         let mut ndx = (i % 3) - 1;
@@ -686,21 +572,21 @@ pub fn update_mite(
         mite.ra = (1 + ndx) as u8;
         mite.rb = (i % 10) as u8;
 
-        neighbor_setter(u, 0, 0, mite);
+        api.set(0, 0, mite);
     } else {
-        if neighbor_getter(u, -1, 0).species == Species::Mite
-            && neighbor_getter(u, 1, 0).species == Species::Mite
-            && neighbor_getter(u, 0, -1).species == Species::Mite
+        if api.get(-1, 0).species == Species::Mite
+            && api.get(1, 0).species == Species::Mite
+            && api.get(0, -1).species == Species::Mite
         {
-            neighbor_setter(u, 0, 0, EMPTY_CELL);
+            api.set(0, 0, EMPTY_CELL);
         } else {
-            if neighbor_getter(u, 0, 1).species == Species::Ice {
-                if neighbor_getter(u, dx, 0).species == Species::Empty {
-                    neighbor_setter(u, 0, 0, EMPTY_CELL);
-                    neighbor_setter(u, dx, 0, mite);
+            if api.get(0, 1).species == Species::Ice {
+                if api.get(dx, 0).species == Species::Empty {
+                    api.set(0, 0, EMPTY_CELL);
+                    api.set(dx, 0, mite);
                 }
             } else {
-                neighbor_setter(u, 0, 0, mite);
+                api.set(0, 0, mite);
             }
         }
     }
@@ -713,6 +599,48 @@ pub struct Universe {
     cells: Vec<Cell>,
     winds: Vec<Wind>,
     generation: u8,
+}
+
+pub struct SandApi<'a> {
+    x: i32,
+    y: i32,
+    universe: &'a mut Universe,
+}
+
+impl<'a> SandApi<'a> {
+    pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
+        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
+            panic!("oob set");
+        }
+        let nx = self.x + dx;
+        let ny = self.y + dy;
+        if nx < 0 || nx > self.universe.width - 1 || ny < 0 || ny > self.universe.height - 1 {
+            return Cell {
+                species: Species::Wall,
+                ra: 0,
+                rb: 0,
+                clock: self.universe.generation,
+            };
+        }
+        self.universe.get_cell(nx, ny)
+    }
+    pub fn set(&mut self, dx: i32, dy: i32, v: Cell) {
+        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
+            panic!("oob set");
+        }
+        let nx = self.x + dx;
+        let ny = self.y + dy;
+
+        if nx < 0 || nx > self.universe.width - 1 || ny < 0 || ny > self.universe.height - 1 {
+            return;
+        }
+        let i = self
+            .universe
+            .get_index((nx) % self.universe.width, (ny) % self.universe.height);
+        // v.clock += 1;
+        self.universe.cells[i] = v;
+        self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
+    }
 }
 
 #[wasm_bindgen]
@@ -735,11 +663,14 @@ impl Universe {
             for y in 0..self.height {
                 let cell = self.get_cell(x, y);
                 let wind = self.get_wind(x, y);
-                self.blow_wind(
+                Universe::blow_wind(
                     cell,
                     wind,
-                    Universe::get_neighbor_getter(x, y),
-                    Universe::get_neighbor_setter(x, y),
+                    SandApi {
+                        universe: self,
+                        x,
+                        y,
+                    },
                 )
             }
         }
@@ -748,10 +679,13 @@ impl Universe {
         for x in 0..self.width {
             for y in 0..self.height {
                 let cell = self.get_cell(x, y);
-                self.update_cell(
+                Universe::update_cell(
                     cell,
-                    Universe::get_neighbor_getter(x, y),
-                    Universe::get_neighbor_setter(x, y),
+                    SandApi {
+                        universe: self,
+                        x,
+                        y,
+                    },
                 )
             }
         }
@@ -852,50 +786,9 @@ impl Universe {
         let i = self.get_index(x, (self.height - y) - 1);
         return self.winds[i];
     }
-    fn get_neighbor_getter(x: i32, y: i32) -> impl Fn(&Universe, i32, i32) -> Cell {
-        return move |u: &Universe, dx: i32, dy: i32| {
-            if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
-                panic!("oob set");
-            }
-            let nx = x + dx;
-            let ny = y + dy;
-            if nx < 0 || nx > u.width - 1 || ny < 0 || ny > u.height - 1 {
-                return Cell {
-                    species: Species::Wall,
-                    ra: 0,
-                    rb: 0,
-                    clock: u.generation,
-                };
-            }
-            u.get_cell(nx, ny)
-        };
-    }
 
-    fn get_neighbor_setter(x: i32, y: i32) -> impl Fn(&mut Universe, i32, i32, Cell) -> () {
-        return move |u: &mut Universe, dx: i32, dy: i32, v: Cell| {
-            if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
-                panic!("oob set");
-            }
-            let nx = x + dx;
-            let ny = y + dy;
-
-            if nx < 0 || nx > u.width - 1 || ny < 0 || ny > u.height - 1 {
-                return;
-            }
-            let i = u.get_index((nx) % u.width, (ny) % u.height);
-            // v.clock += 1;
-            u.cells[i] = v;
-            u.cells[i].clock = u.generation.wrapping_add(1);
-        };
-    }
-    fn blow_wind(
-        &mut self,
-        cell: Cell,
-        wind: Wind,
-        neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-        neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-    ) {
-        if cell.clock - self.generation == 1 {
+    fn blow_wind(cell: Cell, wind: Wind, mut api: SandApi) {
+        if cell.clock - api.universe.generation == 1 {
             return;
         }
         let mut dx = 0;
@@ -912,24 +805,19 @@ impl Universe {
         if wind.dy < -50.0 {
             dy = 1;
         }
-        if neighbor_getter(self, dx, dy).species == Species::Empty {
-            neighbor_setter(self, 0, 0, EMPTY_CELL);
-            neighbor_setter(self, dx, dy, cell);
+        if cell.species != Species::Wall && api.get(dx, dy).species == Species::Empty {
+            api.set(0, 0, EMPTY_CELL);
+            api.set(dx, dy, cell);
             return;
         } else {
-            // neighbor_setter(self, 0, 0, cell);
+            // api.set(0, 0, cell);
         }
     }
-    fn update_cell(
-        &mut self,
-        cell: Cell,
-        neighbor_getter: impl Fn(&Universe, i32, i32) -> Cell,
-        neighbor_setter: impl Fn(&mut Universe, i32, i32, Cell) -> (),
-    ) {
-        if cell.clock - self.generation == 1 {
+    fn update_cell(cell: Cell, api: SandApi) {
+        if cell.clock - api.universe.generation == 1 {
             return;
         }
 
-        cell.update(self, neighbor_getter, neighbor_setter);
+        cell.update(api);
     }
 }
