@@ -174,7 +174,7 @@ class Index extends React.Component {
     });
   }
   reset() {
-    universe.reset();
+    window.confirm("Reset?") && universe.reset();
   }
   render() {
     let { size, paused, selectedElement } = this.state;
