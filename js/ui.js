@@ -198,7 +198,7 @@ class Index extends React.Component {
               key={i}
               className={i == this.state.size ? "selected" : ""}
               onClick={e => this.setSize(e, i)}
-              style={{ padding: 1 }}
+              style={{ padding: "0px" }}
             >
               <svg height="24" width="24" id="d" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r={2 + v} />
