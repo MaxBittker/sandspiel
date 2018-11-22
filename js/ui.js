@@ -272,9 +272,7 @@ const fps = new class {
     let mean = sum / this.frames.length;
 
     // Render the statistics.
-    this.fps.textContent = `
- FPS:${Math.round(mean)}
-    `.trim();
+    this.fps.textContent = `FPS:${Math.round(mean)}`;
   }
 }();
 
