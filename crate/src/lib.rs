@@ -22,6 +22,16 @@ pub struct Wind {
 
 #[wasm_bindgen]
 #[repr(C)]
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct Burn {
+    dx: i8,
+    dy: i8,
+    g: i8,
+    a: i8,
+}
+
+#[wasm_bindgen]
+#[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Cell {
     species: species::Species,
@@ -49,6 +59,7 @@ pub struct Universe {
     height: i32,
     cells: Vec<Cell>,
     winds: Vec<Wind>,
+    burns: Vec<Burn>,
     generation: u8,
 }
 
@@ -137,7 +148,24 @@ impl Universe {
                         x,
                         y,
                     },
-                )
+                );
+                let idx = self.get_index(x, self.height - (1 + y));
+
+                if cell.species == species::Species::Fire {
+                    self.burns[idx] = Burn {
+                        dx: 0,
+                        dy: 100,
+                        g: 0,
+                        a: 0,
+                    }
+                } else {
+                    self.burns[idx] = Burn {
+                        dx: 0,
+                        dy: 0,
+                        g: 0,
+                        a: 0,
+                    }
+                }
             }
         }
         self.generation = self.generation.wrapping_add(1);
@@ -158,6 +186,10 @@ impl Universe {
 
     pub fn winds(&self) -> *const Wind {
         self.winds.as_ptr()
+    }
+
+    pub fn burns(&self) -> *const Burn {
+        self.burns.as_ptr()
     }
 
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: species::Species) {
@@ -206,7 +238,7 @@ impl Universe {
                 }
             })
             .collect();
-        let winds = (0..width * height)
+        let winds: Vec<Wind> = (0..width * height)
             .map(|_i| Wind {
                 dx: 0.,
                 dy: 0.,
@@ -214,10 +246,21 @@ impl Universe {
                 a: 0.,
             })
             .collect();
+
+        let burns: Vec<Burn> = (0..width * height)
+            .map(|_i| Burn {
+                dx: 0,
+                dy: 0,
+                g: 0,
+                a: 0,
+            })
+            .collect();
+
         Universe {
             width,
             height,
             cells,
+            burns,
             winds,
             generation: 0,
         }
@@ -259,6 +302,7 @@ impl Universe {
             dy = 1;
         }
         if cell.species != species::Species::Wall
+            && cell.species != species::Species::Clone
             && api.get(dx, dy).species == species::Species::Empty
         {
             api.set(0, 0, EMPTY_CELL);

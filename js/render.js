@@ -5,7 +5,10 @@ let fsh = require("./glsl/sand.glsl");
 let vsh = require("./glsl/sandVertex.glsl");
 
 let startWebGL = ({ canvas, universe }) => {
-  const regl = reglBuilder({ canvas });
+  const regl = reglBuilder({
+    canvas
+    // attributes: { preserveDrawingBuffer: true }
+  });
   const lastFrame = regl.texture();
   const cellsPtr = universe.cells();
   const width = universe.width();

@@ -7,6 +7,7 @@ varying vec2 vT;
 varying vec2 vB;
 uniform sampler2D uPressure;
 uniform sampler2D uVelocity;
+uniform sampler2D uWind;
 vec2 boundary(in vec2 uv) {
   uv = min(max(uv, 0.0), 1.0);
   return uv;
@@ -17,6 +18,8 @@ void main() {
   float T = texture2D(uPressure, boundary(vT)).x;
   float B = texture2D(uPressure, boundary(vB)).x;
   vec2 velocity = texture2D(uVelocity, vUv).xy;
+  vec2 wind = texture2D(uWind, vUv).xy;
   velocity.xy -= vec2(R - L, T - B);
+  velocity.xy += wind * 25.;
   gl_FragColor = vec4(velocity, 0.0, 1.0);
 }
