@@ -44,9 +44,10 @@ void main() {
   } else if (type == 3) { // water
     hue = 0.6;
     lightness = 0.7 + data.g * 0.25 + noise * 0.1;
-  } else if (type == 4) {
-    hue = 0.5;
-    saturation = 0.5;
+  } else if (type == 4) { // gas
+    hue = 0.0;
+    lightness += 0.4;
+    saturation = 0.2;
   } else if (type == 5) { // clone
     hue = 0.9;
     saturation = 0.3;

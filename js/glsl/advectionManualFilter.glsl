@@ -3,6 +3,7 @@ precision mediump sampler2D;
 varying vec2 vUv;
 uniform sampler2D uVelocity;
 uniform sampler2D uSource;
+uniform sampler2D uWind;
 uniform vec2 texelSize;
 uniform float dt;
 uniform float dissipation;
@@ -20,6 +21,8 @@ vec4 bilerp(in sampler2D sam, in vec2 p) {
 }
 void main() {
   vec2 coord = gl_FragCoord.xy - dt * texture2D(uVelocity, vUv).xy;
-  gl_FragColor = dissipation * bilerp(uSource, coord);
+  vec2 wind = texture2D(uWind, vUv).xy;
+
+  gl_FragColor = dissipation * (bilerp(uSource, coord)+ vec4(wind.y)));
   gl_FragColor.a = 1.0;
 }
