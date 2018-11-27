@@ -23,6 +23,6 @@ void main() {
   vec2 coord = gl_FragCoord.xy - dt * texture2D(uVelocity, vUv).xy;
   vec2 wind = texture2D(uWind, vUv).xy;
 
-  gl_FragColor = dissipation * (bilerp(uSource, coord)+ vec4(wind.y)));
+  gl_FragColor = dissipation * (bilerp(uSource, coord) + vec4(wind.y));
   gl_FragColor.a = 1.0;
 }
