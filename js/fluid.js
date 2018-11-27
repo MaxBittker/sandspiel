@@ -73,6 +73,7 @@ function startFluid({ universe }) {
 
     let gl = canvas.getContext("webgl2", params);
     const isWebGL2 = !!gl;
+    window.isWebGL2 = isWebGL2;
     if (!isWebGL2)
       gl =
         canvas.getContext("webgl", params) ||

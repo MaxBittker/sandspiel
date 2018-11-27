@@ -216,7 +216,13 @@ class Index extends React.Component {
           className={-1 == selectedElement ? "selected" : ""}
           key={name}
           onClick={() => {
-            this.setState({ selectedElement: -1 });
+            if (!window.isWebGL2) {
+              window.alert(
+                "Sorry, you need a browser with webgl2 for this feature"
+              );
+            } else {
+              this.setState({ selectedElement: -1 });
+            }
           }}
         >
           Wind
