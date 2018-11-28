@@ -10,8 +10,11 @@ uniform float dt;
 uniform float dissipation;
 void main() {
   vec2 coord = vUv - dt * texture2D(uVelocity, vUv).xy * texelSize;
-  vec2 wind = texture2D(uWind, vUv).xy;
+  float density = texture2D(uWind, vUv).w * 1.;
+  if (density > 0.99) {
+    density = 0.;
+  }
 
-  gl_FragColor = dissipation * (texture2D(uSource, coord) + vec4(wind.y));
+  gl_FragColor = dissipation * (texture2D(uSource, coord) + vec4(density));
   gl_FragColor.a = 1.0;
 }

@@ -1,3 +1,4 @@
+use Burn;
 use Cell;
 use SandApi;
 use EMPTY_CELL;
@@ -138,6 +139,7 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
         api.set(0, 0, cell);
     }
 }
+
 pub fn update_clone(cell: Cell, mut api: SandApi) {
     let mut clone_species = unsafe { transmute(cell.rb as u8) };
 
@@ -190,6 +192,12 @@ pub fn update_fire(cell: Cell, mut api: SandApi) {
 
     let dx = rand_dir();
     let dy = rand_dir();
+    api.set_fluid(Burn {
+        dx: 0,
+        dy: 100,
+        pressure: 1,
+        density: 50,
+    });
     if api.get(dx, dy).species == Species::Gas || api.get(dx, dy).species == Species::Dust {
         api.set(
             dx,
@@ -201,6 +209,12 @@ pub fn update_fire(cell: Cell, mut api: SandApi) {
                 clock: 0,
             },
         );
+        api.set_fluid(Burn {
+            dx: 0,
+            dy: 0,
+            pressure: 126,
+            density: 10,
+        });
     }
     if ra < 5 || api.get(dx, dy).species == Species::Water {
         api.set(0, 0, EMPTY_CELL);

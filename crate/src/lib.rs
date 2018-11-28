@@ -7,6 +7,7 @@ extern crate web_sys;
 mod species;
 mod utils;
 
+use species::Species;
 use wasm_bindgen::prelude::*;
 // use web_sys::console;
 
@@ -24,17 +25,17 @@ pub struct Wind {
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Burn {
-    dx: i8,
-    dy: i8,
-    g: i8,
-    a: i8,
+    dx: u8,
+    dy: u8,
+    pressure: u8,
+    density: u8,
 }
 
 #[wasm_bindgen]
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Cell {
-    species: species::Species,
+    species: Species,
     ra: u8,
     rb: u8,
     clock: u8,
@@ -47,7 +48,7 @@ impl Cell {
 }
 
 static EMPTY_CELL: Cell = Cell {
-    species: species::Species::Empty,
+    species: Species::Empty,
     ra: 0,
     rb: 0,
     clock: 0,
@@ -78,7 +79,7 @@ impl<'a> SandApi<'a> {
         let ny = self.y + dy;
         if nx < 0 || nx > self.universe.width - 1 || ny < 0 || ny > self.universe.height - 1 {
             return Cell {
-                species: species::Species::Wall,
+                species: Species::Wall,
                 ra: 0,
                 rb: 0,
                 clock: self.universe.generation,
@@ -102,6 +103,13 @@ impl<'a> SandApi<'a> {
         // v.clock += 1;
         self.universe.cells[i] = v;
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
+    }
+    pub fn set_fluid(&mut self, v: Burn) {
+        let idx = self
+            .universe
+            .get_index(self.x, self.universe.height - (1 + self.y));
+
+        self.universe.burns[idx] = v;
     }
 }
 
@@ -140,7 +148,15 @@ impl Universe {
 
         for x in 0..self.width {
             for y in 0..self.height {
+                let idx = self.get_index(x, self.height - (1 + y));
                 let cell = self.get_cell(x, y);
+
+                self.burns[idx] = Burn {
+                    dx: 0,
+                    dy: 0,
+                    pressure: 0,
+                    density: 0,
+                };
                 Universe::update_cell(
                     cell,
                     SandApi {
@@ -149,23 +165,6 @@ impl Universe {
                         y,
                     },
                 );
-                let idx = self.get_index(x, self.height - (1 + y));
-
-                if cell.species == species::Species::Fire {
-                    self.burns[idx] = Burn {
-                        dx: 0,
-                        dy: 100,
-                        g: 0,
-                        a: 0,
-                    }
-                } else {
-                    self.burns[idx] = Burn {
-                        dx: 0,
-                        dy: 0,
-                        g: 0,
-                        a: 0,
-                    }
-                }
             }
         }
         self.generation = self.generation.wrapping_add(1);
@@ -192,7 +191,7 @@ impl Universe {
         self.burns.as_ptr()
     }
 
-    pub fn paint(&mut self, x: i32, y: i32, size: i32, species: species::Species) {
+    pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let radius = size / 2;
         for dx in -radius..radius + 1 {
             for dy in -radius..radius + 1 {
@@ -207,9 +206,7 @@ impl Universe {
                 if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
                     continue;
                 }
-                if self.get_cell(px, py).species == species::Species::Empty
-                    || species == species::Species::Empty
-                {
+                if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
                         species: species,
                         ra: 80
@@ -230,7 +227,7 @@ impl Universe {
                     EMPTY_CELL
                 } else {
                     Cell {
-                        species: species::Species::Powder,
+                        species: Species::Powder,
                         ra: 80 + (js_sys::Math::random() * 80.) as u8,
                         rb: 0,
                         clock: 0,
@@ -251,8 +248,8 @@ impl Universe {
             .map(|_i| Burn {
                 dx: 0,
                 dy: 0,
-                g: 0,
-                a: 0,
+                pressure: 0,
+                density: 0,
             })
             .collect();
 
@@ -289,21 +286,22 @@ impl Universe {
         }
         let mut dx = 0;
         let mut dy = 0;
-        if wind.dx > 50.0 {
+        let threshhold = 60.0;
+        if wind.dx > threshhold {
             dx = 1;
         }
-        if wind.dy > 50.0 {
+        if wind.dy > threshhold {
             dy = -1;
         }
-        if wind.dx < -50.0 {
+        if wind.dx < -threshhold {
             dx = -1;
         }
-        if wind.dy < -50.0 {
+        if wind.dy < -threshhold {
             dy = 1;
         }
-        if cell.species != species::Species::Wall
-            && cell.species != species::Species::Clone
-            && api.get(dx, dy).species == species::Species::Empty
+        if cell.species != Species::Wall
+            && cell.species != Species::Clone
+            && api.get(dx, dy).species == Species::Empty
         {
             api.set(0, 0, EMPTY_CELL);
             api.set(dx, dy, cell);

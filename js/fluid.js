@@ -426,10 +426,13 @@ function startFluid({ universe }) {
   let lastTime = Date.now();
   // multipleSplats(parseInt(Math.random() * 20) + 5);
 
-  let windsPtr = universe.winds();
   const width = universe.width();
   const height = universe.height();
-  const winds = new Float32Array(memory.buffer, windsPtr, width * height * 4);
+  const winds = new Float32Array(
+    memory.buffer,
+    universe.winds(),
+    width * height * 4
+  );
 
   const burnsData = new Uint8Array(
     memory.buffer,
@@ -530,6 +533,7 @@ function startFluid({ universe }) {
     let pressureTexId = pressure.read[2];
     gl.activeTexture(gl.TEXTURE0 + pressureTexId);
     gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
+    gl.uniform1i(clearProgram.uniforms.uWind, burns.read[2]);
     gl.uniform1i(clearProgram.uniforms.uTexture, pressureTexId);
     gl.uniform1f(clearProgram.uniforms.value, config.PRESSURE_DISSIPATION);
     blit(pressure.write[1]);

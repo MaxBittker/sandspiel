@@ -21,8 +21,10 @@ vec4 bilerp(in sampler2D sam, in vec2 p) {
 }
 void main() {
   vec2 coord = gl_FragCoord.xy - dt * texture2D(uVelocity, vUv).xy;
-  vec2 wind = texture2D(uWind, vUv).xy;
-
-  gl_FragColor = dissipation * (bilerp(uSource, coord) + vec4(wind.y));
+  float density = texture2D(uWind, vUv).w;
+  if (density > 0.99) {
+    density = 0.;
+  }
+  gl_FragColor = dissipation * (bilerp(uSource, coord) + vec4(density));
   gl_FragColor.a = 1.0;
 }
