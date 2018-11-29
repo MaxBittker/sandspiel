@@ -58,7 +58,8 @@ function startFluid({ universe }) {
     curlShader,
     vorticityShader,
     pressureShader,
-    gradientSubtractShader
+    gradientSubtractShader,
+    velocityOutShader
   } = compileShaders(gl);
   startGUI();
 
@@ -73,7 +74,6 @@ function startFluid({ universe }) {
 
     let gl = canvas.getContext("webgl2", params);
     const isWebGL2 = !!gl;
-    window.isWebGL2 = isWebGL2;
     if (!isWebGL2)
       gl =
         canvas.getContext("webgl", params) ||
@@ -258,6 +258,7 @@ function startFluid({ universe }) {
   let textureHeight;
   let density;
   let velocity;
+  let velocityOut;
   let burns;
   let divergence;
   let curl;
@@ -266,6 +267,7 @@ function startFluid({ universe }) {
 
   const clearProgram = new GLProgram(baseVertexShader, clearShader);
   const displayProgram = new GLProgram(baseVertexShader, displayShader);
+  const velocityOutProgram = new GLProgram(baseVertexShader, velocityOutShader);
   const splatProgram = new GLProgram(baseVertexShader, splatShader);
   const advectionProgram = new GLProgram(
     baseVertexShader,
@@ -307,6 +309,15 @@ function startFluid({ universe }) {
       rg.internalFormat,
       rg.format,
       texType,
+      ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
+    );
+    velocityOut = createFBO(
+      10,
+      textureWidth,
+      textureHeight,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
       ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
     );
     velocity = createDoubleFBO(
@@ -428,7 +439,7 @@ function startFluid({ universe }) {
 
   const width = universe.width();
   const height = universe.height();
-  const winds = new Float32Array(
+  const winds = new Uint8Array(
     memory.buffer,
     universe.winds(),
     width * height * 4
@@ -566,9 +577,14 @@ function startFluid({ universe }) {
     gl.uniform1i(gradientSubtractProgram.uniforms.uPressure, pressure.read[2]);
     gl.uniform1i(gradientSubtractProgram.uniforms.uVelocity, velocity.read[2]);
     blit(velocity.write[1]);
-
-    gl.readPixels(0, 0, width, height, ext.formatRGBA.format, gl.FLOAT, winds);
     velocity.swap();
+
+    velocityOutProgram.bind();
+    gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
+
+    blit(velocityOut[1]);
+    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, winds);
+
     burns.swap();
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -593,7 +609,7 @@ function startFluid({ universe }) {
     gl.uniform3f(splatProgram.uniforms.color, dx, -dy, 1.0);
     gl.uniform1f(
       splatProgram.uniforms.radius,
-      (window.UI.state.size + 1) / 500
+      (window.UI.state.size + 1) / 700
     );
     blit(velocity.write[1]);
     velocity.swap();

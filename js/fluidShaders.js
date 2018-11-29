@@ -9,6 +9,7 @@ let curlShaderString = require("./glsl/curl.glsl");
 let vorticityShaderString = require("./glsl/vorticity.glsl");
 let pressureShaderString = require("./glsl/pressure.glsl");
 let gradientSubtractShaderString = require("./glsl/gradientSubtract.glsl");
+let velocityOutShaderString = require("./glsl/velocityOut.glsl");
 
 function compileShaders(gl) {
   function compileShader(type, source) {
@@ -51,6 +52,10 @@ function compileShaders(gl) {
     gl.FRAGMENT_SHADER,
     gradientSubtractShaderString
   );
+  const velocityOutShader = compileShader(
+    gl.FRAGMENT_SHADER,
+    velocityOutShaderString
+  );
 
   return {
     baseVertexShader,
@@ -63,7 +68,8 @@ function compileShaders(gl) {
     curlShader,
     vorticityShader,
     pressureShader,
-    gradientSubtractShader
+    gradientSubtractShader,
+    velocityOutShader
   };
 }
 

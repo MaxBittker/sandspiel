@@ -15,10 +15,10 @@ use wasm_bindgen::prelude::*;
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct Wind {
-    dx: f32,
-    dy: f32,
-    g: f32,
-    a: f32,
+    dx: u8,
+    dy: u8,
+    g: u8,
+    a: u8,
 }
 
 #[wasm_bindgen]
@@ -237,10 +237,10 @@ impl Universe {
             .collect();
         let winds: Vec<Wind> = (0..width * height)
             .map(|_i| Wind {
-                dx: 0.,
-                dy: 0.,
-                g: 0.,
-                a: 0.,
+                dx: 0,
+                dy: 0,
+                g: 0,
+                a: 0,
             })
             .collect();
 
@@ -286,17 +286,20 @@ impl Universe {
         }
         let mut dx = 0;
         let mut dy = 0;
-        let threshhold = 60.0;
-        if wind.dx > threshhold {
+        let threshhold = 50;
+        let wx = (wind.dx as i32) - 126;
+        let wy = (wind.dy as i32) - 126;
+
+        if wx > threshhold {
             dx = 1;
         }
-        if wind.dy > threshhold {
+        if wy > threshhold {
             dy = -1;
         }
-        if wind.dx < -threshhold {
+        if wx < -threshhold {
             dx = -1;
         }
-        if wind.dy < -threshhold {
+        if wy < -threshhold {
             dy = 1;
         }
         if cell.species != Species::Wall
