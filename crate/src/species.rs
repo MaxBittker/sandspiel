@@ -3,7 +3,7 @@ use Cell;
 use SandApi;
 use EMPTY_CELL;
 
-use wasm_bindgen::__rt::core::intrinsics::transmute;
+use std::mem;
 use wasm_bindgen::prelude::*;
 
 fn rand_dir() -> i32 {
@@ -141,7 +141,7 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_clone(cell: Cell, mut api: SandApi) {
-    let mut clone_species = unsafe { transmute(cell.rb as u8) };
+    let mut clone_species = unsafe { mem::transmute(cell.rb as u8) };
 
     for dx in [-1, 0, 1].iter().cloned() {
         for dy in [-1, 0, 1].iter().cloned() {
