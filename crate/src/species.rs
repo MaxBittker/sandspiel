@@ -212,7 +212,7 @@ pub fn update_fire(cell: Cell, mut api: SandApi) {
         api.set_fluid(Burn {
             dx: 0,
             dy: 0,
-            pressure: 126,
+            pressure: 80,
             density: 10,
         });
     }
