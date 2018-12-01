@@ -1,7 +1,6 @@
 extern crate cfg_if;
 extern crate js_sys;
 extern crate wasm_bindgen;
-extern crate wbg_rand;
 extern crate web_sys;
 
 mod species;
@@ -72,7 +71,7 @@ pub struct SandApi<'a> {
 
 impl<'a> SandApi<'a> {
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
-        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
+        if dx > 1 || dx < -1 || dy > 1 || dy < -1 {
             panic!("oob set");
         }
         let nx = self.x + dx;
@@ -88,7 +87,7 @@ impl<'a> SandApi<'a> {
         self.universe.get_cell(nx, ny)
     }
     pub fn set(&mut self, dx: i32, dy: i32, v: Cell) {
-        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
+        if dx > 1 || dx < -1 || dy > 1 || dy < -1 {
             panic!("oob set");
         }
         let nx = self.x + dx;
@@ -304,13 +303,12 @@ impl Universe {
         }
         if cell.species != Species::Wall
             && cell.species != Species::Clone
+            && (dx != 0 || dy != 0)
             && api.get(dx, dy).species == Species::Empty
         {
             api.set(0, 0, EMPTY_CELL);
             api.set(dx, dy, cell);
             return;
-        } else {
-            // api.set(0, 0, cell);
         }
     }
     fn update_cell(cell: Cell, api: SandApi) {
