@@ -6,7 +6,7 @@ uniform sampler2D uWind;
 uniform float value;
 void main() {
   float pressure = texture2D(uWind, vUv).z;
-  pressure *= 150.;
+  pressure *= 512.;
   pressure *= pressure;
   gl_FragColor = value * (texture2D(uTexture, vUv) + vec4(pressure));
 }

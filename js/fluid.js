@@ -27,8 +27,7 @@ import { ratio } from "./constants";
 const canvas = document.getElementById("fluid-canvas");
 const sandCanvas = document.getElementById("sand-canvas");
 
-// const ui = document.getElementById("ui");
-let fluidColor = [1, 1, 1];
+let fluidColor = [1, 1, 0.8];
 
 function startFluid({ universe }) {
   canvas.width = universe.width();
@@ -69,7 +68,7 @@ function startFluid({ universe }) {
       depth: false,
       stencil: false,
       antialias: false,
-      preserveDrawingBuffer: true
+      preserveDrawingBuffer: false
     };
 
     let gl = canvas.getContext("webgl2", params);
