@@ -253,8 +253,8 @@ function startFluid({ universe }) {
     }
   }
 
-  let textureWidth;
-  let textureHeight;
+  let texWidth;
+  let texHeight;
   let density;
   let velocity;
   let velocityOut;
@@ -284,8 +284,8 @@ function startFluid({ universe }) {
   );
 
   function initFramebuffers() {
-    textureWidth = gl.drawingBufferWidth >> config.TEXTURE_DOWNSAMPLE;
-    textureHeight = gl.drawingBufferHeight >> config.TEXTURE_DOWNSAMPLE;
+    texWidth = gl.drawingBufferWidth >> config.TEXTURE_DOWNSAMPLE;
+    texHeight = gl.drawingBufferHeight >> config.TEXTURE_DOWNSAMPLE;
 
     const texType = ext.halfFloatTexType;
     const rgba = ext.formatRGBA;
@@ -294,8 +294,8 @@ function startFluid({ universe }) {
 
     velocity = createDoubleFBO(
       0,
-      textureWidth,
-      textureHeight,
+      texWidth,
+      texHeight,
       rg.internalFormat,
       rg.format,
       texType,
@@ -303,8 +303,8 @@ function startFluid({ universe }) {
     );
     density = createDoubleFBO(
       2,
-      textureWidth,
-      textureHeight,
+      texWidth,
+      texHeight,
       rgba.internalFormat,
       rgba.format,
       texType,
@@ -312,8 +312,8 @@ function startFluid({ universe }) {
     );
     divergence = createFBO(
       4,
-      textureWidth,
-      textureHeight,
+      texWidth,
+      texHeight,
       r.internalFormat,
       r.format,
       texType,
@@ -321,8 +321,8 @@ function startFluid({ universe }) {
     );
     curl = createFBO(
       5,
-      textureWidth,
-      textureHeight,
+      texWidth,
+      texHeight,
       r.internalFormat,
       r.format,
       texType,
@@ -330,8 +330,8 @@ function startFluid({ universe }) {
     );
     pressure = createDoubleFBO(
       6,
-      textureWidth,
-      textureHeight,
+      texWidth,
+      texHeight,
       r.internalFormat,
       r.format,
       texType,
@@ -339,8 +339,8 @@ function startFluid({ universe }) {
     );
     burns = createFBO(
       8,
-      textureWidth,
-      textureHeight,
+      texWidth,
+      texHeight,
       rg.internalFormat,
       rg.format,
       texType,
@@ -348,8 +348,8 @@ function startFluid({ universe }) {
     );
     velocityOut = createFBO(
       9,
-      textureWidth,
-      textureHeight,
+      texWidth,
+      texHeight,
       gl.RGBA,
       gl.RGBA,
       gl.UNSIGNED_BYTE,
@@ -458,17 +458,20 @@ function startFluid({ universe }) {
     const dt = Math.min((Date.now() - lastTime) / 1000, 0.016);
     lastTime = Date.now();
 
-    gl.viewport(0, 0, textureWidth, textureHeight);
+    gl.viewport(0, 0, texWidth, texHeight);
 
-    // if (splatStack.length > 0) multipleSplats(splatStack);
+    if (splatStack.length > 0) multipleSplats(splatStack);
     // multipleSplats(1);
 
-    //ADVECTION
+    // ADVECTION
+    // velocityRead ->
+    // velocityWrite
+
     advectionProgram.bind();
     gl.uniform2f(
       advectionProgram.uniforms.texelSize,
-      1.0 / textureWidth,
-      1.0 / textureHeight
+      1.0 / texWidth,
+      1.0 / texHeight
     );
     gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read[2]);
     gl.uniform1i(advectionProgram.uniforms.uSource, velocity.read[2]);
@@ -493,6 +496,12 @@ function startFluid({ universe }) {
       burnsData
     );
 
+    // ADVECTION
+    // burns
+    // velocityRead
+    // densityRead ->
+    // densityWrite
+
     gl.uniform1i(advectionProgram.uniforms.uWind, burns[2]);
     gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read[2]);
     gl.uniform1i(advectionProgram.uniforms.uSource, density.read[2]);
@@ -503,6 +512,9 @@ function startFluid({ universe }) {
     blit(density.write[1]);
     density.swap();
 
+    // Splat
+    // velocityRead -> velocityWrite
+    // densityRead -> velocityWrite
     for (let i = 0; i < pointers.length; i++) {
       const pointer = pointers[i];
       if (pointer.moved && window.UI.state.selectedElement < 0) {
@@ -511,22 +523,27 @@ function startFluid({ universe }) {
       }
     }
 
-    //CURL
+    // CURL
+    // velocityRead -> curl
     curlProgram.bind();
     gl.uniform2f(
       curlProgram.uniforms.texelSize,
-      1.0 / textureWidth,
-      1.0 / textureHeight
+      1.0 / texWidth,
+      1.0 / texHeight
     );
     gl.uniform1i(curlProgram.uniforms.uVelocity, velocity.read[2]);
     blit(curl[1]);
 
-    //VORTICITY
+    // VORTICITY
+    // velocityRead
+    // curl ->
+    // velocityWrite
+
     vorticityProgram.bind();
     gl.uniform2f(
       vorticityProgram.uniforms.texelSize,
-      1.0 / textureWidth,
-      1.0 / textureHeight
+      1.0 / texWidth,
+      1.0 / texHeight
     );
 
     gl.uniform1i(vorticityProgram.uniforms.uVelocity, velocity.read[2]);
@@ -536,17 +553,22 @@ function startFluid({ universe }) {
     blit(velocity.write[1]);
     velocity.swap();
 
-    //DIVERGENCE
+    // DIVERGENCE
+    // velocityRead ->
+    // divergence
     divergenceProgram.bind();
     gl.uniform2f(
       divergenceProgram.uniforms.texelSize,
-      1.0 / textureWidth,
-      1.0 / textureHeight
+      1.0 / texWidth,
+      1.0 / texHeight
     );
     gl.uniform1i(divergenceProgram.uniforms.uVelocity, velocity.read[2]);
     blit(divergence[1]);
 
-    //CLEAR
+    // CLEAR
+    // burns
+    // pressureRead->
+    // pressureWrite
     clearProgram.bind();
     let pressureTexId = pressure.read[2];
     gl.activeTexture(gl.TEXTURE0 + pressureTexId);
@@ -559,12 +581,15 @@ function startFluid({ universe }) {
     blit(pressure.write[1]);
     pressure.swap();
 
-    //PRESSURE
+    // PRESSURE
+    // divergence
+    // pressureRead->
+    // pressureWrite
     pressureProgram.bind();
     gl.uniform2f(
       pressureProgram.uniforms.texelSize,
-      1.0 / textureWidth,
-      1.0 / textureHeight
+      1.0 / texWidth,
+      1.0 / texHeight
     );
     gl.uniform1i(pressureProgram.uniforms.uDivergence, divergence[2]);
     pressureTexId = pressure.read[2];
@@ -576,19 +601,26 @@ function startFluid({ universe }) {
       pressure.swap();
     }
 
-    //VELOCITY OUT
+    // VELOCITY OUT
+    // velocityRead
+    // pressureRead ->
+    // velocityOut
     velocityOutProgram.bind();
     gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
     gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, winds);
 
-    //GRADIENT SUBTRACT
+    // GRADIENT SUBTRACT
+    // burns
+    // pressureRead
+    // velocityRead ->
+    // velocityWrite
     gradientSubtractProgram.bind();
     gl.uniform2f(
       gradientSubtractProgram.uniforms.texelSize,
-      1.0 / textureWidth,
-      1.0 / textureHeight
+      1.0 / texWidth,
+      1.0 / texHeight
     );
 
     gl.uniform1i(gradientSubtractProgram.uniforms.uWind, burns[2]);
@@ -599,7 +631,9 @@ function startFluid({ universe }) {
 
     gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
 
-    //DISPLAY
+    // DISPLAY
+    // density ->
+    // null/renderbuffer?
     displayProgram.bind();
     gl.uniform1i(displayProgram.uniforms.uTexture, density.read[2]);
 
