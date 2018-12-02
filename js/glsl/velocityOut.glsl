@@ -10,7 +10,7 @@ void main() {
   vp = max(vp, vec3(-250.));
   vp = min(vp, vec3(250.));
   vp /= 500.;
-  vp += vec3(0.5);
+  vp += vec3(0.5, 0.5, 0.);
   // v = vec2(0.5);
   gl_FragColor = vec4(vp, 0.0);
 }

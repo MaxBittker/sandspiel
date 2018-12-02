@@ -16,16 +16,6 @@ use wasm_bindgen::prelude::*;
 pub struct Wind {
     dx: u8,
     dy: u8,
-    g: u8,
-    a: u8,
-}
-
-#[wasm_bindgen]
-#[repr(C)]
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub struct Burn {
-    dx: u8,
-    dy: u8,
     pressure: u8,
     density: u8,
 }
@@ -59,7 +49,7 @@ pub struct Universe {
     height: i32,
     cells: Vec<Cell>,
     winds: Vec<Wind>,
-    burns: Vec<Burn>,
+    burns: Vec<Wind>,
     generation: u8,
 }
 
@@ -103,7 +93,14 @@ impl<'a> SandApi<'a> {
         self.universe.cells[i] = v;
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
     }
-    pub fn set_fluid(&mut self, v: Burn) {
+    pub fn get_fluid(&mut self) -> Wind {
+        let idx = self
+            .universe
+            .get_index(self.x, self.universe.height - (1 + self.y));
+
+        self.universe.winds[idx]
+    }
+    pub fn set_fluid(&mut self, v: Wind) {
         let idx = self
             .universe
             .get_index(self.x, self.universe.height - (1 + self.y));
@@ -150,7 +147,7 @@ impl Universe {
                 let idx = self.get_index(x, self.height - (1 + y));
                 let cell = self.get_cell(x, y);
 
-                self.burns[idx] = Burn {
+                self.burns[idx] = Wind {
                     dx: 0,
                     dy: 0,
                     pressure: 0,
@@ -186,7 +183,7 @@ impl Universe {
         self.winds.as_ptr()
     }
 
-    pub fn burns(&self) -> *const Burn {
+    pub fn burns(&self) -> *const Wind {
         self.burns.as_ptr()
     }
 
@@ -238,13 +235,13 @@ impl Universe {
             .map(|_i| Wind {
                 dx: 0,
                 dy: 0,
-                g: 0,
-                a: 0,
+                pressure: 0,
+                density: 0,
             })
             .collect();
 
-        let burns: Vec<Burn> = (0..width * height)
-            .map(|_i| Burn {
+        let burns: Vec<Wind> = (0..width * height)
+            .map(|_i| Wind {
                 dx: 0,
                 dy: 0,
                 pressure: 0,

@@ -1,10 +1,11 @@
-use Burn;
 use Cell;
 use SandApi;
+use Wind;
 use EMPTY_CELL;
 
 use std::mem;
 use wasm_bindgen::prelude::*;
+// use web_sys::console;
 
 fn rand_dir() -> i32 {
     let i = (js_sys::Math::random() * 1000.0) as i32;
@@ -76,6 +77,27 @@ pub fn update_powder(cell: Cell, mut api: SandApi) {
 
 pub fn update_dust(cell: Cell, mut api: SandApi) {
     let dx = rand_dir();
+    let fluid = api.get_fluid();
+
+    if fluid.pressure > 120 {
+        api.set(
+            0,
+            0,
+            Cell {
+                species: Species::Fire,
+                ra: (150 + (cell.ra / 10)) as u8,
+                rb: 0,
+                clock: 0,
+            },
+        );
+        api.set_fluid(Wind {
+            dx: 0,
+            dy: 0,
+            pressure: 80,
+            density: 1,
+        });
+        return;
+    }
 
     let nbr = api.get(0, 1);
     if nbr.species == Species::Empty {
@@ -132,6 +154,12 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
     let dx = rand_dir();
     let dy = rand_dir();
 
+    // api.set_fluid(Wind {
+    //     dx: 0,
+    //     dy: 0,
+    //     pressure: 5,
+    //     density: 0,
+    // });
     if api.get(-dx, dy).species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
         api.set(-dx, dy, cell);
@@ -192,11 +220,11 @@ pub fn update_fire(cell: Cell, mut api: SandApi) {
 
     let dx = rand_dir();
     let dy = rand_dir();
-    api.set_fluid(Burn {
+    api.set_fluid(Wind {
         dx: 0,
-        dy: 100,
+        dy: 150,
         pressure: 1,
-        density: 50,
+        density: 25,
     });
     if api.get(dx, dy).species == Species::Gas || api.get(dx, dy).species == Species::Dust {
         api.set(
@@ -209,11 +237,11 @@ pub fn update_fire(cell: Cell, mut api: SandApi) {
                 clock: 0,
             },
         );
-        api.set_fluid(Burn {
+        api.set_fluid(Wind {
             dx: 0,
             dy: 0,
             pressure: 80,
-            density: 10,
+            density: 4,
         });
     }
     if ra < 5 || api.get(dx, dy).species == Species::Water {
@@ -529,16 +557,18 @@ pub fn update_mite(cell: Cell, mut api: SandApi) {
     i = (js_sys::Math::random() * 1000.0) as i32;
     let sy = (i % 3) - 1;
     let sample = api.get(sx, sy).species;
-    if sample == Species::Fire || sample == Species::Lava {
+    if sample == Species::Fire || sample == Species::Lava || sample == Species::Water {
         api.set(0, 0, EMPTY_CELL);
         return;
     }
-    if (sample == Species::Plant || sample == Species::Wood) && i > 970 {
-        api.set(sx, sy, if i > 990 { cell } else { EMPTY_CELL });
+    if (sample == Species::Plant || sample == Species::Wood) && i > 800 {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(sx, sy, cell);
+
+        return;
     }
     if sample == Species::Dust {
-        api.set(sx, sy, EMPTY_CELL);
-        mite.rb = (i % 50) as u8;
+        api.set(sx, sy, if i > 800 { cell } else { EMPTY_CELL });
     }
     if nbr.species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
