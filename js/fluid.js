@@ -466,15 +466,24 @@ function startFluid({ universe }) {
     // ADVECTION
     // velocityRead ->
     // velocityWrite
-
     advectionProgram.bind();
+
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(advectionProgram.uniforms.uVelocity, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(advectionProgram.uniforms.uSource, texUnit++);
+
     gl.uniform2f(
       advectionProgram.uniforms.texelSize,
       1.0 / texWidth,
       1.0 / texHeight
     );
-    gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read[2]);
-    gl.uniform1i(advectionProgram.uniforms.uSource, velocity.read[2]);
+    // gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read[2]);
+    // gl.uniform1i(advectionProgram.uniforms.uSource, velocity.read[2]);
     gl.uniform1f(advectionProgram.uniforms.dt, dt);
     gl.uniform1f(
       advectionProgram.uniforms.dissipation,
@@ -502,9 +511,22 @@ function startFluid({ universe }) {
     // densityRead ->
     // densityWrite
 
-    gl.uniform1i(advectionProgram.uniforms.uWind, burns[2]);
-    gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read[2]);
-    gl.uniform1i(advectionProgram.uniforms.uSource, density.read[2]);
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, burns[0]);
+    gl.uniform1i(advectionProgram.uniforms.uWind, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(advectionProgram.uniforms.uVelocity, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, density.read[0]);
+    gl.uniform1i(advectionProgram.uniforms.uSource, texUnit++);
+
+    // gl.uniform1i(advectionProgram.uniforms.uWind, burns[2]);
+    // gl.uniform1i(advectionProgram.uniforms.uVelocity, velocity.read[2]);
+    // gl.uniform1i(advectionProgram.uniforms.uSource, density.read[2]);
     gl.uniform1f(
       advectionProgram.uniforms.dissipation,
       config.DENSITY_DISSIPATION
@@ -526,12 +548,18 @@ function startFluid({ universe }) {
     // CURL
     // velocityRead -> curl
     curlProgram.bind();
+
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(curlProgram.uniforms.uVelocity, texUnit++);
+
     gl.uniform2f(
       curlProgram.uniforms.texelSize,
       1.0 / texWidth,
       1.0 / texHeight
     );
-    gl.uniform1i(curlProgram.uniforms.uVelocity, velocity.read[2]);
+    // gl.uniform1i(curlProgram.uniforms.uVelocity, velocity.read[2]);
     blit(curl[1]);
 
     // VORTICITY
@@ -540,14 +568,24 @@ function startFluid({ universe }) {
     // velocityWrite
 
     vorticityProgram.bind();
+
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(vorticityProgram.uniforms.uVelocity, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, curl[0]);
+    gl.uniform1i(vorticityProgram.uniforms.uCurl, texUnit++);
+
     gl.uniform2f(
       vorticityProgram.uniforms.texelSize,
       1.0 / texWidth,
       1.0 / texHeight
     );
 
-    gl.uniform1i(vorticityProgram.uniforms.uVelocity, velocity.read[2]);
-    gl.uniform1i(vorticityProgram.uniforms.uCurl, curl[2]);
+    // gl.uniform1i(vorticityProgram.uniforms.uVelocity, velocity.read[2]);
+    // gl.uniform1i(vorticityProgram.uniforms.uCurl, curl[2]);
     gl.uniform1f(vorticityProgram.uniforms.curl, config.CURL);
     gl.uniform1f(vorticityProgram.uniforms.dt, dt);
     blit(velocity.write[1]);
@@ -557,12 +595,18 @@ function startFluid({ universe }) {
     // velocityRead ->
     // divergence
     divergenceProgram.bind();
+
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(divergenceProgram.uniforms.uVelocity, texUnit++);
+
     gl.uniform2f(
       divergenceProgram.uniforms.texelSize,
       1.0 / texWidth,
       1.0 / texHeight
     );
-    gl.uniform1i(divergenceProgram.uniforms.uVelocity, velocity.read[2]);
+    // gl.uniform1i(divergenceProgram.uniforms.uVelocity, velocity.read[2]);
     blit(divergence[1]);
 
     // CLEAR
@@ -570,12 +614,24 @@ function startFluid({ universe }) {
     // pressureRead->
     // pressureWrite
     clearProgram.bind();
-    let pressureTexId = pressure.read[2];
-    gl.activeTexture(gl.TEXTURE0 + pressureTexId);
-    gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
 
-    gl.uniform1i(clearProgram.uniforms.uWind, burns[2]);
-    gl.uniform1i(clearProgram.uniforms.uTexture, pressureTexId);
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, burns[0]);
+    gl.uniform1i(clearProgram.uniforms.uWind, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
+    gl.uniform1i(clearProgram.uniforms.uTexture, texUnit++);
+
+    let pressureTexId = texUnit - 1;
+
+    // let pressureTexId = pressure.read[2];
+    // gl.activeTexture(gl.TEXTURE0 + pressureTexId);
+    // gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
+
+    // gl.uniform1i(clearProgram.uniforms.uWind, burns[2]);
+    // gl.uniform1i(clearProgram.uniforms.uTexture, pressureTexId);
     gl.uniform1f(clearProgram.uniforms.value, config.PRESSURE_DISSIPATION);
 
     blit(pressure.write[1]);
@@ -586,12 +642,22 @@ function startFluid({ universe }) {
     // pressureRead->
     // pressureWrite
     pressureProgram.bind();
+    //TODO
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, divergence[0]);
+    gl.uniform1i(pressureProgram.uniforms.uDivergence, texUnit++);
+
+    // gl.activeTexture(gl.TEXTURE0 + texUnit);
+    // gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
+    // gl.uniform1i(clearProgram.uniforms.uTexture, texUnit++);
+
     gl.uniform2f(
       pressureProgram.uniforms.texelSize,
       1.0 / texWidth,
       1.0 / texHeight
     );
-    gl.uniform1i(pressureProgram.uniforms.uDivergence, divergence[2]);
+    // gl.uniform1i(pressureProgram.uniforms.uDivergence, divergence[2]);
     pressureTexId = pressure.read[2];
     gl.uniform1i(pressureProgram.uniforms.uPressure, pressureTexId);
     gl.activeTexture(gl.TEXTURE0 + pressureTexId);
@@ -606,8 +672,18 @@ function startFluid({ universe }) {
     // pressureRead ->
     // velocityOut
     velocityOutProgram.bind();
-    gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
-    gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
+
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(velocityOutProgram.uniforms.uTexture, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
+    gl.uniform1i(velocityOutProgram.uniforms.uPressure, texUnit++);
+
+    // gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
+    // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, winds);
 
@@ -617,15 +693,29 @@ function startFluid({ universe }) {
     // velocityRead ->
     // velocityWrite
     gradientSubtractProgram.bind();
+
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, burns[0]);
+    gl.uniform1i(gradientSubtractProgram.uniforms.uWind, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
+    gl.uniform1i(gradientSubtractProgram.uniforms.uPressure, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(gradientSubtractProgram.uniforms.uVelocity, texUnit++);
+
     gl.uniform2f(
       gradientSubtractProgram.uniforms.texelSize,
       1.0 / texWidth,
       1.0 / texHeight
     );
 
-    gl.uniform1i(gradientSubtractProgram.uniforms.uWind, burns[2]);
-    gl.uniform1i(gradientSubtractProgram.uniforms.uPressure, pressure.read[2]);
-    gl.uniform1i(gradientSubtractProgram.uniforms.uVelocity, velocity.read[2]);
+    // gl.uniform1i(gradientSubtractProgram.uniforms.uWind, burns[2]);
+    // gl.uniform1i(gradientSubtractProgram.uniforms.uPressure, pressure.read[2]);
+    // gl.uniform1i(gradientSubtractProgram.uniforms.uVelocity, velocity.read[2]);
     blit(velocity.write[1]);
     velocity.swap();
 
@@ -635,14 +725,26 @@ function startFluid({ universe }) {
     // density ->
     // null/renderbuffer?
     displayProgram.bind();
-    gl.uniform1i(displayProgram.uniforms.uTexture, density.read[2]);
+
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, density.read[0]);
+    gl.uniform1i(displayProgram.uniforms.uTexture, texUnit++);
+
+    // gl.uniform1i(displayProgram.uniforms.uTexture, density.read[2]);
 
     blit(null);
   }
 
   function splat(x, y, dx, dy, color) {
     splatProgram.bind();
-    gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read[2]);
+
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(splatProgram.uniforms.uTarget, texUnit++);
+
+    // gl.uniform1i(splatProgram.uniforms.uTarget, velocity.read[2]);
     gl.uniform1f(
       splatProgram.uniforms.aspectRatio,
       canvas.width / canvas.height
@@ -660,7 +762,11 @@ function startFluid({ universe }) {
     blit(velocity.write[1]);
     velocity.swap();
 
-    gl.uniform1i(splatProgram.uniforms.uTarget, density.read[2]);
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, density.read[0]);
+    gl.uniform1i(splatProgram.uniforms.uTarget, texUnit++);
+
+    // gl.uniform1i(splatProgram.uniforms.uTarget, density.read[2]);
     gl.uniform3f(splatProgram.uniforms.color, color[0], color[1], color[2]);
     blit(density.write[1]);
     density.swap();
