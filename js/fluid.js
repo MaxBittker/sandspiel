@@ -292,22 +292,21 @@ function startFluid({ universe }) {
     const rg = ext.formatRG;
     const r = ext.formatR;
 
-    density = createDoubleFBO(
-      2,
-      textureWidth,
-      textureHeight,
-      rgba.internalFormat,
-      rgba.format,
-      texType,
-      ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
-    );
-
     velocity = createDoubleFBO(
       0,
       textureWidth,
       textureHeight,
       rg.internalFormat,
       rg.format,
+      texType,
+      ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
+    );
+    density = createDoubleFBO(
+      2,
+      textureWidth,
+      textureHeight,
+      rgba.internalFormat,
+      rgba.format,
       texType,
       ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
     );
