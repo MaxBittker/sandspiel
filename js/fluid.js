@@ -301,24 +301,7 @@ function startFluid({ universe }) {
       texType,
       ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
     );
-    burns = createFBO(
-      8,
-      textureWidth,
-      textureHeight,
-      rg.internalFormat,
-      rg.format,
-      texType,
-      ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
-    );
-    velocityOut = createFBO(
-      9,
-      textureWidth,
-      textureHeight,
-      gl.RGBA,
-      gl.RGBA,
-      gl.UNSIGNED_BYTE,
-      ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
-    );
+
     velocity = createDoubleFBO(
       0,
       textureWidth,
@@ -355,11 +338,30 @@ function startFluid({ universe }) {
       texType,
       gl.NEAREST
     );
+    burns = createFBO(
+      8,
+      textureWidth,
+      textureHeight,
+      rg.internalFormat,
+      rg.format,
+      texType,
+      ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
+    );
+    velocityOut = createFBO(
+      9,
+      textureWidth,
+      textureHeight,
+      gl.RGBA,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
+    );
   }
 
   function createFBO(texId, w, h, internalFormat, format, type, param) {
     gl.activeTexture(gl.TEXTURE0 + texId);
     let texture = gl.createTexture();
+
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, param);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, param);
@@ -434,6 +436,7 @@ function startFluid({ universe }) {
   })();
 
   let lastTime = Date.now();
+
   // multipleSplats(parseInt(Math.random() * 20) + 5);
 
   const width = universe.width();
