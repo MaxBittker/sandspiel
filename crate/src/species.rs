@@ -229,7 +229,7 @@ pub fn update_clone(cell: Cell, mut api: SandApi) {
 pub fn update_fire(cell: Cell, mut api: SandApi) {
     let ra = cell.ra;
     let mut degraded = cell.clone();
-    degraded.ra = ra - 2;
+    degraded.ra = ra - (2 + rand_dir()) as u8;
 
     let dx = rand_dir();
     let dy = rand_dir();
