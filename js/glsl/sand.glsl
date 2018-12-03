@@ -81,8 +81,8 @@ void main() {
     saturation = 0.1;
     // lightness = 0.2 + data.g * 0.5;
   } else if (type == 14) { // dust
-    hue = (data.g * 1.5) + t * .0008;
-    saturation = 0.5;
+    hue = (data.g * 2.0) + t * .0008;
+    saturation = 0.4;
     lightness = 0.8;
   } else if (type == 15) { // mite
     hue = 0.8;

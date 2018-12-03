@@ -164,7 +164,6 @@ impl Universe {
             }
         }
         self.generation = self.generation.wrapping_add(1);
-        // self.cells = next;
     }
 
     pub fn width(&self) -> i32 {
@@ -224,7 +223,7 @@ impl Universe {
                 } else {
                     Cell {
                         species: Species::Powder,
-                        ra: 80 + (js_sys::Math::random() * 80.) as u8,
+                        ra: 100 + (js_sys::Math::random() * 40.) as u8,
                         rb: 0,
                         clock: 0,
                     }

@@ -4,8 +4,10 @@ varying vec2 vUv;
 uniform sampler2D uTexture;
 void main() {
   vec3 color = texture2D(uTexture, vUv).rgb * 0.1;
-  color = min(color, 0.4);
+  color *= 0.5;
+  color = min(color, 0.9);
   color = vec3(1.0) - color;
   color *= vec3(0.95, 0.9, 0.9);
+  // color *= 0.5;
   gl_FragColor = vec4(color, 1.0);
 }

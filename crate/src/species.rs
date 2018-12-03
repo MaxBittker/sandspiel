@@ -12,6 +12,14 @@ fn rand_dir() -> i32 {
     (i % 3) - 1
 }
 
+fn rand_dir_2() -> i32 {
+    let i = (js_sys::Math::random() * 1000.0) as i32;
+    if (i % 2) == 0 {
+        -1
+    } else {
+        1
+    }
+}
 #[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -134,11 +142,16 @@ pub fn update_stone(cell: Cell, mut api: SandApi) {
 
 pub fn update_water(cell: Cell, mut api: SandApi) {
     let dx = rand_dir();
-    // i = (js_sys::Math::random() * 100.0) as i32;
 
     if api.get(0, 1).species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
         api.set(0, 1, cell);
+    } else if api.get(dx, 1).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(dx, 1, cell);
+    } else if api.get(-dx, 1).species == Species::Empty {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(-dx, 1, cell);
     } else if api.get(dx, 0).species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
         api.set(dx, 0, cell);
@@ -224,7 +237,7 @@ pub fn update_fire(cell: Cell, mut api: SandApi) {
         dx: 0,
         dy: 150,
         pressure: 1,
-        density: 25,
+        density: 50,
     });
     if api.get(dx, dy).species == Species::Gas || api.get(dx, dy).species == Species::Dust {
         api.set(
