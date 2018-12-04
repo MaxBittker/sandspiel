@@ -1,0 +1,19 @@
+{
+  "name": "Sandtable",
+  "icons": [
+    {
+      "src": "/images/icons-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/images/icons-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#f3e7e5",
+  "display": "standalone",
+  "theme_color": "#f3e7e5"
+}
