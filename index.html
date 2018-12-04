@@ -1,29 +1,36 @@
 <!DOCTYPE html>
 <html>
-<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, user-scalable=no"
+  />
 
-<script src="https://browser.sentry-cdn.com/4.2.3/bundle.min.js" crossorigin="anonymous"></script>
-<script>
-  Sentry.init({ dsn: 'https://4bf8c3ab764f40569d573fc4021efe40@sentry.io/1331284' });
-</script>
+  <script
+    src="https://browser.sentry-cdn.com/4.2.3/bundle.min.js"
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    Sentry.init({
+      dsn: "https://4bf8c3ab764f40569d573fc4021efe40@sentry.io/1331284"
+    });
+  </script>
 
-<head>
-  <meta charset="utf-8">
-  <title>sandtable</title>
-  <link rel="stylesheet" type="text/css" href="styles.css">
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <title>sandtable</title>
+    <link rel="manifest" href="/manifest.json" />
+    <link
+      href="https://fonts.googleapis.com/css?family=Inconsolata"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
 
-<body>
-  <div id="background">
-
-    <div id="ui">
-
+  <body>
+    <div id="background">
+      <div id="ui"></div>
+      <div id="fps"></div>
+      <canvas id="sand-canvas"></canvas> <canvas id="fluid-canvas"></canvas>
     </div>
-    <div id="fps"></div>
-    <canvas id="sand-canvas"></canvas>
-    <canvas id="fluid-canvas"></canvas>
-  </div>
-
-<script type="text/javascript" src="bundle.js"></script></body>
-
+  <script type="text/javascript" src="bundle.js"></script></body>
 </html>

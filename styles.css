@@ -1,6 +1,7 @@
 * {
   margin: 0;
-  font-family: monospace;
+  /* font-family: monospace; */
+  font-family: "Inconsolata", monospace;
 }
 
 html,
@@ -51,7 +52,7 @@ button {
   position: relative;
   height: 30px;
   min-width: 30px;
-  font-size: 14px;
+  font-size: 19px;
   background-color: whitesmoke;
   color: black;
   border: 2px solid whitesmoke;
@@ -90,7 +91,7 @@ button.selected {
   text-align: right;
   display: inline-block;
   white-space: pre;
-  font-family: monospace;
+  /* font-family: monospace; */
   user-select: none;
 }
 
