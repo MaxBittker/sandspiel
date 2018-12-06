@@ -32,7 +32,7 @@ if (mobileAndTabletcheck()) {
   };
 }
 
-const universe = Universe.new(250, 250);
+const universe = Universe.new(300, 300);
 const width = universe.width();
 const height = universe.height();
 const canvas = document.getElementById("sand-canvas");
