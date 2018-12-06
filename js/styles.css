@@ -53,6 +53,7 @@ button {
   height: 30px;
   min-width: 30px;
   font-size: 19px;
+  padding: 1px 5px;
   background-color: whitesmoke;
   color: black;
   border: 2px solid whitesmoke;

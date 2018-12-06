@@ -222,8 +222,8 @@ impl Universe {
                     EMPTY_CELL
                 } else {
                     Cell {
-                        species: Species::Powder,
-                        ra: 120 + (js_sys::Math::random() * 50.) as u8,
+                        species: Species::Sand,
+                        ra: 80 + (js_sys::Math::random() * 90.) as u8,
                         rb: 0,
                         clock: 0,
                     }
@@ -298,7 +298,7 @@ impl Universe {
             dy = 1;
         }
         if cell.species != Species::Wall
-            && cell.species != Species::Clone
+            && cell.species != Species::Cloner
             && (dx != 0 || dy != 0)
             && api.get(dx, dy).species == Species::Empty
         {

@@ -41,6 +41,8 @@ void main() {
     lightness = 0.4;
   } else if (type == 2) {
     hue = 0.1;
+    saturation = 0.5;
+    lightness += 0.3;
   } else if (type == 3) { // water
     hue = 0.6;
     lightness = 0.7 + data.g * 0.25 + noise * 0.1;
@@ -53,7 +55,9 @@ void main() {
     saturation = 0.3;
   } else if (type == 6) { // fire
     hue = (data.g * 0.1);
-    lightness = 0.8 + data.g * 0.3 + noise * 0.1;
+    saturation = 0.7;
+
+    lightness = 0.7 + (data.g * 0.3) + ((noise + 0.8) * 0.5);
   } else if (type == 7) { // wood
     hue = (data.g * 0.1);
     saturation = 0.3;
@@ -77,7 +81,7 @@ void main() {
     saturation = 0.9;
     lightness = 0.8 + data.g * 0.2 + noise * 0.05;
   } else if (type == 13) { // stone
-    hue = 0.9;
+    hue = -0.4 + (data.g * 0.5);
     saturation = 0.1;
     // lightness = 0.2 + data.g * 0.5;
   } else if (type == 14) { // dust
@@ -88,6 +92,11 @@ void main() {
     hue = 0.8;
     saturation = 0.3;
     lightness = 0.8;
+  } else if (type == 16) { // oil
+    hue = (data.g * 5.0) + t * .008;
+
+    saturation = 0.2;
+    lightness = 0.3;
   }
   lightness *= (0.95 + snoise2(floor(uv * resolution / dpi)) * 0.05);
 
