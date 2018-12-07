@@ -7,13 +7,17 @@ use std::mem;
 use wasm_bindgen::prelude::*;
 // use web_sys::console;
 
+fn rand_int(n: i32) -> i32 {
+    (js_sys::Math::random() * n as f64) as i32
+}
+
 fn rand_dir() -> i32 {
-    let i = (js_sys::Math::random() * 1000.0) as i32;
+    let i = rand_int(1000);
     (i % 3) - 1
 }
 
 fn rand_dir_2() -> i32 {
-    let i = (js_sys::Math::random() * 1000.0) as i32;
+    let i = rand_int(1000);
     if (i % 2) == 0 {
         -1
     } else {
@@ -231,7 +235,7 @@ pub fn update_oil(cell: Cell, mut api: SandApi) {
                 dy,
                 Cell {
                     species: Species::Fire,
-                    ra: 20 + (js_sys::Math::random() * 30.) as u8,
+                    ra: 20 + rand_int(30) as u8,
                     rb: 0,
                     clock: 0,
                 },
@@ -330,7 +334,7 @@ pub fn update_cloner(cell: Cell, mut api: SandApi) {
                         Cell {
                             species: clone_species,
                             ra: 80
-                                + (js_sys::Math::random() * 30.) as u8
+                                + rand_int(30) as u8
                                 + ((cell.clock % 127) as i8 - 60).abs() as u8,
                             rb: 0,
                             clock: 0,
@@ -460,7 +464,7 @@ pub fn update_wood(cell: Cell, mut api: SandApi) {
                 dy,
                 Cell {
                     species: Species::Fire,
-                    ra: 50,
+                    ra: 30 + rand_int(60) as u8,
                     rb: 0,
                     clock: 0,
                 },
@@ -494,7 +498,7 @@ pub fn update_wood(cell: Cell, mut api: SandApi) {
 pub fn update_ice(cell: Cell, mut api: SandApi) {
     let dx = rand_dir();
     let dy = rand_dir();
-    let i = (js_sys::Math::random() * 100.0) as i32;
+    let i = rand_int(100);
 
     let fluid = api.get_fluid();
 
@@ -541,7 +545,7 @@ pub fn update_ice(cell: Cell, mut api: SandApi) {
 pub fn update_plant(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
-    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let mut i = rand_int(100);
     let dx = rand_dir();
     let dy = rand_dir();
     let nbr_species = api.get(dx, dy).species;
@@ -580,7 +584,7 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
         && (api.get(-dx, dy).species == Species::Empty
             || api.get(-dx, dy).species == Species::Water)
     {
-        i = (js_sys::Math::random() * 100.0) as i32;
+        i = rand_int(100);
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
         api.set(
@@ -611,7 +615,7 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
                 dy,
                 Cell {
                     species: Species::Fire,
-                    ra: 50,
+                    ra: 20 + rand_int(30) as u8,
                     rb: 0,
                     clock: 0,
                 },
@@ -638,7 +642,7 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
         && api.get(-1, 1).species != Species::Plant
     {
         let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
-        let dec = ((js_sys::Math::random() * 30.) - 20.) as i32;
+        let dec = rand_int(30) - 20;
         if (i + ra as i32) > 165 {
             api.set(
                 0,
@@ -666,7 +670,7 @@ pub fn update_acid(cell: Cell, mut api: SandApi) {
     let ra = cell.ra;
     let mut degraded = cell.clone();
     degraded.ra = ra - 60;
-    // i = (js_sys::Math::random() * 100.0) as i32;
+    // i = rand_int(100);
     if degraded.ra < 80 {
         degraded = EMPTY_CELL;
     }
@@ -705,7 +709,7 @@ pub fn update_acid(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_mite(cell: Cell, mut api: SandApi) {
-    let mut i = (js_sys::Math::random() * 100.0) as i32;
+    let mut i = rand_int(100);
     let mut dx = 0;
     if cell.ra < 20 {
         dx = (cell.ra as i32) - 1;
@@ -720,7 +724,7 @@ pub fn update_mite(cell: Cell, mut api: SandApi) {
     let nbr = api.get(dx, dy);
 
     let sx = (i % 3) - 1;
-    i = (js_sys::Math::random() * 1000.0) as i32;
+    i = rand_int(1000);
     let sy = (i % 3) - 1;
     let sample = api.get(sx, sy).species;
     if sample == Species::Fire
@@ -744,7 +748,7 @@ pub fn update_mite(cell: Cell, mut api: SandApi) {
         api.set(0, 0, EMPTY_CELL);
         api.set(dx, dy, mite);
     } else if dy == 1 && i > 800 {
-        i = (js_sys::Math::random() * 100.0) as i32;
+        i = rand_int(100);
         let mut ndx = (i % 3) - 1;
         if i < 6 {
             ndx = dx;
