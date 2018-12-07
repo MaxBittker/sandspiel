@@ -783,22 +783,17 @@ function startFluid({ universe }) {
     }
   }
 
-  function resizeCanvas() {
-    if (
-      canvas.width != canvas.clientWidth ||
-      canvas.height != canvas.clientHeight
-    ) {
-      canvas.width = canvas.clientWidth;
-      canvas.height = canvas.clientHeight;
-      initFramebuffers();
-    }
-  }
+  let boundingRect;
+  let scaleX;
+  let scaleY;
 
-  const boundingRect = sandCanvas.getBoundingClientRect();
-  const scaleX =
-    sandCanvas.width / window.devicePixelRatio / boundingRect.width;
-  const scaleY =
-    sandCanvas.height / window.devicePixelRatio / boundingRect.height;
+  let resize = () => {
+    boundingRect = sandCanvas.getBoundingClientRect();
+    scaleX = sandCanvas.width / window.devicePixelRatio / boundingRect.width;
+    scaleY = sandCanvas.height / window.devicePixelRatio / boundingRect.height;
+  };
+  resize();
+  window.addEventListener("resize", resize);
 
   sandCanvas.addEventListener("mousemove", e => {
     const canvasLeft = (e.clientX - boundingRect.left) * scaleX;

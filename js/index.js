@@ -46,27 +46,32 @@ document.getElementById("background").addEventListener("touchmove", e => {
 
 const ui = document.getElementById("ui");
 
-let screen_width = window.innerWidth;
-let uiheight = ui.offsetHeight;
-let screen_height = window.innerHeight - uiheight;
+let resize = () => {
+  let screen_width = window.innerWidth;
+  let uiheight = ui.offsetHeight;
+  let screen_height = window.innerHeight - uiheight;
 
-let canvasStyle = "";
-if (screen_width > screen_height) {
-  if (screen_width - window.innerHeight < 225) {
-    canvasStyle = `height: ${window.innerHeight}px; margin:3px`;
-    ui.style = `width: ${screen_width -
-      window.innerHeight -
-      11}px; margin: 3px;`;
+  let canvasStyle = "";
+  if (screen_width > screen_height) {
+    if (screen_width - window.innerHeight < 225) {
+      canvasStyle = `height: ${window.innerHeight}px; margin:3px`;
+      ui.style = `width: ${screen_width -
+        window.innerHeight -
+        12}px; margin: 2px;`;
+    } else {
+      canvasStyle = `height: ${window.innerHeight}px`;
+      ui.style = `width: ${(screen_width - window.innerHeight) / 2 -
+        7}px; margin: 2px;`;
+    }
   } else {
-    canvasStyle = `height: ${window.innerHeight}px`;
-    ui.style = `width: ${(screen_width - window.innerHeight) / 2 -
-      7}px; margin: 3px;`;
+    canvasStyle = `width: ${screen_width}px; bottom:3px;`;
   }
-} else {
-  canvasStyle = `width: ${screen_width}px; bottom:3px;`;
-}
-canvas.style = canvasStyle;
-canvas2.style = canvasStyle;
+  canvas.style = canvasStyle;
+  canvas2.style = canvasStyle;
+};
+
+resize();
+window.addEventListener("resize", resize);
 
 let fluid_update = startFluid({ universe });
 
