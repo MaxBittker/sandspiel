@@ -31,15 +31,15 @@ if (mobileAndTabletcheck()) {
     return true;
   };
 }
+let n = 300;
+const universe = Universe.new(n, n);
 
-const universe = Universe.new(300, 300);
-const width = universe.width();
-const height = universe.height();
 const canvas = document.getElementById("sand-canvas");
 const canvas2 = document.getElementById("fluid-canvas");
 
-canvas.height = height * window.devicePixelRatio;
-canvas.width = width * window.devicePixelRatio;
+canvas.height = n * window.devicePixelRatio;
+canvas.width = n * window.devicePixelRatio;
+
 document.getElementById("background").addEventListener("touchmove", e => {
   e.preventDefault();
 });

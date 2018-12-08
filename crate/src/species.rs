@@ -45,6 +45,7 @@ pub enum Species {
     Dust = 14,
     Mite = 15,
     Oil = 16,
+    Firework = 17,
 }
 
 impl Species {
@@ -58,7 +59,7 @@ impl Species {
             Species::Stone => update_stone(cell, api),
             Species::Gas => update_gas(cell, api),
             Species::Cloner => update_cloner(cell, api),
-            // Species::Firework => update_cloner(cell, api),
+            Species::Firework => update_firework(cell, api),
             Species::Fire => update_fire(cell, api),
             Species::Wood => update_wood(cell, api),
             Species::Lava => update_lava(cell, api),
@@ -344,6 +345,146 @@ pub fn update_cloner(cell: Cell, mut api: SandApi) {
                 }
             }
         }
+    }
+}
+
+pub fn update_firework(cell: Cell, mut api: SandApi) {
+    if cell.rb == 0 {
+        api.set(
+            0,
+            0,
+            Cell {
+                ra: 0,
+                rb: 100,
+                ..cell
+            },
+        );
+        return;
+    }
+
+    let clone_species = if cell.rb != 100 {
+        unsafe { mem::transmute(cell.rb as u8) }
+    } else {
+        Species::Sand
+    };
+
+    let sx = rand_dir();
+    let sy = rand_dir();
+    let sample = api.get(sx, sy);
+
+    if cell.rb == 100
+        && (sample.species != Species::Empty)
+        && sample.species != Species::Firework
+        && sample.species != Species::Wall
+    {
+        api.set(
+            0,
+            0,
+            Cell {
+                rb: sample.species as u8,
+                ..cell
+            },
+        );
+        return;
+    } else if cell.rb == 100 && sample.species == Species::Firework && sample.rb != 100 {
+        api.set(
+            0,
+            0,
+            Cell {
+                rb: sample.rb,
+                ..cell
+            },
+        );
+        return;
+    }
+    let ra = cell.ra;
+
+    if ra == 0 {
+        //falling
+        let dx = rand_dir();
+        let nbr = api.get(0, 1);
+        if nbr.species == Species::Empty {
+            api.set(0, 0, EMPTY_CELL);
+            api.set(0, 1, cell);
+        } else if api.get(dx, 1).species == Species::Empty {
+            api.set(0, 0, EMPTY_CELL);
+            api.set(dx, 1, cell);
+        } else if nbr.species == Species::Water
+            || nbr.species == Species::Gas
+            || nbr.species == Species::Oil
+            || nbr.species == Species::Acid
+        {
+            api.set(0, 0, nbr);
+            api.set(0, 1, cell);
+        } else {
+            api.set(0, 0, cell);
+        }
+    } else if ra > 5 {
+        //rising
+
+        if api.get(0, -2).species == Species::Empty || api.get(0, -2).species == Species::Firework {
+            api.set(
+                0,
+                -2,
+                Cell {
+                    ra: ra.saturating_sub(1),
+                    ..cell
+                },
+            );
+            api.set(0, 0, EMPTY_CELL);
+        } else {
+            api.set(
+                0,
+                0,
+                Cell {
+                    ra: ra.saturating_sub(1),
+                    ..cell
+                },
+            );
+        }
+        if ra < 10 {
+            api.set_fluid(Wind {
+                dx: 0,
+                dy: 90,
+                pressure: 80,
+                density: 90,
+            });
+        }
+        return;
+    } else {
+        api.set_fluid(Wind {
+            dx: 0,
+            dy: 90,
+            pressure: 80,
+            density: 90,
+        });
+        let spawned = Cell {
+            species: clone_species,
+            ra: 80 + (js_sys::Math::random() * 90.) as u8,
+
+            rb: 0,
+            clock: 0,
+        };
+        api.set(1, 0, spawned);
+        api.set(-1, 0, spawned);
+        api.set(0, 1, spawned);
+        api.set(0, -1, spawned);
+        api.set(0, 0, spawned);
+        return;
+    }
+
+    if sample.species == Species::Fire
+        || sample.species == Species::Lava
+        || (sample.species == Species::Firework && sample.ra > 5)
+    {
+        api.set(
+            0,
+            0,
+            Cell {
+                ra: 50 + rand_int(40) as u8,
+                ..cell
+            },
+        );
     }
 }
 pub fn update_fire(cell: Cell, mut api: SandApi) {

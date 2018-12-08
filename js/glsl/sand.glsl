@@ -22,6 +22,8 @@ void main() {
   // color = hsv2rgb(vec3(sin(t * 0.01), 0.5, 0.5));
 
   vec2 textCoord = (uv * vec2(0.5, -0.5)) + vec2(0.5);
+  // vec3 bb = texture2D(backBuffer, (uv * 0.5) + vec2(0.5)).rgb;
+
   vec4 data = texture2D(data, textCoord);
   int type = int((data.r * 255.) + 0.1);
   float hue = 0.0;
@@ -97,6 +99,10 @@ void main() {
 
     saturation = 0.2;
     lightness = 0.3;
+  } else if (type == 17) {
+    hue = 0.0;
+    saturation = 0.4 + data.b;
+    lightness = 0.9;
   }
   lightness *= (0.95 + snoise2(floor(uv * resolution / dpi)) * 0.05);
 
