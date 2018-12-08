@@ -19,7 +19,7 @@ module.exports = {
       "index.html",
       "js/styles.css",
       "manifest.json",
-      "favicon.ico"
+      "assets/*"
     ]),
     new HtmlWebpackPlugin({ template: "index.html" })
   ],

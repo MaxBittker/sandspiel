@@ -373,7 +373,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
     let sample = api.get(sx, sy);
 
     if cell.rb == 100
-        && (sample.species != Species::Empty)
+        && sample.species != Species::Empty
         && sample.species != Species::Firework
         && sample.species != Species::Wall
     {
@@ -461,7 +461,6 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
         let spawned = Cell {
             species: clone_species,
             ra: 80 + (js_sys::Math::random() * 90.) as u8,
-
             rb: 0,
             clock: 0,
         };
@@ -475,7 +474,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
 
     if sample.species == Species::Fire
         || sample.species == Species::Lava
-        || (sample.species == Species::Firework && sample.ra > 5)
+        || (sample.species == Species::Firework && sample.ra > 5 && sample.rb != 0)
     {
         api.set(
             0,

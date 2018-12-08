@@ -34,6 +34,8 @@ if (mobileAndTabletcheck()) {
 let n = 300;
 const universe = Universe.new(n, n);
 
+let width = n;
+let height = n;
 const canvas = document.getElementById("sand-canvas");
 const canvas2 = document.getElementById("fluid-canvas");
 
