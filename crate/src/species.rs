@@ -36,7 +36,7 @@ pub enum Species {
     Ice = 9,
     Gas = 4,
     Cloner = 5,
-    Sink = 10,
+    // Sink = 10,
     Mite = 15,
     Wood = 7,
     Plant = 11,
@@ -46,6 +46,7 @@ pub enum Species {
     Dust = 14,
     Oil = 16,
     Firework = 17,
+    // Goo = 18,
 }
 
 impl Species {
@@ -66,7 +67,7 @@ impl Species {
             Species::Ice => update_ice(cell, api),
             // Species::Snow => update_ice(cell, api),
             //lightning
-            Species::Sink => update_sink(cell, api),
+            // Species::Sink => update_sink(cell, api),
             Species::Plant => update_plant(cell, api),
             Species::Acid => update_acid(cell, api),
             Species::Mite => update_mite(cell, api),
@@ -376,6 +377,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
         && sample.species != Species::Empty
         && sample.species != Species::Firework
         && sample.species != Species::Wall
+        && sample.species != Species::Cloner
     {
         api.set(
             0,
@@ -796,12 +798,27 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
     }
 }
 pub fn update_sink(cell: Cell, mut api: SandApi) {
-    let dx = rand_dir();
-    let dy = rand_dir();
-    if api.get(dx, dy).species != Species::Empty {
-        api.set(dx, dy, EMPTY_CELL);
+    let mut dx = rand_dir();
+    let mut dy = rand_dir();
+
+    // api.set_fluid(Wind {
+    //     dx: 0,
+    //     dy: 0,
+    //     pressure: 5,
+    //     density: 0,
+    // });
+    if api.get(-dx, dy).species != Species::Wall {
+        api.set(0, 0, EMPTY_CELL);
+        api.set(-dx, dy, cell);
+    } else {
         api.set(0, 0, cell);
     }
+    // dx = rand_dir();
+    // dy = rand_dir();
+    // if api.get(dx, dy).species != Species::Empty {
+    //     api.set(dx, dy, EMPTY_CELL);
+    //     api.set(0, 0, cell);
+    // }
 }
 
 pub fn update_acid(cell: Cell, mut api: SandApi) {
