@@ -77,13 +77,15 @@ window.addEventListener("resize", resize);
 
 let fluid_update = startFluid({ universe });
 
+let drawSand = startWebGL({ canvas, universe });
+
 const renderLoop = () => {
   fps.render(); // new
   universe.tick();
+  drawSand();
   fluid_update();
   window.animationId = requestAnimationFrame(renderLoop);
 };
 
-startWebGL({ canvas, universe });
 renderLoop();
 export { renderLoop, canvas, width, height, universe, ratio };

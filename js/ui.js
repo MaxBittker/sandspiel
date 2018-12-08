@@ -1,9 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
-
+import { memory } from "../crate/pkg/sandtable_bg";
 import { Species } from "../crate/pkg";
 
 import { height, renderLoop, universe, width } from "./index.js";
+import { snapshot } from "./render.js";
 
 const canvas = document.getElementById("sand-canvas");
 
@@ -133,6 +134,25 @@ const paint = event => {
   );
 };
 
+const Menu = ({ close, children }) => {
+  return (
+    <div className={"menu"}>
+      {children}
+      {/* <h3>Sandspiel</h3>
+      <p>here's some information</p>
+      <p>
+        Wall = 1, Sand = 2, Water = 3, Stone = 13, Ice = 9, Gas = 4, Cloner = 5,
+        // Sink = 10, Mite = 15, Wood = 7, Plant = 11, Fire = 6, Lava = 8, Acid
+        = 12, Dust = 14, Oil = 16, Firework = 17,
+      </p> */}
+      <button className="x" onClick={close}>
+        {" "}
+        x
+      </button>
+    </div>
+  );
+};
+
 const ElementButton = (name, selectedElement, setElement) => {
   let elementID = Species[name];
   return (
@@ -155,7 +175,13 @@ let sizeMap = [2, 5, 10, 18, 30, 45];
 class Index extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { paused: false, size: 2, selectedElement: Species.Water };
+    this.state = {
+      menuOpen: false,
+      paused: false,
+      size: 2,
+      dataURL: {},
+      selectedElement: Species.Water
+    };
   }
 
   playPause() {
@@ -176,10 +202,35 @@ class Index extends React.Component {
   reset() {
     window.confirm("Reset?") && universe.reset();
   }
+  menu() {
+    this.playPause();
+    this.setState({ menuOpen: true });
+  }
+  closeMenu() {
+    this.playPause();
+    this.setState({ menuOpen: false });
+  }
+  upload() {
+    this.playPause();
+
+    console.log("snapping");
+    let dataURL = snapshot(universe);
+    const cells = new Uint8Array(
+      memory.buffer,
+      universe.cells(),
+      width * height * 4
+    );
+    this.setState({ data: { dataURL, cells: cells }, menuOpen: true });
+    // console.log(dataURL.length);
+  }
   render() {
     let { size, paused, selectedElement } = this.state;
     return (
       <React.Fragment>
+        {/* <button onClick={() => this.menu()}>Menu</button> */}
+        <button onClick={() => this.about()}>About</button>
+        <button onClick={() => this.upload()}>Upload</button>
+        <button onClick={() => this.menu()}>Load</button>
         <button onClick={() => this.reset()}>Reset</button>
         <button onClick={() => this.playPause()}>
           {paused ? (
@@ -191,8 +242,8 @@ class Index extends React.Component {
             </svg>
           )}
         </button>
-        {paused && <button onClick={() => universe.tick()}>Tick</button>}
-        <span>
+        {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
+        <span className="sizes">
           {sizeMap.map((v, i) => (
             <button
               key={i}
@@ -221,6 +272,14 @@ class Index extends React.Component {
         >
           Wind
         </button>
+        {this.state.menuOpen && (
+          <Menu close={() => this.closeMenu()}>
+            <h4>Submit your sand</h4>
+            <img src={this.state.data.dataURL} />
+            <input placeholder="title" />
+            <button onClick={() => this.reset()}>Submit</button>
+          </Menu>
+        )}
         {/* <button disabled onClick={() => this.save()}>
           Save
         </button>

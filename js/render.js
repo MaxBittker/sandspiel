@@ -4,19 +4,22 @@ import { memory } from "../crate/pkg/sandtable_bg";
 let fsh = require("./glsl/sand.glsl");
 let vsh = require("./glsl/sandVertex.glsl");
 
-let startWebGL = ({ canvas, universe }) => {
+let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   const regl = reglBuilder({
-    canvas
-    // attributes: { preserveDrawingBuffer: true }
+    canvas,
+    attributes: { preserveDrawingBuffer: isSnapshot }
   });
-  const lastFrame = regl.texture();
-  const cellsPtr = universe.cells();
+  // const lastFrame = regl.texture();
   const width = universe.width();
   const height = universe.height();
-  const cells = new Uint8Array(memory.buffer, cellsPtr, width * height * 4);
+  const cells = new Uint8Array(
+    memory.buffer,
+    universe.cells(),
+    width * height * 4
+  );
   const dataTexture = regl.texture({ width, height, data: cells });
 
-  let drawTriangle = regl({
+  let drawSand = regl({
     frag: fsh,
     uniforms: {
       t: ({ tick }) => tick,
@@ -25,8 +28,8 @@ let startWebGL = ({ canvas, universe }) => {
         viewportWidth,
         viewportHeight
       ],
-      dpi: window.devicePixelRatio * 2,
-      backBuffer: lastFrame
+      dpi: window.devicePixelRatio * 2
+      // backBuffer: lastFrame
     },
 
     vert: vsh,
@@ -38,11 +41,26 @@ let startWebGL = ({ canvas, universe }) => {
     count: 3
   });
 
-  regl.frame(function(context) {
+  // regl.frame(function(context) {
+  // regl.clear({ color: [0, 0, 0, 0] });
+  // drawSand();
+  // lastFrame({ copy: true });
+  // });
+  return () => {
+    regl.poll();
     // regl.clear({ color: [0, 0, 0, 0] });
-    drawTriangle();
+    drawSand();
     // lastFrame({ copy: true });
-  });
+  };
 };
 
-export { startWebGL, universe };
+let snapshot = (universe, cb) => {
+  let canvas = document.createElement("canvas");
+  canvas.width = universe.width();
+  canvas.height = universe.height();
+  let render = startWebGL({ universe, canvas, isSnapshot: true });
+  render();
+  return canvas.toDataURL();
+};
+
+export { startWebGL, universe, snapshot };
