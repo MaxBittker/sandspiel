@@ -16,14 +16,14 @@ fn rand_dir() -> i32 {
     (i % 3) - 1
 }
 
-fn rand_dir_2() -> i32 {
-    let i = rand_int(1000);
-    if (i % 2) == 0 {
-        -1
-    } else {
-        1
-    }
-}
+// fn rand_dir_2() -> i32 {
+//     let i = rand_int(1000);
+//     if (i % 2) == 0 {
+//         -1
+//     } else {
+//         1
+//     }
+// }
 #[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -32,18 +32,18 @@ pub enum Species {
     Wall = 1,
     Sand = 2,
     Water = 3,
+    Stone = 13,
+    Ice = 9,
     Gas = 4,
     Cloner = 5,
-    Fire = 6,
-    Wood = 7,
-    Lava = 8,
-    Ice = 9,
     Sink = 10,
-    Plant = 11,
-    Acid = 12,
-    Stone = 13,
-    Dust = 14,
     Mite = 15,
+    Wood = 7,
+    Plant = 11,
+    Fire = 6,
+    Lava = 8,
+    Acid = 12,
+    Dust = 14,
     Oil = 16,
     Firework = 17,
 }
