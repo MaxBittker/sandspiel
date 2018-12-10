@@ -37,7 +37,7 @@ canvas {
 #sand-canvas {
   z-index: 2;
 }
-#sand-canvas,
+canvas,
 img {
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;

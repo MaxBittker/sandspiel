@@ -5,7 +5,11 @@ import { Species } from "../crate/pkg";
 
 import { height, renderLoop, universe, width } from "./index.js";
 import { snapshot } from "./render.js";
+var storage;
 
+window.onload = () => {
+  storage = firebase.storage();
+};
 // let url = "http://localhost:5001/sandtable-8d0f7/us-central1/api/creations";
 let endpoint =
   "https://us-central1-sandtable-8d0f7.cloudfunctions.net/api/creations";
@@ -147,7 +151,6 @@ const Menu = ({ close, children }) => {
         {children}
 
         <button className="x" onClick={close}>
-          {" "}
           x
         </button>
       </div>
@@ -155,7 +158,7 @@ const Menu = ({ close, children }) => {
   );
 };
 
-const Submissions = ({ submissions }) => {
+const Submissions = ({ submissions, loadId }) => {
   return (
     <div className="submissions">
       {submissions.map(submission => {
@@ -163,6 +166,9 @@ const Submissions = ({ submissions }) => {
           <div key={submission.id}>
             <img src={`${storageUrl}img-${submission.data.id}.png?alt=media`} />
             <h4>{submission.data.title}</h4>
+            <button className="load" onClick={() => loadId(submission.data.id)}>
+              Load
+            </button>
           </div>
         );
       })}
@@ -275,7 +281,7 @@ class Index extends React.Component {
       .then(response => console.log("Success:", JSON.stringify(response)))
       .catch(error => console.error("Error:", error));
   }
-  load() {
+  loadSubmissions() {
     fetch(endpoint, {
       method: "GET",
       headers: {
@@ -285,17 +291,55 @@ class Index extends React.Component {
       .then(res => res.json())
       .then(response => {
         this.setState({ submissions: response });
+        this.playPause();
       })
       .catch(error => console.error("Error:", error));
-    // const burnsData = new Uint8Array(
-    //   memory.buffer,
-    //   universe.burns(),
-    //   width * height * 4
-    // );
+  }
+  load(id) {
+    storage
+      .refFromURL(`gs://sandtable-8d0f7.appspot.com/creations/data-${id}.png`)
+      .getDownloadURL()
+      .then(dlurl => {
+        fetch(dlurl, {
+          method: "GET"
+          // headers: {
+          //   "Content-Type": "image/png"
+          // }
+        })
+          .then(res => res.blob())
+          // .then(blob => fetch(URL.createObjectURL(blob)))
+          // .then(res => res.arrayBuffer())
+          .then(blob => {
+            // console.log(response);
+            var url = URL.createObjectURL(blob);
+            var img = new Image();
+            img.src = url;
+            img.onload = () => {
+              var canvas = document.createElement("canvas");
+              canvas.width = width;
+              canvas.height = height;
+              var ctx = canvas.getContext("2d");
+              ctx.drawImage(img, 0, 0);
+              var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-    // for (var i = 0; i < width * height * 4; i++) {
-    //   burnsData[i] = otherdata[i];
-    // }
+              var dataURL = canvas.toDataURL("image/png");
+              document.body.appendChild(img);
+
+              const cellsData = new Uint8Array(
+                memory.buffer,
+                universe.cells(),
+                width * height * 4
+              );
+
+              for (var i = 0; i < width * height * 4; i++) {
+                debugger;
+                cellsData[i] = imgData.data[i];
+              }
+              this.setState({ submissions: null });
+            };
+          })
+          .catch(error => console.error("Error:", error));
+      });
   }
   render() {
     let { size, paused, selectedElement } = this.state;
@@ -304,7 +348,7 @@ class Index extends React.Component {
         {/* <button onClick={() => this.menu()}>Menu</button> */}
         <button onClick={() => this.about()}>About</button>
         <button onClick={() => this.upload()}>Upload</button>
-        <button onClick={() => this.load()}>Load</button>
+        <button onClick={() => this.loadSubmissions()}>Load</button>
         <button onClick={() => this.reset()}>Reset</button>
         <button onClick={() => this.playPause()}>
           {paused ? (
@@ -358,8 +402,11 @@ class Index extends React.Component {
           </Menu>
         )}
         {this.state.submissions && (
-          <Menu close={() => this.closeMenu()}>
-            <Submissions submissions={this.state.submissions} />
+          <Menu close={() => this.setState({ submissions: null })}>
+            <Submissions
+              submissions={this.state.submissions}
+              loadId={id => this.load(id)}
+            />
           </Menu>
         )}
         {/* <button disabled onClick={() => this.save()}>

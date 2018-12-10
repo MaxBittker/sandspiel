@@ -13,6 +13,7 @@ module.exports = {
     disableHostCheck: true
   },
   mode: "development",
+  devtool: "source-map",
   plugins: [
     new WasmPackPlugin({ crateDirectory: path.resolve(__dirname, "crate") }),
     new CopyWebpackPlugin([
