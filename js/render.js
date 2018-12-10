@@ -60,7 +60,7 @@ let snapshot = (universe, cb) => {
   canvas.height = universe.height();
   let render = startWebGL({ universe, canvas, isSnapshot: true });
   render();
-  return canvas.toDataURL();
+  return canvas.toDataURL("image/png");
 };
 
 export { startWebGL, universe, snapshot };

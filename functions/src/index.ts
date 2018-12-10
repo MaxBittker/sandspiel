@@ -30,7 +30,7 @@ app.post("/creations", async (req, res) => {
     const mimeType = image.match(
         /data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,.*/
       )[1],
-      filename = `${id}.png`,
+      filename = `img-${id}.png`,
       base64EncodedImageString = image.replace(/^data:image\/\w+;base64,/, ""),
       imageBuffer = new Buffer(base64EncodedImageString, "base64");
 
@@ -42,24 +42,25 @@ app.post("/creations", async (req, res) => {
       public: true,
       validation: "md5"
     });
-    const filename2 = `${id}.json`,
-      jsonBuffer = new Buffer(JSON.stringify(cells));
+
+    const filename2 = `data-${id}.png`,
+      base64EncodedImageString2 = cells.replace(/^data:image\/\w+;base64,/, ""),
+      imageBuffer2 = new Buffer(base64EncodedImageString2, "base64");
 
     // Upload the image to the bucket
     const file2 = bucket.file("creations/" + filename2);
 
-    await file2.save(jsonBuffer, {
-      metadata: { contentType: "application/json" },
+    await file2.save(imageBuffer2, {
+      metadata: { contentType: mimeType },
       public: true,
       validation: "md5"
     });
 
-    const f = await admin
+    await admin
       .firestore()
       .collection("creations")
       .add(data);
-    // const val = snapshot.val();
-    res.status(201).json({ id });
+    res.status(201).json({ id, score: 0 });
   } catch (error) {
     console.log("Error detecting sentiment or saving message", error.message);
     res.sendStatus(500);
@@ -68,7 +69,6 @@ app.post("/creations", async (req, res) => {
 
 // saving message Reference.push failed: first argument contains
 // undefined in property 'creations.0.title'
-
 // GET /api/creations?q={q}
 // Get all creations, optionally specifying a string to filter on
 app.get("/creations", async (req, res) => {
@@ -91,7 +91,7 @@ app.get("/creations", async (req, res) => {
     snapshot.forEach(childSnapshot => {
       creations.push({
         id: childSnapshot.id,
-        creation: childSnapshot.data
+        data: childSnapshot.data()
       });
       return true;
     });

@@ -36,6 +36,9 @@ canvas {
 
 #sand-canvas {
   z-index: 2;
+}
+#sand-canvas,
+img {
   image-rendering: crisp-edges;
   -ms-interpolation-mode: nearest-neighbor;
   image-rendering: -webkit-optimize-contrast;
@@ -110,20 +113,47 @@ button.selected {
   position: absolute;
   left: 10px;
   right: 10px;
-  /* top: 10px; */
+  top: 10px;
   bottom: 10px;
   z-index: 5;
   background-color: #f3f3f4;
   border: 1px solid gray;
   box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.2);
   padding: 5px;
+  max-width: 80vh;
+  margin: auto;
+}
+.menu img {
+  max-width: 80vh;
+  margin: auto;
+}
+.menu-scrim {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  z-index: 4;
+  background-color: #55555555;
 }
 .x {
   position: absolute;
   right: 2px;
   top: 2px;
 }
-
+input {
+  position: relative;
+  height: 24px;
+  min-width: 30px;
+  font-size: 19px;
+  padding: 1px 5px;
+  background-color: whitesmoke;
+  color: black;
+  border: 2px solid whitesmoke;
+  border-color: gainsboro;
+  flex-grow: 1;
+  fill: black;
+}
 img {
   background-color: #f0e4e3;
   width: calc(100% - 10px);

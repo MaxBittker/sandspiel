@@ -6,6 +6,12 @@ import { Species } from "../crate/pkg";
 import { height, renderLoop, universe, width } from "./index.js";
 import { snapshot } from "./render.js";
 
+// let url = "http://localhost:5001/sandtable-8d0f7/us-central1/api/creations";
+let endpoint =
+  "https://us-central1-sandtable-8d0f7.cloudfunctions.net/api/creations";
+let storageUrl =
+  "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
+
 const canvas = document.getElementById("sand-canvas");
 
 const eventDistance = (a, b) => {
@@ -136,19 +142,30 @@ const paint = event => {
 
 const Menu = ({ close, children }) => {
   return (
-    <div className={"menu"}>
-      {children}
-      {/* <h3>Sandspiel</h3>
-      <p>here's some information</p>
-      <p>
-        Wall = 1, Sand = 2, Water = 3, Stone = 13, Ice = 9, Gas = 4, Cloner = 5,
-        // Sink = 10, Mite = 15, Wood = 7, Plant = 11, Fire = 6, Lava = 8, Acid
-        = 12, Dust = 14, Oil = 16, Firework = 17,
-      </p> */}
-      <button className="x" onClick={close}>
-        {" "}
-        x
-      </button>
+    <div className="menu-scrim">
+      <div className={"menu"}>
+        {children}
+
+        <button className="x" onClick={close}>
+          {" "}
+          x
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const Submissions = ({ submissions }) => {
+  return (
+    <div className="submissions">
+      {submissions.map(submission => {
+        return (
+          <div key={submission.id}>
+            <img src={`${storageUrl}img-${submission.data.id}.png?alt=media`} />
+            <h4>{submission.data.title}</h4>
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -180,6 +197,7 @@ class Index extends React.Component {
       paused: false,
       size: 2,
       dataURL: {},
+      submissions: null,
       selectedElement: Species.Water
     };
   }
@@ -220,8 +238,64 @@ class Index extends React.Component {
       universe.cells(),
       width * height * 4
     );
-    this.setState({ data: { dataURL, cells: cells }, menuOpen: true });
+
+    // Create canvas
+    let canvas = document.createElement("canvas"),
+      context = canvas.getContext("2d"),
+      imgData = context.createImageData(width, height);
+
+    canvas.height = height;
+    canvas.width = width;
+
+    // fill imgData with data from cells
+    for (var i = 0; i < width * height * 4; i++) {
+      imgData.data[i] = cells[i];
+    }
+    // put data to context at (0, 0)
+    context.putImageData(imgData, 0, 0);
+
+    let cellData = canvas.toDataURL("image/png");
+
+    this.setState({ data: { dataURL, cells: cellData }, menuOpen: true });
     // console.log(dataURL.length);
+  }
+  submit() {
+    let { title, data } = this.state;
+    let { dataURL, cells } = data;
+    let payload = { title, image: dataURL, cells };
+
+    fetch(endpoint, {
+      method: "POST", // or 'PUT'
+      body: JSON.stringify(payload), // data can be `string` or {object}!
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(response => console.log("Success:", JSON.stringify(response)))
+      .catch(error => console.error("Error:", error));
+  }
+  load() {
+    fetch(endpoint, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(response => {
+        this.setState({ submissions: response });
+      })
+      .catch(error => console.error("Error:", error));
+    // const burnsData = new Uint8Array(
+    //   memory.buffer,
+    //   universe.burns(),
+    //   width * height * 4
+    // );
+
+    // for (var i = 0; i < width * height * 4; i++) {
+    //   burnsData[i] = otherdata[i];
+    // }
   }
   render() {
     let { size, paused, selectedElement } = this.state;
@@ -230,7 +304,7 @@ class Index extends React.Component {
         {/* <button onClick={() => this.menu()}>Menu</button> */}
         <button onClick={() => this.about()}>About</button>
         <button onClick={() => this.upload()}>Upload</button>
-        <button onClick={() => this.menu()}>Load</button>
+        <button onClick={() => this.load()}>Load</button>
         <button onClick={() => this.reset()}>Reset</button>
         <button onClick={() => this.playPause()}>
           {paused ? (
@@ -247,7 +321,7 @@ class Index extends React.Component {
           {sizeMap.map((v, i) => (
             <button
               key={i}
-              className={i == this.state.size ? "selected" : ""}
+              className={i == size ? "selected" : ""}
               onClick={e => this.setSize(e, i)}
               style={{ padding: "0px" }}
             >
@@ -274,10 +348,18 @@ class Index extends React.Component {
         </button>
         {this.state.menuOpen && (
           <Menu close={() => this.closeMenu()}>
-            <h4>Submit your sand</h4>
+            <h4>Share your creation with the people!</h4>
             <img src={this.state.data.dataURL} />
-            <input placeholder="title" />
-            <button onClick={() => this.reset()}>Submit</button>
+            <input
+              placeholder="title"
+              onChange={e => this.setState({ title: e.target.value })}
+            />
+            <button onClick={() => this.submit()}>Submit</button>
+          </Menu>
+        )}
+        {this.state.submissions && (
+          <Menu close={() => this.closeMenu()}>
+            <Submissions submissions={this.state.submissions} />
           </Menu>
         )}
         {/* <button disabled onClick={() => this.save()}>
