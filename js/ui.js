@@ -152,13 +152,13 @@ class Index extends React.Component {
 
     let cellData = canvas.toDataURL("image/png");
 
-    this.setState({ data: { dataURL, cells: cellData }, menuOpen: false });
+    this.setState({ data: { dataURL, cells: cellData }, menuOpen: true });
   }
   submit() {
     let { title, data } = this.state;
     let { dataURL, cells } = data;
     let payload = { title, image: dataURL, cells };
-    fetch(functions._url("creations"), {
+    fetch(functions._url("api/creations"), {
       method: "POST", // or 'PUT'
       body: JSON.stringify(payload), // data can be `string` or {object}!
       headers: {
@@ -166,11 +166,14 @@ class Index extends React.Component {
       }
     })
       .then(res => res.json())
-      .then(response => console.log("Success:", JSON.stringify(response)))
+      .then(response => {
+        console.log("Success:", JSON.stringify(response));
+        this.setState({ menuOpen: false });
+      })
       .catch(error => console.error("Error:", error));
   }
   loadSubmissions() {
-    fetch(functions._url("creations"), {
+    fetch(functions._url("api/creations"), {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
