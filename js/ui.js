@@ -1,148 +1,29 @@
 import React from "react";
 import ReactDOM from "react-dom";
+// import * as UPNG from "upng-js";
+
 import { memory } from "../crate/pkg/sandtable_bg";
 import { Species } from "../crate/pkg";
 
-import { height, renderLoop, universe, width } from "./index.js";
+import { height, universe, width } from "./index.js";
 import { snapshot } from "./render.js";
 var storage;
-
+var functions;
+try {
+  storage = firebase.storage();
+  functions = firebase.functions();
+} catch (e) {}
 window.onload = () => {
+  functions = firebase.functions();
   storage = firebase.storage();
 };
 // let url = "http://localhost:5001/sandtable-8d0f7/us-central1/api/creations";
-let endpoint =
-  "https://us-central1-sandtable-8d0f7.cloudfunctions.net/api/creations";
+// let endpoint =
+// "https://us-central1-sandtable-8d0f7.cloudfunctions.net/api/creations";
 let storageUrl =
   "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
 
-const canvas = document.getElementById("sand-canvas");
-
-const eventDistance = (a, b) => {
-  return Math.sqrt(
-    Math.pow(a.clientX - b.clientX, 2) + Math.pow(a.clientY - b.clientY, 2),
-    2
-  );
-};
-
-const magnitude = a => {
-  return Math.sqrt(Math.pow(a.clientX, 2) + Math.pow(a.clientY, 2), 2);
-};
-
-const norm = a => {
-  let mag = magnitude(a);
-  return { clientX: a.clientX / mag, clientY: a.clientY / mag };
-};
-const scale = (a, s) => {
-  return { clientX: a.clientX * s, clientY: a.clientY * s };
-};
-const add = (a, b) => {
-  return { clientX: a.clientX + b.clientX, clientY: a.clientY + b.clientY };
-};
-const sub = (a, b) => {
-  return { clientX: a.clientX - b.clientX, clientY: a.clientY - b.clientY };
-};
-
-let painting = false;
-let lastPaint = null;
-let repeat = null;
-canvas.addEventListener("mousedown", event => {
-  event.preventDefault();
-  painting = true;
-  clearInterval(repeat);
-  repeat = window.setInterval(() => paint(event), 100);
-  paint(event);
-  lastPaint = event;
-});
-canvas.addEventListener("mouseup", event => {
-  event.preventDefault();
-  lastPaint = null;
-  clearInterval(repeat);
-  painting = false;
-});
-canvas.addEventListener("mousemove", event => {
-  clearInterval(repeat);
-  smoothPaint(event);
-});
-canvas.addEventListener("mouseleave", event => {
-  clearInterval(repeat);
-  lastPaint = null;
-});
-canvas.addEventListener("touchstart", event => {
-  event.preventDefault();
-  painting = true;
-  lastPaint = event;
-  handleTouches(event);
-});
-canvas.addEventListener("touchend", event => {
-  event.preventDefault();
-  lastPaint = null;
-  painting = false;
-  clearInterval(repeat);
-});
-canvas.addEventListener("touchmove", event => {
-  event.preventDefault();
-  clearInterval(repeat);
-  handleTouches(event);
-});
-function smoothPaint(event) {
-  repeat = window.setInterval(() => paint(event), 100);
-  let startEvent = { clientX: event.clientX, clientY: event.clientY };
-  if (!painting) {
-    return;
-  }
-  let size = sizeMap[window.UI.state.size];
-  let i = 0;
-  paint(startEvent);
-  if (lastPaint) {
-    while (eventDistance(startEvent, lastPaint) > size / 2) {
-      let d = eventDistance(startEvent, lastPaint);
-      startEvent = add(
-        startEvent,
-        scale(norm(sub(lastPaint, event)), Math.min(size / 2, d))
-      );
-      i++;
-      if (i > 1000) {
-        break;
-      }
-      paint(startEvent);
-    }
-  }
-
-  lastPaint = event;
-}
-
-const handleTouches = event => {
-  let touches = Array.from(event.touches);
-  if (touches.length == 1) {
-    smoothPaint(touches[0]);
-  } else {
-    touches.forEach(paint);
-  }
-};
-
-const paint = event => {
-  if (!painting) {
-    return;
-  }
-  const boundingRect = canvas.getBoundingClientRect();
-
-  const scaleX = canvas.width / window.devicePixelRatio / boundingRect.width;
-  const scaleY = canvas.height / window.devicePixelRatio / boundingRect.height;
-
-  const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
-  const canvasTop = (event.clientY - boundingRect.top) * scaleY;
-
-  const x = Math.min(Math.floor(canvasLeft), width - 1);
-  const y = Math.min(Math.floor(canvasTop), height - 1);
-  if (window.UI.state.selectedElement < 0) return;
-  universe.paint(
-    x,
-    y,
-    sizeMap[window.UI.state.size],
-    window.UI.state.selectedElement
-  );
-};
+// const canvas = document.getElementById("sand-canvas");
 
 const Menu = ({ close, children }) => {
   return (
@@ -163,12 +44,17 @@ const Submissions = ({ submissions, loadId }) => {
     <div className="submissions">
       {submissions.map(submission => {
         return (
-          <div key={submission.id}>
+          <div key={submission.id} className="submission">
             <img src={`${storageUrl}img-${submission.data.id}.png?alt=media`} />
-            <h4>{submission.data.title}</h4>
-            <button className="load" onClick={() => loadId(submission.data.id)}>
-              Load
-            </button>
+            <div>
+              <h2>{submission.data.title}</h2>
+              <button
+                className="load"
+                onClick={() => loadId(submission.data.id)}
+              >
+                Load
+              </button>
+            </div>
           </div>
         );
       })}
@@ -210,10 +96,10 @@ class Index extends React.Component {
 
   playPause() {
     if (this.state.paused) {
-      renderLoop();
+      // renderLoop();
+      window.paused = false;
     } else {
-      cancelAnimationFrame(window.animationId);
-      window.animationId = null;
+      window.paused = true;
     }
     this.setState({ paused: !this.state.paused });
   }
@@ -255,22 +141,24 @@ class Index extends React.Component {
 
     // fill imgData with data from cells
     for (var i = 0; i < width * height * 4; i++) {
-      imgData.data[i] = cells[i];
+      if (i % 4 == 3) {
+        imgData.data[i] = 255;
+      } else {
+        imgData.data[i] = cells[i];
+      }
     }
     // put data to context at (0, 0)
     context.putImageData(imgData, 0, 0);
 
     let cellData = canvas.toDataURL("image/png");
 
-    this.setState({ data: { dataURL, cells: cellData }, menuOpen: true });
-    // console.log(dataURL.length);
+    this.setState({ data: { dataURL, cells: cellData }, menuOpen: false });
   }
   submit() {
     let { title, data } = this.state;
     let { dataURL, cells } = data;
     let payload = { title, image: dataURL, cells };
-
-    fetch(endpoint, {
+    fetch(functions._url("creations"), {
       method: "POST", // or 'PUT'
       body: JSON.stringify(payload), // data can be `string` or {object}!
       headers: {
@@ -282,7 +170,7 @@ class Index extends React.Component {
       .catch(error => console.error("Error:", error));
   }
   loadSubmissions() {
-    fetch(endpoint, {
+    fetch(functions._url("creations"), {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -307,8 +195,6 @@ class Index extends React.Component {
           // }
         })
           .then(res => res.blob())
-          // .then(blob => fetch(URL.createObjectURL(blob)))
-          // .then(res => res.arrayBuffer())
           .then(blob => {
             // console.log(response);
             var url = URL.createObjectURL(blob);
@@ -322,8 +208,8 @@ class Index extends React.Component {
               ctx.drawImage(img, 0, 0);
               var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-              var dataURL = canvas.toDataURL("image/png");
-              document.body.appendChild(img);
+              // var dataURL = canvas.toDataURL("image/png");
+              // document.body.appendChild(img);
 
               const cellsData = new Uint8Array(
                 memory.buffer,
@@ -332,7 +218,7 @@ class Index extends React.Component {
               );
 
               for (var i = 0; i < width * height * 4; i++) {
-                debugger;
+                // debugger;
                 cellsData[i] = imgData.data[i];
               }
               this.setState({ submissions: null });
@@ -464,4 +350,4 @@ const fps = new class {
   }
 }();
 
-export { fps };
+export { fps, sizeMap };

@@ -2,6 +2,7 @@ import { Cell, Species, Universe } from "../crate/pkg";
 
 import { startWebGL } from "./render";
 import { fps } from "./ui";
+import {} from "./paint";
 import { startFluid } from "./fluid";
 import { ratio } from "./constants";
 if (window.safari) {
@@ -43,7 +44,9 @@ canvas.height = n * window.devicePixelRatio;
 canvas.width = n * window.devicePixelRatio;
 
 document.getElementById("background").addEventListener("touchmove", e => {
+  // if (!window.paused) {
   e.preventDefault();
+  // }
 });
 
 const ui = document.getElementById("ui");
@@ -80,12 +83,15 @@ let fluid_update = startFluid({ universe });
 let drawSand = startWebGL({ canvas, universe });
 
 const renderLoop = () => {
-  fps.render(); // new
-  universe.tick();
+  if (!window.paused) {
+    fps.render(); // new
+    universe.tick();
+    fluid_update();
+  }
   drawSand();
-  fluid_update();
+
   window.animationId = requestAnimationFrame(renderLoop);
 };
 
 renderLoop();
-export { renderLoop, canvas, width, height, universe, ratio };
+export { canvas, width, height, universe, ratio };

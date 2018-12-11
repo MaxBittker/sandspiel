@@ -111,10 +111,11 @@ button.selected {
 
 .menu {
   position: absolute;
+  overflow: scroll;
   left: 10px;
   right: 10px;
   top: 10px;
-  bottom: 10px;
+  /* bottom: 10px; */
   z-index: 5;
   background-color: #f3f3f4;
   border: 1px solid gray;
@@ -125,7 +126,7 @@ button.selected {
 }
 .menu img {
   max-width: 80vh;
-  margin: auto;
+  /* margin: auto; */
 }
 .menu-scrim {
   position: absolute;
@@ -159,4 +160,23 @@ img {
   width: calc(100% - 10px);
   margin: 5px;
   box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.2);
+}
+.submission {
+  margin: 5px;
+  position: relative;
+  background-color: gainsboro;
+}
+.submission div img {
+  /* margin-bo: auto; */
+}
+.submission div {
+  padding: 5px;
+}
+.submission div h2 {
+  display: inline;
+}
+.submission div button {
+  position: absolute;
+  right: 5px;
+  bottom: 5px;
 }

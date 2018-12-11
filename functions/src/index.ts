@@ -23,7 +23,7 @@ app.post("/creations", async (req, res) => {
   try {
     const bucket = admin.storage().bucket();
     const id = uuidv4();
-    const data = { title, id };
+    const data = { title: title.slice(0, 200), id };
 
     // Convert the base64 string back to an image to upload into the Google Cloud Storage bucket
 
