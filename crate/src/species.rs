@@ -15,7 +15,32 @@ fn rand_dir() -> i32 {
     let i = rand_int(1000);
     (i % 3) - 1
 }
-
+fn adjacency_right(dir: (i32, i32)) -> (i32, i32) {
+    match dir {
+        (0, 1) => (1, 1),
+        (1, 1) => (1, 0),
+        (1, 0) => (1, -1),
+        (1, -1) => (0, -1),
+        (0, -1) => (-1, -1),
+        (-1, -1) => (-1, 0),
+        (-1, 0) => (-1, 1),
+        (-1, 1) => (0, 1),
+        _ => (0, 0),
+    }
+}
+fn adjacency_left(dir: (i32, i32)) -> (i32, i32) {
+    match dir {
+        (0, 1) => (-1, 1),
+        (1, 1) => (0, 1),
+        (1, 0) => (1, 1),
+        (1, -1) => (1, 0),
+        (0, -1) => (1, -1),
+        (-1, -1) => (0, -1),
+        (-1, 0) => (-1, -1),
+        (-1, 1) => (-1, 0),
+        _ => (0, 0),
+    }
+}
 // fn rand_dir_2() -> i32 {
 //     let i = rand_int(1000);
 //     if (i % 2) == 0 {
@@ -40,13 +65,14 @@ pub enum Species {
     Mite = 15,
     Wood = 7,
     Plant = 11,
+    Fungus = 18,
+
     Fire = 6,
     Lava = 8,
     Acid = 12,
     Dust = 14,
     Oil = 16,
     Firework = 17,
-    // Goo = 18,
 }
 
 impl Species {
@@ -72,6 +98,7 @@ impl Species {
             Species::Acid => update_acid(cell, api),
             Species::Mite => update_mite(cell, api),
             Species::Oil => update_oil(cell, api),
+            Species::Fungus => update_fungus(cell, api),
         }
     }
 }
@@ -797,6 +824,133 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
         }
     }
 }
+
+pub fn update_fungus(cell: Cell, mut api: SandApi) {
+    let rb = cell.rb;
+
+    let mut i = rand_int(100);
+    let dx = rand_dir();
+    let dy = rand_dir();
+    let nbr_species = api.get(dx, dy).species;
+    if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
+        api.set(
+            0,
+            0,
+            Cell {
+                species: Species::Fungus,
+                ra: cell.ra,
+                rb: 10,
+                clock: 0,
+            },
+        );
+    }
+    if nbr_species != Species::Empty
+        && nbr_species != Species::Fungus
+        && nbr_species != Species::Fire
+    {
+        let dx = rand_dir();
+        let dy = rand_dir();
+
+        let drift = (i % 15) - 7;
+        let newra = (cell.ra as i32 + drift) as u8;
+        if api.get(dx, dy).species == Species::Empty {
+            api.set(
+                dx,
+                dy,
+                Cell {
+                    species: Species::Fungus,
+                    ra: newra,
+                    rb: 0,
+                    clock: 0,
+                },
+            );
+        }
+    }
+
+    if i > 90
+        && nbr_species == Species::Wood
+        && api.get(-dx, dy).species == Species::Wood
+        && api.get(dx, -dy).species == Species::Wood
+    {
+        i = rand_int(100);
+        let drift = (i % 15) - 7;
+        let newra = (cell.ra as i32 + drift) as u8;
+        api.set(
+            dx,
+            dy,
+            Cell {
+                ra: newra,
+                rb: 0,
+                ..cell
+            },
+        );
+        api.set(-dx, dy, EMPTY_CELL);
+    }
+
+    if rb > 1 {
+        api.set(
+            0,
+            0,
+            Cell {
+                ra: cell.ra,
+                rb: rb - 1,
+                ..cell
+            },
+        );
+        if nbr_species == Species::Empty {
+            api.set(
+                dx,
+                dy,
+                Cell {
+                    species: Species::Fire,
+                    ra: 10 + rand_int(10) as u8,
+                    rb: 0,
+                    clock: 0,
+                },
+            )
+        }
+        if nbr_species == Species::Water {
+            api.set(
+                0,
+                0,
+                Cell {
+                    ra: 50,
+                    rb: 0,
+                    ..cell
+                },
+            )
+        }
+    } else if rb == 1 {
+        api.set(0, 0, EMPTY_CELL);
+    }
+
+    let ra = cell.ra;
+
+    if ra > 50 {
+        let mdx = rand_dir();
+        let mdy = rand_dir();
+        let (ldx, ldy) = adjacency_left((mdx, mdy));
+        let (rdx, rdy) = adjacency_right((mdx, mdy));
+        if api.get(mdx, mdy).species == Species::Empty
+            && api.get(ldx, ldy).species != Species::Fungus
+            && api.get(rdx, rdy).species != Species::Fungus
+        {
+            let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
+            let dec = rand_int(20) - 20;
+            if (i + ra as i32) > 165 {
+                api.set(
+                    mdx,
+                    mdy,
+                    Cell {
+                        ra: (ra as i32 + dec) as u8,
+                        ..cell
+                    },
+                );
+            }
+        }
+    }
+}
+
 pub fn update_sink(cell: Cell, mut api: SandApi) {
     let mut dx = rand_dir();
     let mut dy = rand_dir();

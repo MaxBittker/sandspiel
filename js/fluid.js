@@ -451,7 +451,37 @@ function startFluid({ universe }) {
     universe.burns(),
     width * height * 4
   );
+  function reset() {
+    clearProgram.bind();
 
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, burns[0]);
+    gl.uniform1i(clearProgram.uniforms.uWind, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, pressure.read[0]);
+    gl.uniform1i(clearProgram.uniforms.uTexture, texUnit++);
+
+    gl.uniform1f(clearProgram.uniforms.value, 0);
+
+    blit(pressure.write[1]);
+    pressure.swap();
+
+    texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, burns[0]);
+    gl.uniform1i(clearProgram.uniforms.uWind, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
+    gl.uniform1i(clearProgram.uniforms.uTexture, texUnit++);
+
+    gl.uniform1f(clearProgram.uniforms.value, 0);
+
+    blit(velocity.write[1]);
+    velocity.swap();
+  }
   function update() {
     // resizeCanvas();
 
@@ -808,7 +838,9 @@ function startFluid({ universe }) {
   sandCanvas.addEventListener(
     "touchmove",
     e => {
-      e.preventDefault();
+      if (!window.paused) {
+        e.preventDefault();
+      }
       const touches = e.targetTouches;
       for (let i = 0; i < touches.length; i++) {
         let pointer = pointers[i];
@@ -859,7 +891,7 @@ function startFluid({ universe }) {
         if (touches[i].identifier == pointers[j].id) pointers[j].down = false;
   });
 
-  return update;
+  return { update, reset };
 }
 
 export { startFluid };

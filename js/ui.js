@@ -5,7 +5,7 @@ import ReactDOM from "react-dom";
 import { memory } from "../crate/pkg/sandtable_bg";
 import { Species } from "../crate/pkg";
 
-import { height, universe, width } from "./index.js";
+import { height, universe, width, reset } from "./index.js";
 import { snapshot } from "./render.js";
 var storage;
 var functions;
@@ -20,14 +20,13 @@ window.onload = () => {
 // let url = "http://localhost:5001/sandtable-8d0f7/us-central1/api/creations";
 // let endpoint =
 // "https://us-central1-sandtable-8d0f7.cloudfunctions.net/api/creations";
+
 let storageUrl =
   "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
 
-// const canvas = document.getElementById("sand-canvas");
-
 const Menu = ({ close, children }) => {
   return (
-    <div className="menu-scrim">
+    <div className="menu-scrim" onTouchMove={e => e.stopPropagation()}>
       <div className={"menu"}>
         {children}
 
@@ -45,7 +44,7 @@ const Submissions = ({ submissions, loadId }) => {
       {submissions.map(submission => {
         return (
           <div key={submission.id} className="submission">
-            <img src={`${storageUrl}img-${submission.data.id}.png?alt=media`} />
+            <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
             <div>
               <h2>{submission.data.title}</h2>
               <button
@@ -93,15 +92,17 @@ class Index extends React.Component {
       selectedElement: Species.Water
     };
   }
-
-  playPause() {
-    if (this.state.paused) {
-      // renderLoop();
-      window.paused = false;
-    } else {
-      window.paused = true;
-    }
+  togglePause() {
+    window.paused = !this.state.paused;
     this.setState({ paused: !this.state.paused });
+  }
+  play() {
+    window.paused = false;
+    this.setState({ paused: false });
+  }
+  pause() {
+    window.paused = true;
+    this.setState({ paused: true });
   }
   setSize(event, size) {
     event.preventDefault();
@@ -110,19 +111,17 @@ class Index extends React.Component {
     });
   }
   reset() {
-    window.confirm("Reset?") && universe.reset();
+    window.confirm("Reset?") && reset();
   }
   menu() {
-    this.playPause();
+    this.pause();
     this.setState({ menuOpen: true });
   }
   closeMenu() {
-    this.playPause();
+    this.play();
     this.setState({ menuOpen: false });
   }
   upload() {
-    this.playPause();
-
     console.log("snapping");
     let dataURL = snapshot(universe);
     const cells = new Uint8Array(
@@ -152,6 +151,7 @@ class Index extends React.Component {
 
     let cellData = canvas.toDataURL("image/png");
 
+    this.pause();
     this.setState({ data: { dataURL, cells: cellData }, menuOpen: true });
   }
   submit() {
@@ -169,6 +169,7 @@ class Index extends React.Component {
       .then(response => {
         console.log("Success:", JSON.stringify(response));
         this.setState({ menuOpen: false });
+        this.play();
       })
       .catch(error => console.error("Error:", error));
   }
@@ -182,20 +183,17 @@ class Index extends React.Component {
       .then(res => res.json())
       .then(response => {
         this.setState({ submissions: response });
-        this.playPause();
+        this.pause();
       })
       .catch(error => console.error("Error:", error));
   }
   load(id) {
     storage
-      .refFromURL(`gs://sandtable-8d0f7.appspot.com/creations/data-${id}.png`)
+      .refFromURL(`gs://sandtable-8d0f7.appspot.com/creations/${id}.data.png`)
       .getDownloadURL()
       .then(dlurl => {
         fetch(dlurl, {
           method: "GET"
-          // headers: {
-          //   "Content-Type": "image/png"
-          // }
         })
           .then(res => res.blob())
           .then(blob => {
@@ -211,9 +209,6 @@ class Index extends React.Component {
               ctx.drawImage(img, 0, 0);
               var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
 
-              // var dataURL = canvas.toDataURL("image/png");
-              // document.body.appendChild(img);
-
               const cellsData = new Uint8Array(
                 memory.buffer,
                 universe.cells(),
@@ -221,7 +216,6 @@ class Index extends React.Component {
               );
 
               for (var i = 0; i < width * height * 4; i++) {
-                // debugger;
                 cellsData[i] = imgData.data[i];
               }
               this.setState({ submissions: null });
@@ -234,21 +228,26 @@ class Index extends React.Component {
     let { size, paused, selectedElement } = this.state;
     return (
       <React.Fragment>
-        {/* <button onClick={() => this.menu()}>Menu</button> */}
-        <button onClick={() => this.about()}>About</button>
-        <button onClick={() => this.upload()}>Upload</button>
-        <button onClick={() => this.loadSubmissions()}>Load</button>
-        <button onClick={() => this.reset()}>Reset</button>
-        <button onClick={() => this.playPause()}>
+        <button
+          onClick={() => this.togglePause()}
+          className={paused ? "selected" : ""}
+        >
           {paused ? (
-            "\u25B6\uFE0E"
+            <svg height="20" width="20" id="d" viewBox="0 0 300 300">
+              <polygon id="play" points="0,0 , 300,150 0,300" />
+            </svg>
           ) : (
-            <svg height="10" width="10" id="d" viewBox="0 0 300 300">
-              <polygon id="shape1" points="0,0 110,0 110,300 0,300" />
-              <polygon id="shape2" points="190,0 300,0 300,300 190,300" />
+            <svg height="20" width="20" id="d" viewBox="0 0 300 300">
+              <polygon id="bar2" points="0,0 110,0 110,300 0,300" />
+              <polygon id="bar1" points="190,0 300,0 300,300 190,300" />
             </svg>
           )}
         </button>
+        <button onClick={() => this.upload()}>Upload</button>
+        <button onClick={() => this.loadSubmissions()}>Browse</button>
+        <button onClick={() => this.reset()}>Reset</button>
+        <button onClick={() => this.about()}>About</button>
+
         {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
         <span className="sizes">
           {sizeMap.map((v, i) => (

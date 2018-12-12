@@ -78,7 +78,7 @@ let resize = () => {
 resize();
 window.addEventListener("resize", resize);
 
-let fluid_update = startFluid({ universe });
+let fluid = startFluid({ universe });
 
 let drawSand = startWebGL({ canvas, universe });
 
@@ -86,7 +86,7 @@ const renderLoop = () => {
   if (!window.paused) {
     fps.render(); // new
     universe.tick();
-    fluid_update();
+    fluid.update();
   }
   drawSand();
 
@@ -94,4 +94,9 @@ const renderLoop = () => {
 };
 
 renderLoop();
-export { canvas, width, height, universe, ratio };
+
+function reset() {
+  fluid.reset();
+  universe.reset();
+}
+export { canvas, width, height, universe, ratio, reset };

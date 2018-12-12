@@ -99,10 +99,16 @@ void main() {
 
     saturation = 0.2;
     lightness = 0.3;
-  } else if (type == 17) {
+  } else if (type == 17) { // firework
     hue = 0.0;
     saturation = 0.4 + data.b;
     lightness = 0.9;
+  } else if (type == 18) { // fungus
+    hue = (data.g * -0.1) + 0.05;
+    saturation = (data.g * 0.5);
+
+    // (data.g * 0.00);
+    lightness = 1.5 - (data.g * 0.2);
   }
   lightness *= (0.95 + snoise2(floor(uv * resolution / dpi)) * 0.05);
 

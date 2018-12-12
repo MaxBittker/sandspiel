@@ -65,6 +65,7 @@ button {
   flex-grow: 1;
   max-width: 200px;
   fill: black;
+  line-height: 0px;
 }
 
 button:focus {

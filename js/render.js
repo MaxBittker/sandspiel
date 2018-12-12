@@ -56,8 +56,8 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
 
 let snapshot = (universe, cb) => {
   let canvas = document.createElement("canvas");
-  canvas.width = universe.width();
-  canvas.height = universe.height();
+  canvas.width = universe.width() / 2;
+  canvas.height = universe.height() / 2;
   let render = startWebGL({ universe, canvas, isSnapshot: true });
   render();
   return canvas.toDataURL("image/png");
