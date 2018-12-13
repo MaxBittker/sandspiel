@@ -24,9 +24,73 @@ window.onload = () => {
 let storageUrl =
   "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
 
+const Info = () => {
+  return (
+    <div className="Info">
+      <h1>Sandfarm </h1>
+      <p>
+        Thank you for playing this game! Falling sand games like this provided
+        me hours of fun and imagination growing up. I want to particularly
+        thanks danball's{" "}
+        <a href="https://dan-ball.jp/en/javagame/dust/">Powder Game</a> as the
+        primary inspiration for sandfarm. {"<3"}
+      </p>
+      <p>
+        You can follow the game on twitter for updates and new uploads:
+        <a href="https://twitter.com/sandspiel_feed">@sandfarm</a>
+      </p>
+      <p>
+        View the{" "}
+        <a href="https://github.com/maxbittker/sandtable">source code</a> or{" "}
+        <a href="https://github.com/maxbittker/sandtable/issues">report bugs</a>{" "}
+        on github
+      </p>
+      <p>
+        Created by <a href="https://maxbittker.com">max bittker</a>
+      </p>
+      <h2>Element Information:</h2>
+      <h4>Wall </h4>
+      Indestructible
+      <h4>Sand </h4>
+      Sinks in water
+      <h4>Water </h4>
+      Puts out fire
+      <h4>Stone </h4>
+      Forms arches
+      <h4>Ice </h4>
+      Freezes Water
+      <h4>Gas </h4>
+      Highly Flammable!
+      <h4>Cloner </h4>
+      Copies the first element it touches
+      <h4>Mite </h4>
+      Eats wood and plant, but loves dust! Slides on ice
+      <h4>Wood </h4>
+      Sturdy
+      <h4>Plant </h4>
+      Thrives in wet enviroments
+      <h4>Fungus </h4>
+      Grows over everything
+      <h4>Flower </h4>
+      <h4>Fire </h4>
+      Hot!
+      <h4>Lava </h4>
+      Flammable and heavy
+      <h4>Acid </h4>
+      Corrodes other elements
+      <h4>Dust </h4>
+      Pretty but dangerously explosive
+      <h4>Oil </h4>
+      Produces smoke
+      <h4>Firework </h4>
+      Explodes into the first element it touches
+    </div>
+  );
+};
+
 const Menu = ({ close, children }) => {
   return (
-    <div className="menu-scrim" onTouchMove={e => e.stopPropagation()}>
+    <div className="menu-scrim">
       <div className={"menu"}>
         {children}
 
@@ -38,7 +102,10 @@ const Menu = ({ close, children }) => {
   );
 };
 
-const Submissions = ({ submissions, loadId }) => {
+const Submissions = ({ submissions, loadSubmission }) => {
+  if (submissions.length == 0) {
+    return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
+  }
   return (
     <div className="submissions">
       {submissions.map(submission => {
@@ -46,10 +113,14 @@ const Submissions = ({ submissions, loadId }) => {
           <div key={submission.id} className="submission">
             <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
             <div>
-              <h2>{submission.data.title}</h2>
+              <h3 style={{ flexGrow: 1 }}>{submission.data.title}</h3>
+              <h3>❤{submission.data.score}</h3>
+              <h4>
+                {new Date(submission.data.timestamp).toLocaleDateString()}
+              </h4>
               <button
                 className="load"
-                onClick={() => loadId(submission.data.id)}
+                onClick={() => loadSubmission(submission)}
               >
                 Load
               </button>
@@ -84,8 +155,10 @@ class Index extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      menuOpen: false,
+      submissionMenuOpen: false,
+      infoOpen: false,
       paused: false,
+      submitting: false,
       size: 2,
       dataURL: {},
       submissions: null,
@@ -111,15 +184,21 @@ class Index extends React.Component {
     });
   }
   reset() {
-    window.confirm("Reset?") && reset();
+    if (window.confirm("Reset?")) {
+      this.setState({ currentSubmission: null });
+      reset();
+    }
   }
   menu() {
     this.pause();
-    this.setState({ menuOpen: true });
+    this.setState({ submissionMenuOpen: true });
+  }
+  info() {
+    this.setState({ infoOpen: true });
   }
   closeMenu() {
     this.play();
-    this.setState({ menuOpen: false });
+    this.setState({ submissionMenuOpen: false });
   }
   upload() {
     console.log("snapping");
@@ -152,12 +231,17 @@ class Index extends React.Component {
     let cellData = canvas.toDataURL("image/png");
 
     this.pause();
-    this.setState({ data: { dataURL, cells: cellData }, menuOpen: true });
+    this.setState({
+      data: { dataURL, cells: cellData },
+      submissionMenuOpen: true
+    });
   }
   submit() {
     let { title, data } = this.state;
     let { dataURL, cells } = data;
     let payload = { title, image: dataURL, cells };
+    this.setState({ submitting: true });
+
     fetch(functions._url("api/creations"), {
       method: "POST", // or 'PUT'
       body: JSON.stringify(payload), // data can be `string` or {object}!
@@ -168,12 +252,15 @@ class Index extends React.Component {
       .then(res => res.json())
       .then(response => {
         console.log("Success:", JSON.stringify(response));
-        this.setState({ menuOpen: false });
         this.play();
       })
-      .catch(error => console.error("Error:", error));
+      .catch(error => console.error("Error:", error))
+      .then(() => {
+        this.setState({ submissionMenuOpen: false, submitting: false });
+      });
   }
   loadSubmissions() {
+    this.setState({ submissions: [] });
     fetch(functions._url("api/creations"), {
       method: "GET",
       headers: {
@@ -185,11 +272,17 @@ class Index extends React.Component {
         this.setState({ submissions: response });
         this.pause();
       })
-      .catch(error => console.error("Error:", error));
+      .catch(error => {
+        this.setState({ submissions: false });
+        console.error("Error:", error);
+      });
   }
-  load(id) {
+  load({ id, data }) {
+    this.setState({ currentSubmission: { id, data } });
     storage
-      .refFromURL(`gs://sandtable-8d0f7.appspot.com/creations/${id}.data.png`)
+      .refFromURL(
+        `gs://sandtable-8d0f7.appspot.com/creations/${data.id}.data.png`
+      )
       .getDownloadURL()
       .then(dlurl => {
         fetch(dlurl, {
@@ -215,6 +308,8 @@ class Index extends React.Component {
                 width * height * 4
               );
 
+              reset();
+
               for (var i = 0; i < width * height * 4; i++) {
                 cellsData[i] = imgData.data[i];
               }
@@ -222,6 +317,24 @@ class Index extends React.Component {
             };
           })
           .catch(error => console.error("Error:", error));
+      });
+  }
+  incScore() {
+    let { currentSubmission } = this.state;
+    let { id } = currentSubmission;
+    // creations/:id/vote
+    fetch(functions._url(`api/creations/${id}/vote`), {
+      method: "PUT", // or 'PUT'
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (currentSubmission != null) {
+          console.log(data);
+          this.setState({ currentSubmission: { ...currentSubmission, data } });
+        }
       });
   }
   render() {
@@ -246,7 +359,7 @@ class Index extends React.Component {
         <button onClick={() => this.upload()}>Upload</button>
         <button onClick={() => this.loadSubmissions()}>Browse</button>
         <button onClick={() => this.reset()}>Reset</button>
-        <button onClick={() => this.about()}>About</button>
+        <button onClick={() => this.info()}>Info</button>
 
         {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
         <span className="sizes">
@@ -257,7 +370,7 @@ class Index extends React.Component {
               onClick={e => this.setSize(e, i)}
               style={{ padding: "0px" }}
             >
-              <svg height="24" width="24" id="d" viewBox="0 0 100 100">
+              <svg height="23" width="23" id="d" viewBox="0 0 100 100">
                 <circle cx="50" cy="50" r={2 + v} />
               </svg>
             </button>
@@ -278,29 +391,46 @@ class Index extends React.Component {
         >
           Wind
         </button>
-        {this.state.menuOpen && (
+        {this.state.currentSubmission && (
+          <div className="submission-title">
+            <button onClick={() => this.incScore()}>
+              +❤{this.state.currentSubmission.data.score}{" "}
+            </button>
+            {this.state.currentSubmission.data.title}
+          </div>
+        )}
+        {this.state.submissionMenuOpen && (
           <Menu close={() => this.closeMenu()}>
             <h4>Share your creation with the people!</h4>
             <img src={this.state.data.dataURL} />
-            <input
-              placeholder="title"
-              onChange={e => this.setState({ title: e.target.value })}
-            />
-            <button onClick={() => this.submit()}>Submit</button>
+            <div style={{ display: "flex" }}>
+              <input
+                placeholder="title"
+                onChange={e => this.setState({ title: e.target.value })}
+              />
+              <button
+                disabled={this.state.submitting}
+                onClick={() => this.submit()}
+              >
+                Submit
+              </button>
+            </div>
           </Menu>
         )}
         {this.state.submissions && (
           <Menu close={() => this.setState({ submissions: null })}>
             <Submissions
               submissions={this.state.submissions}
-              loadId={id => this.load(id)}
+              loadSubmission={submission => this.load(submission)}
             />
           </Menu>
         )}
-        {/* <button disabled onClick={() => this.save()}>
-          Save
-        </button>
-        <button onClick={() => this.load()}>Load</button> */}
+
+        {this.state.infoOpen && (
+          <Menu close={() => this.setState({ infoOpen: false })}>
+            <Info />
+          </Menu>
+        )}
       </React.Fragment>
     );
   }

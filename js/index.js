@@ -44,9 +44,9 @@ canvas.height = n * window.devicePixelRatio;
 canvas.width = n * window.devicePixelRatio;
 
 document.getElementById("background").addEventListener("touchmove", e => {
-  // if (!window.paused) {
-  e.preventDefault();
-  // }
+  if (!window.paused) {
+    e.preventDefault();
+  }
 });
 
 const ui = document.getElementById("ui");

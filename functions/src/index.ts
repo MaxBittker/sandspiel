@@ -10,6 +10,7 @@ import * as admin from "firebase-admin";
 admin.initializeApp();
 
 import * as express from "express";
+
 const app = express();
 app.use(cors);
 // // Start writing Firebase Functions
@@ -94,7 +95,7 @@ app.get("/creations", async (req, res) => {
     .firestore()
     .collection(`/creations`)
     .orderBy("timestamp", "desc")
-    .limit(50);
+    .limit(200);
   if (q) {
     res.status(404).json({
       errorCode: 404,
@@ -121,27 +122,41 @@ app.get("/creations", async (req, res) => {
   }
 });
 
-// // GET /api/creation/{id}
-// // Get details about a message
-// app.get("/message/:messageId", async (req, res) => {
-//   const messageId = req.params.messageId;
-//   try {
-//     const snapshot = await admin
-//       .database()
-//       .ref(`/creationss/${messageId}`)
-//       .once("value");
-//     if (!snapshot.exists()) {
-//       return res.status(404).json({
-//         errorCode: 404,
-//         errorMessage: `message '${messageId}' not found`
-//       });
-//     }
-//     return res.set("Cache-Control", "private, max-age=300");
-//   } catch (error) {
-//     console.log("Error getting message details", messageId, error.message);
-//     return res.sendStatus(500);
-//   }
-// });
+// GET /api/creation/{id}
+// Get details about a message
+app.put("/creations/:id/vote", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const doc_ref = await admin
+      .firestore()
+      .collection(`/creations`)
+      .doc(id);
+
+    // debugger.
+    await admin.firestore().runTransaction(t =>
+      t
+        .get(doc_ref)
+        .then(doc => {
+          if (doc.exists) {
+            const new_score = doc.data().score + 1;
+            t.update(doc_ref, { score: new_score });
+            res.status(200).json({ ...doc.data(), score: new_score });
+          } else {
+            res.status(404).json({
+              errorCode: 404,
+              errorMessage: `message '${id}' not found`
+            });
+          }
+        })
+        .catch(error => {
+          console.log("Error incrementing vote", id, error.message);
+        })
+    );
+  } catch (error) {
+    console.log("Error incrementing vote", id, error.message);
+    res.sendStatus(500);
+  }
+});
 
 // Expose the API as a function
 exports.api = functions.https.onRequest(app);
