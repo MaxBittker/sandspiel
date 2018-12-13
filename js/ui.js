@@ -114,7 +114,7 @@ const Submissions = ({ submissions, loadSubmission }) => {
             <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
             <div>
               <h3 style={{ flexGrow: 1 }}>{submission.data.title}</h3>
-              <h3>❤{submission.data.score}</h3>
+              <h3>❤&#xFE0E;{submission.data.score}</h3>
               <h4>
                 {new Date(submission.data.timestamp).toLocaleDateString()}
               </h4>
@@ -185,6 +185,7 @@ class Index extends React.Component {
   }
   reset() {
     if (window.confirm("Reset?")) {
+      this.play();
       this.setState({ currentSubmission: null });
       reset();
     }
@@ -201,7 +202,6 @@ class Index extends React.Component {
     this.setState({ submissionMenuOpen: false });
   }
   upload() {
-    console.log("snapping");
     let dataURL = snapshot(universe);
     const cells = new Uint8Array(
       memory.buffer,
@@ -394,7 +394,7 @@ class Index extends React.Component {
         {this.state.currentSubmission && (
           <div className="submission-title">
             <button onClick={() => this.incScore()}>
-              +❤{this.state.currentSubmission.data.score}{" "}
+              +❤&#xFE0E;{this.state.currentSubmission.data.score}{" "}
             </button>
             {this.state.currentSubmission.data.title}
           </div>

@@ -4,6 +4,18 @@ import * as crypto from "crypto";
 
 import * as functions from "firebase-functions";
 import * as c from "cors";
+
+import * as Twit from "twit";
+
+const T = new Twit({
+  consumer_key: functions.config().twitter.consumer_key.key,
+  consumer_secret: functions.config().twitter.consumer_secret,
+  access_token: functions.config().twitter.access_token,
+  access_token_secret: functions.config().twitter.access_token_secret,
+  timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
+  strictSSL: false // optional - requires SSL certificates to be valid.
+});
+
 const cors = c({ origin: true });
 
 import * as admin from "firebase-admin";
@@ -79,6 +91,45 @@ app.post("/creations", async (req, res) => {
       .add(data);
 
     res.status(201).json({ id });
+
+    // post a tweet with media
+    //
+    const b64content = image.replace(/^data:image\/\w+;base64,/, "");
+
+    // first we must post the media to Twitter
+    T.post("media/upload", { media_data: b64content }, function(
+      err,
+      res_data,
+      response
+    ) {
+      // now we can assign alt text to the media, for use by screen readers and
+      // other text-based presentations and interpreters
+      const mediaIdStr = res_data.media_id_string;
+      const altText = title;
+      const meta_params = {
+        media_id: mediaIdStr,
+        alt_text: { text: altText }
+      };
+
+      T.post("media/metadata/create", meta_params, function(
+        post_err,
+        post_data
+      ) {
+        if (!err) {
+          // now we can reference the media and post a tweet (media will attach to the tweet)
+          const params = {
+            status: title,
+            media_ids: [mediaIdStr]
+          };
+
+          T.post("statuses/update", params, function(_, _data) {
+            console.log(_data);
+          });
+        } else {
+          console.log(err);
+        }
+      });
+    });
   } catch (error) {
     console.log("Error saving message", error.message);
     res.sendStatus(500);
