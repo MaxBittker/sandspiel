@@ -26,24 +26,34 @@ const Info = () => {
     <div className="Info">
       <h1>sandspiel </h1>
       <p>
-        Thank you for playing! Falling sand games like this provided me hours of
-        fun and imagination growing up. I want to particularly thanks danball's{" "}
-        <a href="https://dan-ball.jp/en/javagame/dust/">Powder Game</a> as the
-        primary inspiration for sandfarm. {"<3"}
+        Created by <a href="https://maxbittker.com">max bittker</a>
       </p>
       <p>
-        You can follow the game on twitter for updates and new uploads:
+        Welcome, and thanks for coming by! I hope that you enjoy exploring this
+        small game, and it brings you some calm.{" "}
+      </p>
+      <p>
+        Growing up, "falling sand" games like this one provided me hours of
+        entertainment and imagination. I want to particularly thank ha55ii's{" "}
+        <a href="https://dan-ball.jp/en/javagame/dust/">Powder Game</a> as the
+        primary inspiration for sandspiel.
+      </p>
+      <br />
+      <p>
+        You can follow sandspiel on twitter for updates and new uploads:
         <a href="https://twitter.com/sandspiel_feed">@sandfarm</a>
       </p>
+      <br />
       <p>
-        View the{" "}
+        If you'd like, you can view the{" "}
         <a href="https://github.com/maxbittker/sandspiel">source code</a> or{" "}
         <a href="https://github.com/maxbittker/sandspiel/issues">report bugs</a>{" "}
         on github
       </p>
-      <p>
-        Created by <a href="https://maxbittker.com">max bittker</a>
-      </p>
+      <h2>FAQs</h2>
+      <p>(TODO: write some FAQs)</p>
+      If you have any other questions, feel free to reach out on twitter and
+      I'll try to answer!
       <h2>Element Information:</h2>
       <h4>Wall </h4>
       Indestructible
@@ -62,7 +72,7 @@ const Info = () => {
       <h4>Mite </h4>
       Eats wood and plant, but loves dust! Slides on ice
       <h4>Wood </h4>
-      Sturdy
+      Sturdy, but biodegradable
       <h4>Plant </h4>
       Thrives in wet enviroments
       <h4>Fungus </h4>
@@ -76,11 +86,11 @@ const Info = () => {
       <h4>Acid </h4>
       Corrodes other elements
       <h4>Dust </h4>
-      Pretty but dangerously explosive
+      Pretty, but dangerously explosive
       <h4>Oil </h4>
       Produces smoke
       <h4>Firework </h4>
-      Explodes into the first element it touches
+      Explodes into copies of the first element it touches
     </div>
   );
 };
