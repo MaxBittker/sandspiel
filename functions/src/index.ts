@@ -96,7 +96,7 @@ app.post("/creations", async (req, res) => {
       uploadPNG(image, ".png")
     ]);
 
-    await admin
+    const doc = await admin
       .firestore()
       .collection("creations")
       .add(data);
@@ -129,7 +129,10 @@ app.post("/creations", async (req, res) => {
         if (!err) {
           // now we can reference the media and post a tweet (media will attach to the tweet)
           const params = {
-            status: trimmed_title.replace(/@/g, ""),
+            status: `${trimmed_title.replace(
+              /@/g,
+              ""
+            )}\n https://sandspiel.club/#${doc.id}`,
             media_ids: [mediaIdStr]
           };
 
@@ -157,14 +160,15 @@ app.get("/creations", async (req, res) => {
     .firestore()
     .collection(`/creations`)
     .orderBy("timestamp", "desc")
-    .limit(200);
-  if (q) {
-    res.status(404).json({
-      errorCode: 404,
-      errorMessage: `creation '${q}' not found`
-    });
-    return;
-  }
+    .limit(500);
+
+  // if (q) {
+  //   res.status(404).json({
+  //     errorCode: 404,
+  //     errorMessage: `creation '${q}' not found`
+  //   });
+  //   return;
+  // }
   try {
     const snapshot = await query.get();
     // snapshot
@@ -183,9 +187,31 @@ app.get("/creations", async (req, res) => {
     res.sendStatus(500);
   }
 });
-
-// GET /api/creation/{id}
+// GET /api/creations/{id}
 // Get details about a message
+app.get("/creations/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const doc = await admin
+      .firestore()
+      .collection(`/creations`)
+      .doc(id)
+      .get();
+
+    if (doc.exists) {
+      res.status(200).json({ ...doc.data() });
+    } else {
+      res.status(404).json({
+        errorCode: 404,
+        errorMessage: `submission '${id}' not found`
+      });
+    }
+  } catch (error) {
+    console.log("Error incrementing vote", id, error.message);
+    res.sendStatus(500);
+  }
+});
+
 app.put("/creations/:id/vote", async (req, res) => {
   const id = req.params.id;
   try {
@@ -194,7 +220,6 @@ app.put("/creations/:id/vote", async (req, res) => {
       .collection(`/creations`)
       .doc(id);
 
-    // debugger.
     await admin.firestore().runTransaction(t =>
       t
         .get(doc_ref)
@@ -206,7 +231,7 @@ app.put("/creations/:id/vote", async (req, res) => {
           } else {
             res.status(404).json({
               errorCode: 404,
-              errorMessage: `message '${id}' not found`
+              errorMessage: `submission '${id}' not found`
             });
           }
         })

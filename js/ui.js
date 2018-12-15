@@ -66,8 +66,9 @@ const Info = () => {
       <h4>Plant </h4>
       Thrives in wet enviroments
       <h4>Fungus </h4>
-      Grows over everything
-      <h4>Flower </h4>
+      Spreads over everything
+      <h4>Seed </h4>
+      Grows in sand
       <h4>Fire </h4>
       Hot!
       <h4>Lava </h4>
@@ -150,6 +151,7 @@ let sizeMap = [2, 5, 10, 18, 30, 45];
 class Index extends React.Component {
   constructor(props) {
     super(props);
+    let initialId = window.location.hash.replace(/#/, "");
     this.state = {
       submissionMenuOpen: false,
       infoOpen: false,
@@ -160,6 +162,9 @@ class Index extends React.Component {
       submissions: null,
       selectedElement: Species.Water
     };
+    if (initialId.length > 0) {
+      this.load(initialId);
+    }
   }
   togglePause() {
     window.paused = !this.state.paused;
@@ -182,6 +187,7 @@ class Index extends React.Component {
   reset() {
     if (window.confirm("Reset?")) {
       this.play();
+      window.location = "#";
       this.setState({ currentSubmission: null });
       reset();
     }
@@ -274,46 +280,68 @@ class Index extends React.Component {
         console.error("Error:", error);
       });
   }
-  load({ id, data }) {
-    this.setState({ currentSubmission: { id, data } });
-    storage
-      .refFromURL(
-        `gs://sandtable-8d0f7.appspot.com/creations/${data.id}.data.png`
-      )
-      .getDownloadURL()
-      .then(dlurl => {
-        fetch(dlurl, {
-          method: "GET"
-        })
-          .then(res => res.blob())
-          .then(blob => {
-            // console.log(response);
-            var url = URL.createObjectURL(blob);
-            var img = new Image();
-            img.src = url;
-            img.onload = () => {
-              var canvas = document.createElement("canvas");
-              canvas.width = width;
-              canvas.height = height;
-              var ctx = canvas.getContext("2d");
-              ctx.drawImage(img, 0, 0);
-              var imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+  load(id) {
+    window.location = `#${id}`;
 
-              const cellsData = new Uint8Array(
-                memory.buffer,
-                universe.cells(),
-                width * height * 4
-              );
+    fetch(functions._url(`api/creations/${id}`), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        storage
+          .refFromURL(
+            `gs://sandtable-8d0f7.appspot.com/creations/${data.id}.data.png`
+          )
+          .getDownloadURL()
+          .then(dlurl => {
+            fetch(dlurl, {
+              method: "GET"
+            })
+              .then(res => res.blob())
+              .then(blob => {
+                // console.log(response);
+                this.setState({ currentSubmission: { id, data } });
 
-              reset();
+                var url = URL.createObjectURL(blob);
+                var img = new Image();
+                img.src = url;
+                img.onload = () => {
+                  var canvas = document.createElement("canvas");
+                  canvas.width = width;
+                  canvas.height = height;
+                  var ctx = canvas.getContext("2d");
+                  ctx.drawImage(img, 0, 0);
+                  var imgData = ctx.getImageData(
+                    0,
+                    0,
+                    canvas.width,
+                    canvas.height
+                  );
 
-              for (var i = 0; i < width * height * 4; i++) {
-                cellsData[i] = imgData.data[i];
-              }
-              this.setState({ submissions: null });
-            };
-          })
-          .catch(error => console.error("Error:", error));
+                  const cellsData = new Uint8Array(
+                    memory.buffer,
+                    universe.cells(),
+                    width * height * 4
+                  );
+
+                  reset();
+
+                  for (var i = 0; i < width * height * 4; i++) {
+                    cellsData[i] = imgData.data[i];
+                  }
+                  this.pause();
+                  this.setState({ submissions: null });
+                };
+              })
+              .catch(error => console.error("Error:", error));
+          });
+      })
+      .catch(error => {
+        this.setState({ submissions: false });
+        console.error("Error:", error);
       });
   }
   incScore() {
@@ -418,7 +446,7 @@ class Index extends React.Component {
           <Menu close={() => this.setState({ submissions: null })}>
             <Submissions
               submissions={this.state.submissions}
-              loadSubmission={submission => this.load(submission)}
+              loadSubmission={submission => this.load(submission.id)}
             />
           </Menu>
         )}
