@@ -92,7 +92,7 @@ void main() {
     lightness = 0.8;
   } else if (type == 15) { // mite
     hue = 0.8;
-    saturation = 0.3;
+    saturation = 0.9;
     lightness = 0.8;
   } else if (type == 16) { // oil
     hue = (data.g * 5.0) + t * .008;
@@ -104,14 +104,18 @@ void main() {
     saturation = 0.4 + data.b;
     lightness = 0.9;
   } else if (type == 18) { // fungus
-    hue = (data.g * -0.1) + 0.05;
-    saturation = (data.g * 0.5);
+    hue = (data.g * 0.15) - 0.1;
+    saturation = (data.g * 0.8) - 0.05;
 
     // (data.g * 0.00);
     lightness = 1.5 - (data.g * 0.2);
+  } else if (type == 19) { // seed/flower
+
+    hue = fract(fract(data.b * 2.) * 0.5) - 0.3;
+    saturation = 0.7 * (data.g + 0.4) + data.b * 0.2;
+    lightness = 0.9 * (data.g + 0.9);
   }
   lightness *= (0.95 + snoise2(floor(uv * resolution / dpi)) * 0.05);
-
   color = hsv2rgb(vec3(hue, saturation, lightness));
   gl_FragColor = vec4(color, a);
 }

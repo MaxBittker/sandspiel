@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-// import * as UPNG from "upng-js";
+import { withUrlState } from "with-url-state";
 
 import { memory } from "../crate/pkg/sandtable_bg";
 import { Species } from "../crate/pkg";
@@ -17,9 +17,6 @@ window.onload = () => {
   functions = firebase.functions();
   storage = firebase.storage();
 };
-// let url = "http://localhost:5001/sandtable-8d0f7/us-central1/api/creations";
-// let endpoint =
-// "https://us-central1-sandtable-8d0f7.cloudfunctions.net/api/creations";
 
 let storageUrl =
   "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
@@ -27,11 +24,10 @@ let storageUrl =
 const Info = () => {
   return (
     <div className="Info">
-      <h1>Sandfarm </h1>
+      <h1>sandspiel </h1>
       <p>
-        Thank you for playing this game! Falling sand games like this provided
-        me hours of fun and imagination growing up. I want to particularly
-        thanks danball's{" "}
+        Thank you for playing! Falling sand games like this provided me hours of
+        fun and imagination growing up. I want to particularly thanks danball's{" "}
         <a href="https://dan-ball.jp/en/javagame/dust/">Powder Game</a> as the
         primary inspiration for sandfarm. {"<3"}
       </p>
@@ -41,8 +37,8 @@ const Info = () => {
       </p>
       <p>
         View the{" "}
-        <a href="https://github.com/maxbittker/sandtable">source code</a> or{" "}
-        <a href="https://github.com/maxbittker/sandtable/issues">report bugs</a>{" "}
+        <a href="https://github.com/maxbittker/sandspiel">source code</a> or{" "}
+        <a href="https://github.com/maxbittker/sandspiel/issues">report bugs</a>{" "}
         on github
       </p>
       <p>
@@ -56,9 +52,9 @@ const Info = () => {
       <h4>Water </h4>
       Puts out fire
       <h4>Stone </h4>
-      Forms arches
+      Forms arches, folds under pressure
       <h4>Ice </h4>
-      Freezes Water
+      Freezes Water, slippery!
       <h4>Gas </h4>
       Highly Flammable!
       <h4>Cloner </h4>
@@ -114,7 +110,7 @@ const Submissions = ({ submissions, loadSubmission }) => {
             <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
             <div>
               <h3 style={{ flexGrow: 1 }}>{submission.data.title}</h3>
-              <h3>❤&#xFE0E;{submission.data.score}</h3>
+              <h3>♡{submission.data.score}</h3>
               <h4>
                 {new Date(submission.data.timestamp).toLocaleDateString()}
               </h4>
@@ -195,6 +191,7 @@ class Index extends React.Component {
     this.setState({ submissionMenuOpen: true });
   }
   info() {
+    this.pause();
     this.setState({ infoOpen: true });
   }
   closeMenu() {
@@ -394,7 +391,7 @@ class Index extends React.Component {
         {this.state.currentSubmission && (
           <div className="submission-title">
             <button onClick={() => this.incScore()}>
-              +❤&#xFE0E;{this.state.currentSubmission.data.score}{" "}
+              +♡{this.state.currentSubmission.data.score}{" "}
             </button>
             {this.state.currentSubmission.data.title}
           </div>

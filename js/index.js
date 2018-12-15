@@ -1,4 +1,4 @@
-import { Cell, Species, Universe } from "../crate/pkg";
+import { Universe } from "../crate/pkg";
 
 import { startWebGL } from "./render";
 import { fps } from "./ui";
@@ -53,7 +53,7 @@ const ui = document.getElementById("ui");
 
 let resize = () => {
   let screen_width = window.innerWidth;
-  let uiheight = ui.offsetHeight;
+  let uiheight = 50;
   let screen_height = window.innerHeight - uiheight;
 
   let canvasStyle = "";
@@ -76,7 +76,9 @@ let resize = () => {
 };
 
 resize();
-window.addEventListener("resize", resize);
+window.addEventListener("resize", () => {
+  resize();
+});
 
 let fluid = startFluid({ universe });
 

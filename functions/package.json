@@ -18,7 +18,8 @@
     "firebase-admin": "~6.0.0",
     "firebase-functions": "^2.1.0",
     "twit": "^2.2.11",
-    "uuid": "^3.3.2"
+    "uuid": "^3.3.2",
+    "wordfilter": "^0.2.6"
   },
   "devDependencies": {
     "tslint": "~5.8.0",

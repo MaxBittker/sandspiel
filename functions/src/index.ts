@@ -6,6 +6,10 @@ import * as functions from "firebase-functions";
 import * as c from "cors";
 
 import * as Twit from "twit";
+import * as wordfilter from "wordfilter";
+
+wordfilter.removeWord("homo");
+wordfilter.removeWord("crazy");
 
 const T = new Twit({
   consumer_key: functions.config().twitter.consumer_key.key,
@@ -32,6 +36,13 @@ app.use(cors);
 // Create a new creation, and upload two image
 app.post("/creations", async (req, res) => {
   const { title, image, cells } = req.body;
+
+  if (wordfilter.blacklisted(title)) {
+    res.sendStatus(418);
+    return;
+  }
+  const trimmed_title = title.slice(0, 200);
+
   try {
     const bucket = admin.storage().bucket();
     const id = crypto
@@ -53,7 +64,7 @@ app.post("/creations", async (req, res) => {
     }
 
     const data = {
-      title: title.slice(0, 200),
+      title: trimmed_title,
       id,
       score: 0,
       timestamp: Date.now()
@@ -105,7 +116,7 @@ app.post("/creations", async (req, res) => {
       // now we can assign alt text to the media, for use by screen readers and
       // other text-based presentations and interpreters
       const mediaIdStr = res_data.media_id_string;
-      const altText = title;
+      const altText = trimmed_title;
       const meta_params = {
         media_id: mediaIdStr,
         alt_text: { text: altText }
@@ -118,7 +129,7 @@ app.post("/creations", async (req, res) => {
         if (!err) {
           // now we can reference the media and post a tweet (media will attach to the tweet)
           const params = {
-            status: title,
+            status: trimmed_title.replace(/@/g, ""),
             media_ids: [mediaIdStr]
           };
 

@@ -46,6 +46,7 @@
     "http-server": "^0.11.1",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
-    "regl": "^1.3.9"
+    "regl": "^1.3.9",
+    "with-url-state": "^2.0.2"
   }
 }
