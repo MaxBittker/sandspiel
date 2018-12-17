@@ -12,8 +12,7 @@ fn rand_int(n: i32) -> i32 {
 }
 
 fn rand_dir() -> i32 {
-    let i = rand_int(1000);
-    (i % 3) - 1
+    rand_int(3) - 1
 }
 fn adjacency_right(dir: (i32, i32)) -> (i32, i32) {
     match dir {
