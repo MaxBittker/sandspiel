@@ -316,6 +316,7 @@ pub fn update_oil(cell: Cell, mut api: SandApi) {
 pub fn update_gas(cell: Cell, mut api: SandApi) {
     let dx = rand_dir();
     let dy = rand_dir();
+    let nbr_species = api.get(dx, dy).species;
 
     // api.set_fluid(Wind {
     //     dx: 0,
@@ -323,9 +324,22 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
     //     pressure: 5,
     //     density: 0,
     // });
-    if api.get(-dx, dy).species == Species::Empty {
+    
+    if nbr_species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
-        api.set(-dx, dy, cell);
+        api.set(dx, dy, cell);
+    } else if nbr_species == Species::Ice {
+        // Freeze on contact with ice. This simulates diffusion-limited aggregation.
+        // https://en.wikipedia.org/wiki/Diffusion-limited_aggregation
+        api.set(
+            0,
+            0,
+            Cell {
+                species: Species::Ice,
+                clock: 0,
+                ..cell
+            },
+        );
     } else {
         api.set(0, 0, cell);
     }
