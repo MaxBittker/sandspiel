@@ -74,6 +74,7 @@ button:disabled {
 
 button:focus {
   outline: none;
+  cursor:pointer;
 }
 
 button.selected {
