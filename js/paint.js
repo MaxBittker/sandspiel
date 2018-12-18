@@ -38,11 +38,13 @@ canvas.addEventListener("mousedown", event => {
   paint(event);
   lastPaint = event;
 });
-canvas.addEventListener("mouseup", event => {
-  event.preventDefault();
-  lastPaint = null;
+document.body.addEventListener("mouseup", event => {
   clearInterval(repeat);
-  painting = false;
+  if (painting) {
+    event.preventDefault();
+    lastPaint = null;
+    painting = false;
+  }
 });
 canvas.addEventListener("mousemove", event => {
   clearInterval(repeat);
