@@ -93,7 +93,7 @@ impl<'a> SandApi<'a> {
         }
         let i = self
             .universe
-            .get_index((nx) % self.universe.width, (ny) % self.universe.height);
+            .get_index(nx, ny);
         // v.clock += 1;
         self.universe.cells[i] = v;
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
