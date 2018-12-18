@@ -6,8 +6,8 @@
 
 This is a [falling sand](https://en.wikipedia.org/wiki/Falling-sand_game) game built in rust (via wasm), webgl, and some JS glueing things together.
 
-The goal is to produce an cellular automata enviroment that's interesting to play with and supports the sharing and forking of fun creations with other players.
-Ultimately, I want the platform to support editing and uploading of your own elements via a programable cellular automata API.
+The goal is to produce an cellular automata environment that's interesting to play with and supports the sharing and forking of fun creations with other players.
+Ultimately, I want the platform to support editing and uploading of your own elements via a programmable cellular automata API.
 
 ### 🛠️ Build:
 
