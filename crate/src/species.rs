@@ -340,6 +340,10 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
                 ..cell
             },
         );
+    } else if api.get(-dx, -dy).species == Species::Empty {
+        // Bounce if possible
+        api.set(0, 0, EMPTY_CELL);
+        api.set(-dx, -dy, cell);
     } else {
         api.set(0, 0, cell);
     }
