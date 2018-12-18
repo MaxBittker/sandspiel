@@ -66,7 +66,7 @@ button {
   max-width: 200px;
   fill: black;
   line-height: 0px;
-  cursor:pointer;
+  cursor: pointer;
 }
 button:disabled {
   background-color: gainsboro;
