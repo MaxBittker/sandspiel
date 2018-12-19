@@ -41,7 +41,7 @@ const Info = () => {
       <br />
       <p>
         You can follow sandspiel on twitter for updates and new uploads:
-        <a href="https://twitter.com/sandspiel_feed">@sandfarm</a>
+        <a href="https://twitter.com/sandspiel_feed">@sandspiel_feed</a>
       </p>
       <br />
       <p>

@@ -159,7 +159,7 @@ app.get("/creations", async (req, res) => {
   const query = admin
     .firestore()
     .collection(`/creations`)
-    .orderBy("timestamp", "desc")
+    .orderBy("timestamp", "asc")
     .limit(500);
 
   // if (q) {

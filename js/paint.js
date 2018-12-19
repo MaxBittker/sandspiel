@@ -74,6 +74,7 @@ canvas.addEventListener("touchmove", event => {
   handleTouches(event);
 });
 function smoothPaint(event) {
+  clearInterval(repeat);
   repeat = window.setInterval(() => paint(event), 100);
   let startEvent = { clientX: event.clientX, clientY: event.clientY };
   if (!painting) {
