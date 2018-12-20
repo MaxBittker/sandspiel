@@ -20,6 +20,40 @@ const T = new Twit({
   strictSSL: false // optional - requires SSL certificates to be valid.
 });
 
+function Tweet(b64content, title, id) {
+  // first we must post the media to Twitter
+  T.post("media/upload", { media_data: b64content }, function(
+    err,
+    res_data,
+    response
+  ) {
+    // now we can assign alt text to the media, for use by screen readers and
+    // other text-based presentations and interpreters
+    const mediaIdStr = res_data.media_id_string;
+    const altText = title;
+    const meta_params = {
+      media_id: mediaIdStr,
+      alt_text: { text: altText }
+    };
+
+    T.post("media/metadata/create", meta_params, function(post_err, post_data) {
+      if (!err) {
+        // now we can reference the media and post a tweet (media will attach to the tweet)
+        const params = {
+          status: `${title.replace(/@/g, "")}\n https://sandspiel.club/#${id}`,
+          media_ids: [mediaIdStr]
+        };
+
+        T.post("statuses/update", params, function(_, _data) {
+          console.log(_data);
+        });
+      } else {
+        console.log(err);
+      }
+    });
+  });
+}
+
 const cors = c({ origin: true });
 
 import * as admin from "firebase-admin";
@@ -107,43 +141,7 @@ app.post("/creations", async (req, res) => {
     //
     const b64content = image.replace(/^data:image\/\w+;base64,/, "");
 
-    // first we must post the media to Twitter
-    T.post("media/upload", { media_data: b64content }, function(
-      err,
-      res_data,
-      response
-    ) {
-      // now we can assign alt text to the media, for use by screen readers and
-      // other text-based presentations and interpreters
-      const mediaIdStr = res_data.media_id_string;
-      const altText = trimmed_title;
-      const meta_params = {
-        media_id: mediaIdStr,
-        alt_text: { text: altText }
-      };
-
-      T.post("media/metadata/create", meta_params, function(
-        post_err,
-        post_data
-      ) {
-        if (!err) {
-          // now we can reference the media and post a tweet (media will attach to the tweet)
-          const params = {
-            status: `${trimmed_title.replace(
-              /@/g,
-              ""
-            )}\n https://sandspiel.club/#${doc.id}`,
-            media_ids: [mediaIdStr]
-          };
-
-          T.post("statuses/update", params, function(_, _data) {
-            console.log(_data);
-          });
-        } else {
-          console.log(err);
-        }
-      });
-    });
+    Tweet(b64content, trimmed_title, doc.id);
   } catch (error) {
     console.log("Error saving message", error.message);
     res.sendStatus(500);
@@ -159,7 +157,8 @@ app.get("/creations", async (req, res) => {
   const query = admin
     .firestore()
     .collection(`/creations`)
-    .orderBy("timestamp", "asc")
+    .orderBy("timestamp", "desc")
+    // .where("timestamp", "<=", 1545244187419)
     .limit(500);
 
   // if (q) {
@@ -214,7 +213,26 @@ app.get("/creations/:id", async (req, res) => {
 
 app.put("/creations/:id/vote", async (req, res) => {
   const id = req.params.id;
+  const ip = req.header("x-forwarded-for").split(",")[0];
+
   try {
+    const vote = await admin
+      .firestore()
+      .collection("/votes")
+      .where("ip", "==", ip)
+      .where("id", "==", id)
+      .get();
+
+    if (!vote.empty) {
+      res.status(301);
+      return;
+    }
+
+    await admin
+      .firestore()
+      .collection("/votes")
+      .add({ id, ip });
+
     const doc_ref = await admin
       .firestore()
       .collection(`/creations`)
