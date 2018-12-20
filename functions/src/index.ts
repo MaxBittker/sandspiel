@@ -154,10 +154,11 @@ app.post("/creations", async (req, res) => {
 // Get all creations, optionally specifying a string to filter on
 app.get("/creations", async (req, res) => {
   const q = req.query.q;
+  console.log(q);
   const query = admin
     .firestore()
     .collection(`/creations`)
-    .orderBy("timestamp", "desc")
+    .orderBy(q === "score" ? "score" : "timestamp", "desc")
     // .where("timestamp", "<=", 1545244187419)
     .limit(500);
 

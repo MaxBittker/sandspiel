@@ -454,6 +454,8 @@ class Index extends React.Component {
         )}
         {this.state.submissions && (
           <Menu close={() => this.setState({ submissions: null })}>
+            {/* <button>Recent</button> */}
+            {/* <button>Top</button> */}
             <Submissions
               submissions={this.state.submissions}
               loadSubmission={submission => this.load(submission.id)}
