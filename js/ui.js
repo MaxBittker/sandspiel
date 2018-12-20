@@ -272,9 +272,9 @@ class Index extends React.Component {
         this.setState({ submissionMenuOpen: false, submitting: false });
       });
   }
-  loadSubmissions() {
+  loadSubmissions(q) {
     this.setState({ submissions: [] });
-    fetch(functions._url("api/creations"), {
+    fetch(functions._url("api/creations") + `?q=${q}`, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -454,8 +454,8 @@ class Index extends React.Component {
         )}
         {this.state.submissions && (
           <Menu close={() => this.setState({ submissions: null })}>
-            {/* <button>Recent</button> */}
-            {/* <button>Top</button> */}
+            <button onClick={() => this.loadSubmissions()}>Recent</button>
+            <button onClick={() => this.loadSubmissions("score")}>Top</button>
             <Submissions
               submissions={this.state.submissions}
               loadSubmission={submission => this.load(submission.id)}

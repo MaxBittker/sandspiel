@@ -214,7 +214,7 @@ app.get("/creations/:id", async (req, res) => {
 
 app.put("/creations/:id/vote", async (req, res) => {
   const id = req.params.id;
-  const ip = req.header("x-forwarded-for").split(",")[0];
+  const ip = req.header("x-appengine-user-ip");
 
   try {
     const vote = await admin
