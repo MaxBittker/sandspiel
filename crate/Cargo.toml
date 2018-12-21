@@ -13,8 +13,6 @@ default = ["console_error_panic_hook"]
 cfg-if = "0.1.6"
 wasm-bindgen = "0.2.29"
 js-sys = "0.3.5"
-rand = "0.6.1"
-rand_isaac = "0.1.1"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
@@ -24,11 +22,6 @@ console_error_panic_hook = { version = "0.1.1", optional = true }
 
 [dev-dependencies]
 wasm-bindgen-test = "0.2"
-criterion = "0.2"
-
-[[bench]]
-name = "bench1"
-harness = false
 
 [profile.release]
 # Tell `rustc` to optimize for small code size.
