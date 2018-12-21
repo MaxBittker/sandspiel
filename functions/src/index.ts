@@ -225,7 +225,7 @@ app.put("/creations/:id/vote", async (req, res) => {
       .get();
 
     if (!vote.empty) {
-      res.status(301);
+      res.sendStatus(301);
       return;
     }
 
