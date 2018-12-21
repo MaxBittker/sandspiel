@@ -1152,9 +1152,16 @@ pub fn update_mite(cell: Cell, mut api: SandApi) {
     let mut dy = 1;
     let mut mite = cell.clone();
 
-    if cell.rb > 1 {
+    if cell.rb > 10 {
+        // /
         mite.rb = mite.rb.saturating_sub(1);
         dy = -1;
+    } else if cell.rb > 1 {
+        // \
+        mite.rb = mite.rb.saturating_sub(1);
+    } else {
+        // |
+        dx = 0;
     }
     let nbr = api.get(dx, dy);
 
@@ -1179,6 +1186,7 @@ pub fn update_mite(cell: Cell, mut api: SandApi) {
     if sample == Species::Dust {
         api.set(sx, sy, if i > 800 { cell } else { EMPTY_CELL });
     }
+
     if nbr.species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
         api.set(dx, dy, mite);
@@ -1186,11 +1194,12 @@ pub fn update_mite(cell: Cell, mut api: SandApi) {
         i = rand_int(100);
         let mut ndx = (i % 3) - 1;
         if i < 6 {
+            //switch direction
             ndx = dx;
         }
 
         mite.ra = (1 + ndx) as u8;
-        mite.rb = (i % 10) as u8;
+        mite.rb = 10 + (i % 10) as u8; //hop height
 
         api.set(0, 0, mite);
     } else {
