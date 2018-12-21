@@ -7,14 +7,6 @@ use std::mem;
 use wasm_bindgen::prelude::*;
 // use web_sys::console;
 
-fn rand_int(n: i32) -> i32 {
-    (js_sys::Math::random() * n as f64) as i32
-}
-
-fn rand_dir() -> i32 {
-    let i = rand_int(1000);
-    (i % 3) - 1
-}
 fn adjacency_right(dir: (i32, i32)) -> (i32, i32) {
     match dir {
         (0, 1) => (1, 1),
@@ -41,8 +33,8 @@ fn adjacency_left(dir: (i32, i32)) -> (i32, i32) {
         _ => (0, 0),
     }
 }
-// fn rand_dir_2() -> i32 {
-//     let i = rand_int(1000);
+// fn api.rand_dir_2() -> i32 {
+//     let i = api.rand_int(1000);
 //     if (i % 2) == 0 {
 //         -1
 //     } else {
@@ -105,7 +97,7 @@ impl Species {
 }
 
 pub fn update_sand(cell: Cell, mut api: SandApi) {
-    let dx = rand_dir();
+    let dx = api.rand_dir();
 
     let nbr = api.get(0, 1);
     if nbr.species == Species::Empty {
@@ -127,7 +119,7 @@ pub fn update_sand(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_dust(cell: Cell, mut api: SandApi) {
-    let dx = rand_dir();
+    let dx = api.rand_dir();
     let fluid = api.get_fluid();
 
     if fluid.pressure > 120 {
@@ -171,7 +163,7 @@ pub fn update_stone(cell: Cell, mut api: SandApi) {
     }
     let fluid = api.get_fluid();
 
-    if fluid.pressure > 120 && (js_sys::Math::random() > 0.5) {
+    if fluid.pressure > 120 && (api.rand_float() > 0.5) {
         api.set(
             0,
             0,
@@ -203,7 +195,7 @@ pub fn update_stone(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_water(cell: Cell, mut api: SandApi) {
-    let dx = rand_dir();
+    let dx = api.rand_dir();
     let below = api.get(0, 1);
     let dx1 = api.get(dx, 1);
     let dx0 = api.get(dx, 0);
@@ -229,8 +221,8 @@ pub fn update_water(cell: Cell, mut api: SandApi) {
 
 pub fn update_oil(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
-    let dx = rand_dir();
-    let dy = rand_dir();
+    let dx = api.rand_dir();
+    let dy = api.rand_dir();
 
     let mut new_cell = cell;
     let nbr = api.get(dx, dy);
@@ -260,12 +252,13 @@ pub fn update_oil(cell: Cell, mut api: SandApi) {
             density: 180,
         });
         if rb % 4 != 0 && nbr.species == Species::Empty {
+            let ra = 20 + api.rand_int(30) as u8;
             api.set(
                 dx,
                 dy,
                 Cell {
                     species: Species::Fire,
-                    ra: 20 + rand_int(30) as u8,
+                    ra: ra,
                     rb: 0,
                     clock: 0,
                 },
@@ -314,8 +307,8 @@ pub fn update_oil(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_gas(cell: Cell, mut api: SandApi) {
-    let dx = rand_dir();
-    let dy = rand_dir();
+    let dx = api.rand_dir();
+    let dy = api.rand_dir();
 
     // api.set_fluid(Wind {
     //     dx: 0,
@@ -358,14 +351,15 @@ pub fn update_cloner(cell: Cell, mut api: SandApi) {
                 }
             } else {
                 if api.get(dx, dy).species == Species::Empty {
+                    let ra = 80
+                                + api.rand_int(30) as u8
+                                + ((cell.clock % 127) as i8 - 60).abs() as u8;
                     api.set(
                         dx,
                         dy,
                         Cell {
                             species: clone_species,
-                            ra: 80
-                                + rand_int(30) as u8
-                                + ((cell.clock % 127) as i8 - 60).abs() as u8,
+                            ra,
                             rb: 0,
                             clock: 0,
                         },
@@ -397,8 +391,8 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
         Species::Sand
     };
 
-    let sx = rand_dir();
-    let sy = rand_dir();
+    let sx = api.rand_dir();
+    let sy = api.rand_dir();
     let sample = api.get(sx, sy);
 
     if cell.rb == 100
@@ -431,7 +425,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
 
     if ra == 0 {
         //falling
-        let dx = rand_dir();
+        let dx = api.rand_dir();
         let nbr = api.get(0, 1);
         if nbr.species == Species::Empty {
             api.set(0, 0, EMPTY_CELL);
@@ -450,7 +444,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
             api.set(0, 0, cell);
         }
     } else if ra > 5 {
-        //rising
+        // rising
 
         if api.get(0, -2).species == Species::Empty || api.get(0, -2).species == Species::Firework {
             api.set(
@@ -490,7 +484,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
         });
         let spawned = Cell {
             species: clone_species,
-            ra: 80 + (js_sys::Math::random() * 90.) as u8,
+            ra: 80 + (api.rand_float() * 90.) as u8,
             rb: 0,
             clock: 0,
         };
@@ -506,11 +500,12 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
         || sample.species == Species::Lava
         || (sample.species == Species::Firework && sample.ra > 5 && sample.rb != 0)
     {
+        let ra = 50 + api.rand_int(40) as u8;
         api.set(
             0,
             0,
             Cell {
-                ra: 50 + rand_int(40) as u8,
+                ra,
                 ..cell
             },
         );
@@ -519,10 +514,10 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
 pub fn update_fire(cell: Cell, mut api: SandApi) {
     let ra = cell.ra;
     let mut degraded = cell.clone();
-    degraded.ra = ra - (2 + rand_dir()) as u8;
+    degraded.ra = ra - (2 + api.rand_dir()) as u8;
 
-    let dx = rand_dir();
-    let dy = rand_dir();
+    let dx = api.rand_dir();
+    let dy = api.rand_dir();
     api.set_fluid(Wind {
         dx: 0,
         dy: 150,
@@ -558,8 +553,8 @@ pub fn update_fire(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_lava(cell: Cell, mut api: SandApi) {
-    let dx = rand_dir();
-    let dy = rand_dir();
+    let dx = api.rand_dir();
+    let dy = api.rand_dir();
     if api.get(dx, dy).species == Species::Gas || api.get(dx, dy).species == Species::Dust {
         api.set(
             dx,
@@ -601,8 +596,8 @@ pub fn update_lava(cell: Cell, mut api: SandApi) {
 pub fn update_wood(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
-    let dx = rand_dir();
-    let dy = rand_dir();
+    let dx = api.rand_dir();
+    let dy = api.rand_dir();
     let nbr_species = api.get(dx, dy).species;
     if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
         api.set(
@@ -629,12 +624,13 @@ pub fn update_wood(cell: Cell, mut api: SandApi) {
             },
         );
         if rb % 4 == 0 && nbr_species == Species::Empty {
+            let ra = 30 + api.rand_int(60) as u8;
             api.set(
                 dx,
                 dy,
                 Cell {
                     species: Species::Fire,
-                    ra: 30 + rand_int(60) as u8,
+                    ra,
                     rb: 0,
                     clock: 0,
                 },
@@ -666,13 +662,13 @@ pub fn update_wood(cell: Cell, mut api: SandApi) {
     }
 }
 pub fn update_ice(cell: Cell, mut api: SandApi) {
-    let dx = rand_dir();
-    let dy = rand_dir();
-    let i = rand_int(100);
+    let dx = api.rand_dir();
+    let dy = api.rand_dir();
+    let i = api.rand_int(100);
 
     let fluid = api.get_fluid();
 
-    if fluid.pressure > 120 && (js_sys::Math::random() > 0.5) {
+    if fluid.pressure > 120 && (api.rand_float() > 0.5) {
         api.set(
             0,
             0,
@@ -715,9 +711,9 @@ pub fn update_ice(cell: Cell, mut api: SandApi) {
 pub fn update_plant(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
-    let mut i = rand_int(100);
-    let dx = rand_dir();
-    let dy = rand_dir();
+    let mut i = api.rand_int(100);
+    let dx = api.rand_dir();
+    let dy = api.rand_dir();
     let nbr_species = api.get(dx, dy).species;
     if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
         api.set(
@@ -732,8 +728,8 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
         );
     }
     if nbr_species == Species::Wood {
-        let dx = rand_dir();
-        let dy = rand_dir();
+        let dx = api.rand_dir();
+        let dy = api.rand_dir();
 
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
@@ -756,7 +752,7 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
                 || api.get(-dx, dy).species == Species::Water
                 || api.get(-dx, dy).species == Species::Fungus)
     {
-        i = rand_int(100);
+        i = api.rand_int(100);
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
         api.set(
@@ -782,12 +778,13 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
             },
         );
         if nbr_species == Species::Empty {
+            let ra = 20 + api.rand_int(30) as u8;
             api.set(
                 dx,
                 dy,
                 Cell {
                     species: Species::Fire,
-                    ra: 20 + rand_int(30) as u8,
+                    ra,
                     rb: 0,
                     clock: 0,
                 },
@@ -813,8 +810,8 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
         && api.get(1, 1).species != Species::Plant
         && api.get(-1, 1).species != Species::Plant
     {
-        let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
-        let dec = rand_int(30) - 20;
+        let i = (api.rand_float() * api.rand_float() * 100.) as i32;
+        let dec = api.rand_int(30) - 20;
         if (i + ra as i32) > 165 {
             api.set(
                 0,
@@ -832,8 +829,8 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
     let ra = cell.ra;
 
-    let dx = rand_dir();
-    let dy = rand_dir();
+    let dx = api.rand_dir();
+    let dy = api.rand_dir();
     let nbr_species = api.get(dx, dy).species;
     if nbr_species == Species::Fire || nbr_species == Species::Lava {
         api.set(
@@ -852,17 +849,18 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
     if rb == 0 {
         //falling
 
-        let dx = rand_dir();
+        let dx = api.rand_dir();
         let nbr_species = api.get(dx, 1).species;
         if nbr_species == Species::Sand
             || nbr_species == Species::Plant
             || nbr_species == Species::Fungus
         {
+            let rb = (api.rand_int(253) + 1) as u8;
             api.set(
                 0,
                 0,
                 Cell {
-                    rb: (rand_int(253) + 1) as u8,
+                    rb,
                     ..cell
                 },
             );
@@ -889,28 +887,30 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
     } else {
         if ra > 60 {
             //stem
-            let dx = rand_dir();
-            if rand_int(100) > 75
+            let dx = api.rand_dir();
+            if api.rand_int(100) > 75
                 && (api.get(dx, -1).species == Species::Empty
                     || api.get(dx, -1).species == Species::Sand
                     || api.get(dx, -1).species == Species::Seed)
                 && api.get(1, -1).species != Species::Plant
                 && api.get(-1, -1).species != Species::Plant
             {
+                let ra = (ra as i32 - api.rand_int(10)) as u8;
                 api.set(
                     dx,
                     -1,
                     Cell {
-                        ra: (ra as i32 - rand_int(10)) as u8,
+                        ra,
                         ..cell
                     },
                 );
+                let ra = 80 + (api.rand_float() * 30.) as u8;
                 api.set(
                     0,
                     0,
                     Cell {
                         species: Species::Plant,
-                        ra: 80 + (js_sys::Math::random() * 30.) as u8,
+                        ra,
                         rb: 0,
                         clock: 0,
                     },
@@ -919,10 +919,10 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
         } else {
             if ra > 40 {
                 //petals
-                // let i = rand_int(100);
+                // let i = api.rand_int(100);
 
-                let mdx = rand_dir();
-                let mdy = rand_dir();
+                let mdx = api.rand_dir();
+                let mdy = api.rand_dir();
                 let (ldx, ldy) = adjacency_left((mdx, mdy));
                 let (rdx, rdy) = adjacency_right((mdx, mdy));
 
@@ -930,8 +930,8 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
                     && (api.get(ldx, ldy).species == Species::Empty
                         || api.get(rdx, rdy).species == Species::Empty)
                 {
-                    let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
-                    let dec = 10 - rand_int(3);
+                    let i = (api.rand_float() * api.rand_float() * 100.) as i32;
+                    let dec = 10 - api.rand_int(3);
                     if (i + ra as i32) > 100 {
                         api.set(
                             mdx,
@@ -951,9 +951,9 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
 pub fn update_fungus(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
-    let mut i = rand_int(100);
-    let dx = rand_dir();
-    let dy = rand_dir();
+    let mut i = api.rand_int(100);
+    let dx = api.rand_dir();
+    let dy = api.rand_dir();
     let nbr_species = api.get(dx, dy).species;
     if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
         api.set(
@@ -972,8 +972,8 @@ pub fn update_fungus(cell: Cell, mut api: SandApi) {
         && nbr_species != Species::Fire
         && nbr_species != Species::Ice
     {
-        let dx = rand_dir();
-        let dy = rand_dir();
+        let dx = api.rand_dir();
+        let dy = api.rand_dir();
 
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
@@ -997,7 +997,7 @@ pub fn update_fungus(cell: Cell, mut api: SandApi) {
         && api.get(dx, -dy).species == Species::Wood
         && api.get(dx, dy).ra % 4 != 0
     {
-        i = rand_int(100);
+        i = api.rand_int(100);
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
         api.set(
@@ -1022,12 +1022,13 @@ pub fn update_fungus(cell: Cell, mut api: SandApi) {
             },
         );
         if nbr_species == Species::Empty {
+            let ra = 10 + api.rand_int(10) as u8;
             api.set(
                 dx,
                 dy,
                 Cell {
                     species: Species::Fire,
-                    ra: 10 + rand_int(10) as u8,
+                    ra,
                     rb: 0,
                     clock: 0,
                 },
@@ -1051,16 +1052,16 @@ pub fn update_fungus(cell: Cell, mut api: SandApi) {
     let ra = cell.ra;
 
     if ra > 120 {
-        let mdx = rand_dir();
-        let mdy = rand_dir();
+        let mdx = api.rand_dir();
+        let mdy = api.rand_dir();
         let (ldx, ldy) = adjacency_left((mdx, mdy));
         let (rdx, rdy) = adjacency_right((mdx, mdy));
         if api.get(mdx, mdy).species == Species::Empty
             && api.get(ldx, ldy).species != Species::Fungus
             && api.get(rdx, rdy).species != Species::Fungus
         {
-            let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
-            let dec = 15 - rand_int(20);
+            let i = (api.rand_float() * api.rand_float() * 100.) as i32;
+            let dec = 15 - api.rand_int(20);
             if (i + ra as i32) > 165 {
                 api.set(
                     mdx,
@@ -1076,8 +1077,8 @@ pub fn update_fungus(cell: Cell, mut api: SandApi) {
 }
 
 // pub fn update_sink(cell: Cell, mut api: SandApi) {
-//     let mut dx = rand_dir();
-//     let mut dy = rand_dir();
+//     let mut dx = api.rand_dir();
+//     let mut dy = api.rand_dir();
 
 //     // api.set_fluid(Wind {
 //     //     dx: 0,
@@ -1091,8 +1092,8 @@ pub fn update_fungus(cell: Cell, mut api: SandApi) {
 //     } else {
 //         api.set(0, 0, cell);
 //     }
-//     // dx = rand_dir();
-//     // dy = rand_dir();
+//     // dx = api.rand_dir();
+//     // dy = api.rand_dir();
 //     // if api.get(dx, dy).species != Species::Empty {
 //     //     api.set(dx, dy, EMPTY_CELL);
 //     //     api.set(0, 0, cell);
@@ -1100,12 +1101,12 @@ pub fn update_fungus(cell: Cell, mut api: SandApi) {
 // }
 
 pub fn update_acid(cell: Cell, mut api: SandApi) {
-    let dx = rand_dir();
+    let dx = api.rand_dir();
 
     let ra = cell.ra;
     let mut degraded = cell.clone();
     degraded.ra = ra - 60;
-    // i = rand_int(100);
+    // i = api.rand_int(100);
     if degraded.ra < 80 {
         degraded = EMPTY_CELL;
     }
@@ -1144,7 +1145,7 @@ pub fn update_acid(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_mite(cell: Cell, mut api: SandApi) {
-    let mut i = rand_int(100);
+    let mut i = api.rand_int(100);
     let mut dx = 0;
     if cell.ra < 20 {
         dx = (cell.ra as i32) - 1;
@@ -1166,7 +1167,7 @@ pub fn update_mite(cell: Cell, mut api: SandApi) {
     let nbr = api.get(dx, dy);
 
     let sx = (i % 3) - 1;
-    i = rand_int(1000);
+    i = api.rand_int(1000);
     let sy = (i % 3) - 1;
     let sample = api.get(sx, sy).species;
     if sample == Species::Fire
@@ -1191,7 +1192,7 @@ pub fn update_mite(cell: Cell, mut api: SandApi) {
         api.set(0, 0, EMPTY_CELL);
         api.set(dx, dy, mite);
     } else if dy == 1 && i > 800 {
-        i = rand_int(100);
+        i = api.rand_int(100);
         let mut ndx = (i % 3) - 1;
         if i < 6 {
             //switch direction
