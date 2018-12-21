@@ -2,12 +2,16 @@ extern crate cfg_if;
 extern crate js_sys;
 extern crate wasm_bindgen;
 extern crate web_sys;
+extern crate rand;
+extern crate rand_isaac;
 
 mod species;
 mod utils;
 
-use species::Species;
+pub use species::Species;
 use wasm_bindgen::prelude::*;
+use rand::{Rng, SeedableRng};
+use rand_isaac::Isaac64Rng;
 // use web_sys::console;
 
 #[wasm_bindgen]
@@ -51,6 +55,7 @@ pub struct Universe {
     winds: Vec<Wind>,
     burns: Vec<Wind>,
     generation: u8,
+    rng: Isaac64Rng,
 }
 
 pub struct SandApi<'a> {
@@ -88,7 +93,7 @@ impl<'a> SandApi<'a> {
         }
         let i = self
             .universe
-            .get_index((nx) % self.universe.width, (ny) % self.universe.height);
+            .get_index(nx, ny);
         // v.clock += 1;
         self.universe.cells[i] = v;
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
@@ -107,6 +112,17 @@ impl<'a> SandApi<'a> {
 
         self.universe.burns[idx] = v;
     }
+    // generate a random number r such that 0 <= r < n
+    pub fn rand_int(&mut self, n: i32) -> i32 {
+        self.universe.rng.gen_range(0, n)
+    }
+    // generate a float r such that 0 <= r < 1
+    pub fn rand_float(&mut self) -> f32 {
+        self.universe.rng.gen()
+    }
+    pub fn rand_dir(&mut self) -> i32 {
+        self.rand_int(3) - 1
+    }
 }
 
 #[wasm_bindgen]
@@ -122,7 +138,7 @@ impl Universe {
     pub fn tick(&mut self) {
         // let mut next = self.cells.clone();
         // let dx = self.winds[(self.width * self.height / 2) as usize].dx;
-        // let js: JsValue = (dx).into();
+         //let js: JsValue = (dx).into();
         // console::log_2(&"dx: ".into(), &js);
 
         for x in 0..self.width {
@@ -205,7 +221,7 @@ impl Universe {
                     self.cells[i] = Cell {
                         species: species,
                         ra: 80
-                            + (js_sys::Math::random() * 30.) as u8
+                            + (self.rng.gen::<f32>() * 30.) as u8
                             + ((self.generation % 127) as i8 - 60).abs() as u8,
                         rb: 0,
                         clock: self.generation,
@@ -216,14 +232,17 @@ impl Universe {
     }
 
     pub fn new(width: i32, height: i32) -> Universe {
+        // seed from random.org
+        let mut rng: Isaac64Rng = SeedableRng::seed_from_u64(0x734f6b89de5f83cc);
+
         let cells = (0..width * height)
             .map(|i| {
-                if js_sys::Math::random() < 0.9 || i < width * height / 3 {
+                if rng.gen::<f32>() < 0.9 || i < width * height / 3 {
                     EMPTY_CELL
                 } else {
                     Cell {
                         species: Species::Sand,
-                        ra: 80 + (js_sys::Math::random() * 90.) as u8,
+                        ra: 80 + (rng.gen::<f32>() * 90.) as u8,
                         rb: 0,
                         clock: 0,
                     }
@@ -255,6 +274,7 @@ impl Universe {
             burns,
             winds,
             generation: 0,
+            rng
         }
     }
 }
@@ -276,7 +296,7 @@ impl Universe {
     }
 
     fn blow_wind(cell: Cell, wind: Wind, mut api: SandApi) {
-        if cell.clock - api.universe.generation == 1 {
+        if cell.clock as i32 - api.universe.generation as i32 == 1 {
             return;
         }
         let mut dx = 0;
@@ -308,7 +328,7 @@ impl Universe {
         }
     }
     fn update_cell(cell: Cell, api: SandApi) {
-        if cell.clock - api.universe.generation == 1 {
+        if cell.clock as i32 - api.universe.generation as i32 == 1 {
             return;
         }
 
