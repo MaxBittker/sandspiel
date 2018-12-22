@@ -162,13 +162,6 @@ app.get("/creations", async (req, res) => {
     // .where("timestamp", "<=", 1545244187419)
     .limit(500);
 
-  // if (q) {
-  //   res.status(404).json({
-  //     errorCode: 404,
-  //     errorMessage: `creation '${q}' not found`
-  //   });
-  //   return;
-  // }
   try {
     const snapshot = await query.get();
     // snapshot
@@ -181,6 +174,9 @@ app.get("/creations", async (req, res) => {
       return true;
     });
 
+    if (q === "toprecent") {
+      creations.sort((a, b) => b.data.score - a.data.score);
+    }
     res.status(200).json(creations);
   } catch (error) {
     console.log("Error getting creations", error.message);

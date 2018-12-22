@@ -455,7 +455,12 @@ class Index extends React.Component {
         {this.state.submissions && (
           <Menu close={() => this.setState({ submissions: null })}>
             <button onClick={() => this.loadSubmissions()}>Recent</button>
-            <button onClick={() => this.loadSubmissions("score")}>Top</button>
+            <button onClick={() => this.loadSubmissions("toprecent")}>
+              Top Recent
+            </button>
+            <button onClick={() => this.loadSubmissions("score")}>
+              Top All Time
+            </button>
             <Submissions
               submissions={this.state.submissions}
               loadSubmission={submission => this.load(submission.id)}
