@@ -258,7 +258,7 @@ class Index extends React.Component {
     this.setState({ submitting: true });
 
     fetch(functions._url("api/creations"), {
-      method: "POST", // or 'PUT'
+      method: "POST",
       body: JSON.stringify(payload), // data can be `string` or {object}!
       headers: {
         "Content-Type": "application/json"
@@ -361,7 +361,7 @@ class Index extends React.Component {
     let { id } = currentSubmission;
     // creations/:id/vote
     fetch(functions._url(`api/creations/${id}/vote`), {
-      method: "PUT", // or 'PUT'
+      method: "PUT",
       headers: {
         "Content-Type": "application/json"
       }

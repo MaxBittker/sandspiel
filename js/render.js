@@ -4,53 +4,6 @@ import { memory } from "../crate/pkg/sandtable_bg";
 let fsh = require("./glsl/sand.glsl");
 let vsh = require("./glsl/sandVertex.glsl");
 
-// let startWebGL = ({ canvas, isSnapshot = false }) => {
-//   const regl = reglBuilder({
-//     canvas,
-//     attributes: { preserveDrawingBuffer: isSnapshot }
-//   });
-//   // const lastFrame = regl.texture();
-//   const width = 100;
-//   const height = 100;
-//   const cells = new Uint8Array(width * height * 4);
-//   for(var i = 0;)
-//   const dataTexture = regl.texture({ width, height, data: cells });
-
-//   let drawSand = regl({
-//     frag: fsh,
-//     uniforms: {
-//       t: ({ tick }) => tick,
-//       data: () => dataTexture({ width, height, data: cells }),
-//       resolution: ({ viewportWidth, viewportHeight }) => [
-//         viewportWidth,
-//         viewportHeight
-//       ],
-//       dpi: window.devicePixelRatio * 2
-//       // backBuffer: lastFrame
-//     },
-
-//     vert: vsh,
-//     attributes: {
-//       // Full screen triangle
-//       position: [[-1, 4], [-1, -1], [4, -1]]
-//     },
-//     // Our triangle has 3 vertices
-//     count: 3
-//   });
-
-//   // regl.frame(function(context) {
-//   // regl.clear({ color: [0, 0, 0, 0] });
-//   // drawSand();
-//   // lastFrame({ copy: true });
-//   // });
-//   return () => {
-//     regl.poll();
-//     // regl.clear({ color: [0, 0, 0, 0] });
-//     drawSand();
-//     // lastFrame({ copy: true });
-//   };
-// };
-
 let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   const regl = reglBuilder({
     canvas,
@@ -75,7 +28,8 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
         viewportWidth,
         viewportHeight
       ],
-      dpi: window.devicePixelRatio * 2
+      dpi: window.devicePixelRatio * 2,
+      isSnapshot
       // backBuffer: lastFrame
     },
 

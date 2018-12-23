@@ -2,6 +2,7 @@ precision highp float;
 uniform float t;
 uniform float dpi;
 uniform vec2 resolution;
+uniform bool isSnapshot;
 uniform sampler2D backBuffer;
 uniform sampler2D data;
 
@@ -33,10 +34,15 @@ void main() {
   float a = 1.0;
 
   if (type == 0) {
-    hue = 0.1;
+    hue = 0.0;
     saturation = 0.1;
     lightness = 0.1;
     a = 0.1;
+    if (isSnapshot) {
+      saturation = 0.05;
+      lightness = 1.01;
+      a = 1.0;
+    }
   } else if (type == 1) {
     hue = 0.1;
     saturation = 0.1;
@@ -115,7 +121,9 @@ void main() {
     saturation = 0.7 * (data.g + 0.4) + data.b * 0.2;
     lightness = 0.9 * (data.g + 0.9);
   }
-  lightness *= (0.95 + snoise2(floor(uv * resolution / dpi)) * 0.05);
+  if (isSnapshot == false) {
+    lightness *= (0.975 + snoise2(floor(uv * resolution / dpi)) * 0.025);
+  }
   color = hsv2rgb(vec3(hue, saturation, lightness));
   gl_FragColor = vec4(color, a);
 }
