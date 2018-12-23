@@ -259,6 +259,7 @@ function startFluid({ universe }) {
   let velocity;
   let velocityOut;
   let burns;
+  let cells;
   let divergence;
   let curl;
   let pressure;
@@ -339,6 +340,15 @@ function startFluid({ universe }) {
     );
     burns = createFBO(
       8,
+      texWidth,
+      texHeight,
+      rg.internalFormat,
+      rg.format,
+      texType,
+      ext.supportLinearFiltering ? gl.LINEAR : gl.NEAREST
+    );
+    cells = createFBO(
+      10,
       texWidth,
       texHeight,
       rg.internalFormat,
@@ -451,6 +461,12 @@ function startFluid({ universe }) {
     universe.burns(),
     width * height * 4
   );
+
+  const cellsData = new Uint8Array(
+    memory.buffer,
+    universe.cells(),
+    width * height * 4
+  );
   function reset() {
     clearProgram.bind();
 
@@ -482,6 +498,7 @@ function startFluid({ universe }) {
     blit(velocity.write[1]);
     velocity.swap();
   }
+
   function update() {
     // resizeCanvas();
 
@@ -533,6 +550,19 @@ function startFluid({ universe }) {
       gl.RGBA,
       gl.UNSIGNED_BYTE,
       burnsData
+    );
+
+    gl.bindTexture(gl.TEXTURE_2D, cells[0]);
+    gl.texImage2D(
+      gl.TEXTURE_2D,
+      0,
+      gl.RGBA,
+      width,
+      height,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      cellsData
     );
 
     // ADVECTION
@@ -720,7 +750,8 @@ function startFluid({ universe }) {
     // GRADIENT SUBTRACT
     // burns
     // pressureRead
-    // velocityRead ->
+    // velocityRead
+    // sands ->
     // velocityWrite
     gradientSubtractProgram.bind();
 
@@ -736,6 +767,10 @@ function startFluid({ universe }) {
     gl.activeTexture(gl.TEXTURE0 + texUnit);
     gl.bindTexture(gl.TEXTURE_2D, velocity.read[0]);
     gl.uniform1i(gradientSubtractProgram.uniforms.uVelocity, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, cells[0]);
+    gl.uniform1i(gradientSubtractProgram.uniforms.uCells, texUnit++);
 
     gl.uniform2f(
       gradientSubtractProgram.uniforms.texelSize,

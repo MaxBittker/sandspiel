@@ -119,8 +119,10 @@ const Submissions = ({ submissions, loadSubmission }) => {
         return (
           <div key={submission.id} className="submission">
             <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
-            <div>
-              <h3 style={{ flexGrow: 1 }}>{submission.data.title}</h3>
+            <div style={{ width: "50%" }}>
+              <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
+                {submission.data.title}
+              </h3>
               <h3>♡{submission.data.score}</h3>
               <h4>
                 {new Date(submission.data.timestamp).toLocaleDateString()}
