@@ -333,7 +333,7 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
 
 pub fn update_cloner(cell: Cell, mut api: SandApi) {
     let mut clone_species = unsafe { mem::transmute(cell.rb as u8) };
-
+    let g = api.universe.generation;
     for dx in [-1, 0, 1].iter().cloned() {
         for dy in [-1, 0, 1].iter().cloned() {
             if cell.rb == 0 {
@@ -363,9 +363,7 @@ pub fn update_cloner(cell: Cell, mut api: SandApi) {
                         dy,
                         Cell {
                             species: clone_species,
-                            ra: 80
-                                + rand_int(30) as u8
-                                + ((cell.clock % 127) as i8 - 60).abs() as u8,
+                            ra: 80 + rand_int(30) as u8 + ((g % 127) as i8 - 60).abs() as u8,
                             rb: 0,
                             clock: 0,
                         },

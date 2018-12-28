@@ -101,4 +101,5 @@ function reset() {
   fluid.reset();
   universe.reset();
 }
+window.u = universe;
 export { canvas, width, height, universe, ratio, reset };
