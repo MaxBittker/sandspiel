@@ -35,7 +35,7 @@
     "raw-loader": "^0.5.1",
     "webpack": "^4.26.1",
     "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.10"
+    "webpack-dev-server": "^3.1.14"
   },
   "dependencies": {
     "dat.gui": "^0.7.3",
