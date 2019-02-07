@@ -123,7 +123,25 @@ const Submissions = ({ submissions, loadSubmission }) => {
               <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
                 {submission.data.title}
               </h3>
-              <h3>♡{submission.data.score}</h3>
+              <h3
+                onClick={() => {
+                  // creations/:id/vote
+                  fetch(functions._url(`api/creations/${submission.id}/vote`), {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json"
+                    }
+                  })
+                    .then(res => res.json())
+                    .then(data => {
+                      // if (currentSubmission != null) {
+                      // console.log(data);
+                      // }
+                    });
+                }}
+              >
+                ♡{submission.data.score}
+              </h3>
               <h4>
                 {new Date(submission.data.timestamp).toLocaleDateString()}
               </h4>
@@ -372,6 +390,9 @@ class Index extends React.Component {
           console.log(data);
           this.setState({ currentSubmission: { ...currentSubmission, data } });
         }
+      })
+      .catch(e => {
+        console.error(e);
       });
   }
   render() {

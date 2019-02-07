@@ -86,9 +86,7 @@ impl<'a> SandApi<'a> {
         if nx < 0 || nx > self.universe.width - 1 || ny < 0 || ny > self.universe.height - 1 {
             return;
         }
-        let i = self
-            .universe
-            .get_index(nx, ny);
+        let i = self.universe.get_index(nx, ny);
         // v.clock += 1;
         self.universe.cells[i] = v;
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
@@ -141,11 +139,16 @@ impl Universe {
             }
         }
         self.generation = self.generation.wrapping_add(1);
-
         for x in 0..self.width {
+            let scanx = if self.generation % 2 == 0 {
+                self.width - (1 + x)
+            } else {
+                x
+            };
+
             for y in 0..self.height {
-                let idx = self.get_index(x, self.height - (1 + y));
-                let cell = self.get_cell(x, y);
+                let idx = self.get_index(scanx, self.height - (1 + y));
+                let cell = self.get_cell(scanx, y);
 
                 self.burns[idx] = Wind {
                     dx: 0,
@@ -157,12 +160,13 @@ impl Universe {
                     cell,
                     SandApi {
                         universe: self,
-                        x,
+                        x: scanx,
                         y,
                     },
                 );
             }
         }
+
         self.generation = self.generation.wrapping_add(1);
     }
 
@@ -303,6 +307,18 @@ impl Universe {
             && api.get(dx, dy).species == Species::Empty
         {
             api.set(0, 0, EMPTY_CELL);
+            if dy == -1
+                && api.get(dx, -2).species == Species::Empty
+                && (cell.species == Species::Sand
+                    || cell.species == Species::Water
+                    || cell.species == Species::Lava
+                    || cell.species == Species::Seed
+                    || cell.species == Species::Acid
+                    || cell.species == Species::Oil
+                    || cell.species == Species::Firework)
+            {
+                dy = -2;
+            }
             api.set(dx, dy, cell);
             return;
         }

@@ -57,7 +57,7 @@ void main() {
   } else if (type == 4) { // gas
     hue = 0.0;
     lightness += 0.4;
-    saturation = 0.2;
+    saturation = 0.2 + (data.b * 1.5);
   } else if (type == 5) { // clone
     hue = 0.9;
     saturation = 0.3;
