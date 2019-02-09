@@ -109,7 +109,12 @@ const Menu = ({ close, children }) => {
   );
 };
 
-const Submissions = ({ submissions, loadSubmission }) => {
+const Submissions = ({
+  submissions,
+  loadSubmission,
+  voteFromBrowse,
+  browseVotes
+}) => {
   if (submissions.length == 0) {
     return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
   }
@@ -123,24 +128,8 @@ const Submissions = ({ submissions, loadSubmission }) => {
               <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
                 {submission.data.title}
               </h3>
-              <h3
-                onClick={() => {
-                  // creations/:id/vote
-                  fetch(functions._url(`api/creations/${submission.id}/vote`), {
-                    method: "PUT",
-                    headers: {
-                      "Content-Type": "application/json"
-                    }
-                  })
-                    .then(res => res.json())
-                    .then(data => {
-                      // if (currentSubmission != null) {
-                      // console.log(data);
-                      // }
-                    });
-                }}
-              >
-                ♡{submission.data.score}
+              <h3 onClick={() => voteFromBrowse(submission)}>
+                ♡{browseVotes[submission.id] || submission.data.score}
               </h3>
               <h4>
                 {new Date(submission.data.timestamp).toLocaleDateString()}
@@ -190,7 +179,8 @@ class Index extends React.Component {
       size: 2,
       dataURL: {},
       submissions: null,
-      selectedElement: Species.Water
+      selectedElement: Species.Water,
+      browseVotes: {}
     };
     if (initialId.length > 0) {
       this.load(initialId);
@@ -392,7 +382,25 @@ class Index extends React.Component {
         }
       })
       .catch(e => {
-        console.error(e);
+        console.log(e);
+      });
+  }
+  voteFromBrowse(submission) {
+    // creations/:id/vote
+    fetch(functions._url(`api/creations/${submission.id}/vote`), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        this.setState(({ browseVotes }) => ({
+          browseVotes: { [submission.id]: data.score, ...browseVotes }
+        }));
+      })
+      .catch(e => {
+        console.log(e);
       });
   }
   render() {
@@ -487,6 +495,8 @@ class Index extends React.Component {
             <Submissions
               submissions={this.state.submissions}
               loadSubmission={submission => this.load(submission.id)}
+              voteFromBrowse={submission => this.voteFromBrowse(submission)}
+              browseVotes={this.state.browseVotes}
             />
           </Menu>
         )}
