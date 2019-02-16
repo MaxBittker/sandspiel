@@ -234,6 +234,10 @@ impl Universe {
         };
     }
 
+    pub fn flush_undos(&mut self) {
+        self.undo_stack.clear();
+    }
+
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {

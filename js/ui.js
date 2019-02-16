@@ -353,6 +353,8 @@ class Index extends React.Component {
                   for (var i = 0; i < width * height * 4; i++) {
                     cellsData[i] = imgData.data[i];
                   }
+                  universe.flush_undos();
+                  universe.push_undo();
                   this.pause();
                   this.setState({ submissions: null });
                 };
