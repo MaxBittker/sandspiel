@@ -323,7 +323,7 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
     //     pressure: 5,
     //     density: 0,
     // });
-    if (cell.rb == 0) {
+    if cell.rb == 0 {
         api.set(0, 0, Cell { rb: 5, ..cell });
     }
 

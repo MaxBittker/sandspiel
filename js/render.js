@@ -12,18 +12,24 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   // const lastFrame = regl.texture();
   const width = universe.width();
   const height = universe.height();
-  const cells = new Uint8Array(
-    memory.buffer,
-    universe.cells(),
-    width * height * 4
-  );
+  let cell_pointer = universe.cells();
+  let cells = new Uint8Array(memory.buffer, cell_pointer, width * height * 4);
   const dataTexture = regl.texture({ width, height, data: cells });
 
   let drawSand = regl({
     frag: fsh,
     uniforms: {
       t: ({ tick }) => tick,
-      data: () => dataTexture({ width, height, data: cells }),
+      data: () => {
+        // if (cell_pointer != universe.cells()) {
+        //   console.log(cell_pointer);
+        // }
+        cell_pointer = universe.cells();
+        cells = new Uint8Array(memory.buffer, cell_pointer, width * height * 4);
+        // }
+
+        return dataTexture({ width, height, data: cells });
+      },
       resolution: ({ viewportWidth, viewportHeight }) => [
         viewportWidth,
         viewportHeight

@@ -198,6 +198,7 @@ class Index extends React.Component {
     window.paused = true;
     this.setState({ paused: true });
   }
+
   setSize(event, size) {
     event.preventDefault();
     this.setState({
@@ -457,6 +458,16 @@ class Index extends React.Component {
         >
           Wind
         </button>
+        {/* <button onClick={() => universe.push_undo()}>push</button> */}
+        <button
+          onClick={() => {
+            reset();
+            universe.pop_undo();
+          }}
+        >
+          ⎌
+        </button>
+
         {this.state.currentSubmission && (
           <div className="submission-title">
             <button onClick={() => this.incScore()}>

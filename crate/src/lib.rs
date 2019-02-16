@@ -7,6 +7,7 @@ mod species;
 mod utils;
 
 use species::Species;
+use std::collections::VecDeque;
 use wasm_bindgen::prelude::*;
 // use web_sys::console;
 
@@ -48,6 +49,7 @@ pub struct Universe {
     width: i32,
     height: i32,
     cells: Vec<Cell>,
+    undo_stack: VecDeque<Vec<Cell>>,
     winds: Vec<Wind>,
     burns: Vec<Wind>,
     generation: u8,
@@ -219,6 +221,19 @@ impl Universe {
         }
     }
 
+    pub fn push_undo(&mut self) {
+        self.undo_stack.push_front(self.cells.clone());
+        self.undo_stack.truncate(50);
+    }
+
+    pub fn pop_undo(&mut self) {
+        let old_state = self.undo_stack.pop_front();
+        match old_state {
+            Some(state) => self.cells = state,
+            None => (),
+        };
+    }
+
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {
@@ -256,6 +271,7 @@ impl Universe {
             width,
             height,
             cells,
+            undo_stack: VecDeque::with_capacity(50),
             burns,
             winds,
             generation: 0,

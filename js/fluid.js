@@ -450,25 +450,41 @@ function startFluid({ universe }) {
 
   const width = universe.width();
   const height = universe.height();
-  const winds = new Uint8Array(
+
+  let winds = new Uint8Array(
     memory.buffer,
     universe.winds(),
     width * height * 4
   );
 
-  const burnsData = new Uint8Array(
+  let burnsData = new Uint8Array(
     memory.buffer,
     universe.burns(),
     width * height * 4
   );
 
-  const cellsData = new Uint8Array(
+  let cellsData = new Uint8Array(
     memory.buffer,
     universe.cells(),
     width * height * 4
   );
+
   function reset() {
     clearProgram.bind();
+
+    var texUnit = 0;
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, burns[0]);
+    gl.uniform1i(clearProgram.uniforms.uWind, texUnit++);
+
+    gl.activeTexture(gl.TEXTURE0 + texUnit);
+    gl.bindTexture(gl.TEXTURE_2D, density.read[0]);
+    gl.uniform1i(clearProgram.uniforms.uTexture, texUnit++);
+
+    gl.uniform1f(clearProgram.uniforms.value, 0);
+
+    blit(density.write[1]);
+    density.swap();
 
     var texUnit = 0;
     gl.activeTexture(gl.TEXTURE0 + texUnit);
@@ -500,6 +516,17 @@ function startFluid({ universe }) {
   }
 
   function update() {
+    winds = new Uint8Array(memory.buffer, universe.winds(), width * height * 4);
+
+    burnsData = new Uint8Array(
+      memory.buffer,
+      universe.burns(),
+      width * height * 4
+    );
+
+    let cell_pointer = universe.cells();
+    cellsData = new Uint8Array(memory.buffer, cell_pointer, width * height * 4);
+
     // resizeCanvas();
 
     const dt = Math.min((Date.now() - lastTime) / 1000, 0.016);
