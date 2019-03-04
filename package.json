@@ -38,7 +38,7 @@
     "webpack-dev-server": "^3.1.10"
   },
   "dependencies": {
-    "dat.gui": "^0.7.3",
+    "dat.gui": "^0.7.5",
     "gh-pages": "^2.0.1",
     "glsl-hsv2rgb": "^1.0.0",
     "glsl-noise": "0.0.0",
