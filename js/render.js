@@ -64,4 +64,4 @@ let snapshot = (universe, cb) => {
   return canvas.toDataURL("image/png");
 };
 
-export { startWebGL, universe, snapshot };
+export { startWebGL, snapshot };

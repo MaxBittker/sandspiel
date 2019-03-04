@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { withUrlState } from "with-url-state";
+// import { withUrlState } from "with-url-state";
 
 import { memory } from "../crate/pkg/sandtable_bg";
 import { Species } from "../crate/pkg";
