@@ -460,14 +460,14 @@ class Index extends React.Component {
         >
           Wind
         </button>
-        {/* <button onClick={() => universe.push_undo()}>push</button> */}
+
         <button
           onClick={() => {
             reset();
             universe.pop_undo();
           }}
         >
-          ⎌
+          ↜
         </button>
 
         {this.state.currentSubmission && (
