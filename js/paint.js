@@ -1,5 +1,5 @@
 import { height, universe, width } from "./index.js";
-import { sizeMap } from "./ui";
+import { sizeMap } from "./components/ui";
 const canvas = document.getElementById("sand-canvas");
 
 const eventDistance = (a, b) => {

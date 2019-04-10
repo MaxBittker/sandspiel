@@ -1,152 +1,15 @@
 import React from "react";
-import ReactDOM from "react-dom";
-// import { withUrlState } from "with-url-state";
+import { Link } from "react-router-dom";
+// import { Link, } from "history";
 
-import { memory } from "../crate/pkg/sandtable_bg";
-import { Species } from "../crate/pkg";
+import { memory } from "../../crate/pkg/sandtable_bg";
+import { Species } from "../../crate/pkg/sandtable";
 
-import { height, universe, width, reset } from "./index.js";
-import { snapshot } from "./render.js";
-var storage;
-var functions;
-try {
-  storage = firebase.storage();
-  functions = firebase.functions();
-} catch (e) {}
-window.onload = () => {
-  functions = firebase.functions();
-  storage = firebase.storage();
-};
+import { height, universe, width, reset } from "../index.js";
+import { snapshot } from "../render.js";
+import { functions, storage } from "../api.js";
 
-let storageUrl =
-  "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
-
-const Info = () => {
-  return (
-    <div className="Info">
-      <h1>sandspiel </h1>
-      <p>
-        Created by <a href="https://maxbittker.com">max bittker</a>
-      </p>
-      <p>
-        Welcome, and thanks for coming by! I hope that you enjoy exploring this
-        small game, and it brings you some calm.{" "}
-      </p>
-      <p>
-        Growing up, "falling sand" games like this one provided me hours of
-        entertainment and imagination. I want to particularly thank ha55ii's{" "}
-        <a href="https://dan-ball.jp/en/javagame/dust/">Powder Game</a> as the
-        primary inspiration for sandspiel.
-      </p>
-      <br />
-      <p>
-        You can follow sandspiel on twitter for updates and new uploads:
-        <a href="https://twitter.com/sandspiel_feed">@sandspiel_feed</a>
-      </p>
-      <br />
-      <p>
-        If you'd like, you can view the{" "}
-        <a href="https://github.com/maxbittker/sandspiel">source code</a> or{" "}
-        <a href="https://github.com/maxbittker/sandspiel/issues">report bugs</a>{" "}
-        on github
-      </p>
-      <h2>FAQs</h2>
-      <p>(TODO: write some FAQs)</p>
-      If you have any other questions, feel free to reach out on twitter and
-      I'll try to answer!
-      <h2>Element Information:</h2>
-      <h4>Wall </h4>
-      Indestructible
-      <h4>Sand </h4>
-      Sinks in water
-      <h4>Water </h4>
-      Puts out fire
-      <h4>Stone </h4>
-      Forms arches, folds under pressure
-      <h4>Ice </h4>
-      Freezes Water, slippery!
-      <h4>Gas </h4>
-      Highly Flammable!
-      <h4>Cloner </h4>
-      Copies the first element it touches
-      <h4>Mite </h4>
-      Eats wood and plant, but loves dust! Slides on ice
-      <h4>Wood </h4>
-      Sturdy, but biodegradable
-      <h4>Plant </h4>
-      Thrives in wet enviroments
-      <h4>Fungus </h4>
-      Spreads over everything
-      <h4>Seed </h4>
-      Grows in sand
-      <h4>Fire </h4>
-      Hot!
-      <h4>Lava </h4>
-      Flammable and heavy
-      <h4>Acid </h4>
-      Corrodes other elements
-      <h4>Dust </h4>
-      Pretty, but dangerously explosive
-      <h4>Oil </h4>
-      Produces smoke
-      <h4>Firework </h4>
-      Explodes into copies of the first element it touches
-    </div>
-  );
-};
-
-const Menu = ({ close, children }) => {
-  return (
-    <div className="menu-scrim">
-      <div className={"menu"}>
-        {children}
-
-        <button className="x" onClick={close}>
-          x
-        </button>
-      </div>
-    </div>
-  );
-};
-
-const Submissions = ({
-  submissions,
-  loadSubmission,
-  voteFromBrowse,
-  browseVotes
-}) => {
-  if (submissions.length == 0) {
-    return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
-  }
-  return (
-    <div className="submissions">
-      {submissions.map(submission => {
-        return (
-          <div key={submission.id} className="submission">
-            <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
-            <div style={{ width: "50%" }}>
-              <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
-                {submission.data.title}
-              </h3>
-              <h3 onClick={() => voteFromBrowse(submission)}>
-                ♡{browseVotes[submission.id] || submission.data.score}
-              </h3>
-              <h4>
-                {new Date(submission.data.timestamp).toLocaleDateString()}
-              </h4>
-              <button
-                className="load"
-                onClick={() => loadSubmission(submission)}
-              >
-                Load
-              </button>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+import Menu from "./menu";
 
 const ElementButton = (name, selectedElement, setElement) => {
   let elementID = Species[name];
@@ -170,20 +33,43 @@ let sizeMap = [2, 5, 10, 18, 30, 45];
 class Index extends React.Component {
   constructor(props) {
     super(props);
-    let initialId = window.location.hash.replace(/#/, "");
+
     this.state = {
       submissionMenuOpen: false,
-      infoOpen: false,
       paused: false,
       submitting: false,
       size: 2,
       dataURL: {},
-      submissions: null,
-      selectedElement: Species.Water,
-      browseVotes: {}
+      currentSubmission: null,
+      selectedElement: Species.Water
     };
-    if (initialId.length > 0) {
-      this.load(initialId);
+    window.UI = this;
+    // if (initialId.length > 0) {
+    this.load();
+    // }
+  }
+
+  componentDidUpdate(prevProps) {
+    console.log(this.props.location);
+    // if (this.props.location.state && this.props.location.state.isLoad) {
+    //   console.log("wasload");
+    //   this.setState({ currentSubmission: null });
+    // }
+    if (
+      this.props.location.pathname === "/" &&
+      prevProps.location.pathname !== "/" &&
+      this.state.currentSubmission
+    ) {
+      console.log("replacing hash!");
+      console.log(this.state.currentSubmission);
+      window.location = `#${this.state.currentSubmission.id}`;
+      // return;
+    }
+    if (
+      prevProps.location.hash === "" ||
+      prevProps.location.hash != this.props.location.hash
+    ) {
+      this.load();
     }
   }
   togglePause() {
@@ -217,10 +103,7 @@ class Index extends React.Component {
     this.pause();
     this.setState({ submissionMenuOpen: true });
   }
-  info() {
-    this.pause();
-    this.setState({ infoOpen: true });
-  }
+
   closeMenu() {
     this.play();
     this.setState({ submissionMenuOpen: false });
@@ -283,26 +166,20 @@ class Index extends React.Component {
         this.setState({ submissionMenuOpen: false, submitting: false });
       });
   }
-  loadSubmissions(q) {
-    this.setState({ submissions: [] });
-    fetch(functions._url("api/creations") + `?q=${q}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => res.json())
-      .then(response => {
-        this.setState({ submissions: response });
-        this.pause();
-      })
-      .catch(error => {
-        this.setState({ submissions: false });
-        console.error("Error:", error);
-      });
-  }
-  load(id) {
-    window.location = `#${id}`;
+
+  load() {
+    let { location } = this.props;
+    let id = location.hash.replace(/#/, "");
+    if (id === "") {
+      return;
+    }
+    // if(id == this.sa)
+    // console.log(id)
+    debugger;
+    if (this.state.currentSubmission && this.state.currentSubmission.id == id) {
+      return;
+    }
+    // window.location = `#${id}`;
 
     fetch(functions._url(`api/creations/${id}`), {
       method: "GET",
@@ -356,14 +233,12 @@ class Index extends React.Component {
                   universe.flush_undos();
                   universe.push_undo();
                   this.pause();
-                  this.setState({ submissions: null });
                 };
               })
               .catch(error => console.error("Error:", error));
           });
       })
       .catch(error => {
-        this.setState({ submissions: false });
         console.error("Error:", error);
       });
   }
@@ -388,24 +263,7 @@ class Index extends React.Component {
         console.log(e);
       });
   }
-  voteFromBrowse(submission) {
-    // creations/:id/vote
-    fetch(functions._url(`api/creations/${submission.id}/vote`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        this.setState(({ browseVotes }) => ({
-          browseVotes: { [submission.id]: data.score, ...browseVotes }
-        }));
-      })
-      .catch(e => {
-        console.log(e);
-      });
-  }
+
   render() {
     let { size, paused, selectedElement } = this.state;
     return (
@@ -426,9 +284,14 @@ class Index extends React.Component {
           )}
         </button>
         <button onClick={() => this.upload()}>Upload</button>
-        <button onClick={() => this.loadSubmissions()}>Browse</button>
+        <Link to="/browse/" onClick={() => this.pause()}>
+          <button>Browse</button>
+        </Link>
+
         <button onClick={() => this.reset()}>Reset</button>
-        <button onClick={() => this.info()}>Info</button>
+        <Link to="/info/">
+          <button>Info</button>
+        </Link>
 
         {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
         <span className="sizes">
@@ -496,78 +359,14 @@ class Index extends React.Component {
             </div>
           </Menu>
         )}
-        {this.state.submissions && (
-          <Menu close={() => this.setState({ submissions: null })}>
-            <button onClick={() => this.loadSubmissions()}>Recent</button>
-            <button onClick={() => this.loadSubmissions("toprecent")}>
-              Top Recent
-            </button>
-            <button onClick={() => this.loadSubmissions("score")}>
-              Top All Time
-            </button>
-            <Submissions
-              submissions={this.state.submissions}
-              loadSubmission={submission => this.load(submission.id)}
-              voteFromBrowse={submission => this.voteFromBrowse(submission)}
-              browseVotes={this.state.browseVotes}
-            />
-          </Menu>
-        )}
-
-        {this.state.infoOpen && (
+        {/* {this.state.infoOpen && (
           <Menu close={() => this.setState({ infoOpen: false })}>
             <Info />
           </Menu>
-        )}
+        )} */}
       </React.Fragment>
     );
   }
 }
 
-ReactDOM.render(
-  <Index
-    ref={UI => {
-      window.UI = UI;
-    }}
-  />,
-  document.getElementById("ui")
-);
-
-const fps = new class {
-  constructor() {
-    this.fps = document.getElementById("fps");
-    this.frames = [];
-    this.lastFrameTimeStamp = performance.now();
-  }
-
-  render() {
-    // Convert the delta time since the last frame render into a measure
-    // of frames per second.
-    const now = performance.now();
-    const delta = now - this.lastFrameTimeStamp;
-    this.lastFrameTimeStamp = now;
-    const fps = (1 / delta) * 1000;
-
-    // Save only the latest 100 timings.
-    this.frames.push(fps);
-    if (this.frames.length > 30) {
-      this.frames.shift();
-    }
-
-    // Find the max, min, and mean of our 100 latest timings.
-    let min = Infinity;
-    let max = -Infinity;
-    let sum = 0;
-    for (let i = 0; i < this.frames.length; i++) {
-      sum += this.frames[i];
-      min = Math.min(this.frames[i], min);
-      max = Math.max(this.frames[i], max);
-    }
-    let mean = sum / this.frames.length;
-
-    // Render the statistics.
-    this.fps.textContent = `FPS:${Math.round(mean)}`;
-  }
-}();
-
-export { fps, sizeMap };
+export { sizeMap, Index };

@@ -68,6 +68,9 @@ button {
   line-height: 0px;
   cursor: pointer;
 }
+.active button {
+  background-color: gainsboro;
+}
 button:disabled {
   background-color: gainsboro;
   color: gray;

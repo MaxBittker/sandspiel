@@ -1,8 +1,9 @@
 import { Universe } from "../crate/pkg";
 
 import { startWebGL } from "./render";
-import { fps } from "./ui";
+import { fps } from "./fps";
 import {} from "./paint";
+import {} from "./app";
 import { startFluid } from "./fluid";
 import { ratio } from "./constants";
 if (window.safari) {
@@ -33,18 +34,18 @@ if (mobileAndTabletcheck()) {
   };
 }
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then(registration => {
-        console.log("SW registered: ", registration);
-      })
-      .catch(registrationError => {
-        console.log("SW registration failed: ", registrationError);
-      });
-  });
-}
+// if ("serviceWorker" in navigator) {
+//   window.addEventListener("load", () => {
+//     navigator.serviceWorker
+//       .register("/service-worker.js")
+//       .then(registration => {
+//         console.log("SW registered: ", registration);
+//       })
+//       .catch(registrationError => {
+//         console.log("SW registration failed: ", registrationError);
+//       });
+//   });
+// }
 
 let n = 300;
 const universe = Universe.new(n, n);
@@ -113,6 +114,10 @@ renderLoop();
 
 function reset() {
   fluid.reset();
+  fluid.update();
+  fluid.reset();
+  fluid.update();
+
   universe.reset();
 }
 window.u = universe;
