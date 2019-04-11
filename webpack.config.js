@@ -9,11 +9,18 @@ const { GenerateSW } = require("workbox-webpack-plugin");
 
 module.exports = {
   entry: "./js/bootstrap.js",
-  output: { path: dist, filename: "bundle.js" },
+  output: {
+    path: dist,
+    filename: "bundle.js",
+    publicPath: "/"
+  },
   devServer: {
     contentBase: dist,
-    disableHostCheck: true
+    disableHostCheck: true,
+    publicPath: "/",
+    historyApiFallback: true
   },
+
   mode: "development",
   devtool: "source-map",
   plugins: [
@@ -25,7 +32,7 @@ module.exports = {
       "assets/*"
     ]),
     new HtmlWebpackPlugin({ template: "index.html" }),
-    new GenerateSW()
+    new GenerateSW({ navigateFallback: "index.html" })
   ],
   module: {
     rules: [

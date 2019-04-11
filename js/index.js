@@ -1,16 +1,19 @@
 import { Universe } from "../crate/pkg";
 
 import { startWebGL } from "./render";
-import { fps } from "./ui";
+import { fps } from "./fps";
 import {} from "./paint";
+import {} from "./app";
 import { startFluid } from "./fluid";
 import { ratio } from "./constants";
+
 if (window.safari) {
   history.pushState(null, null, location.href);
   window.onpopstate = function(event) {
     history.go(1);
   };
 }
+
 function mobileAndTabletcheck() {
   var check = false;
   (function(a) {
@@ -113,6 +116,10 @@ renderLoop();
 
 function reset() {
   fluid.reset();
+  fluid.update();
+  fluid.reset();
+  fluid.update();
+
   universe.reset();
 }
 window.u = universe;
