@@ -30,6 +30,14 @@ const Submissions = ({ submissions, voteFromBrowse, browseVotes }) => {
                   pathname: "/",
                   hash: `#${submission.id}`
                 }}
+                onClick={() => {
+                  window.UI.setState(
+                    () => ({
+                      currentSubmission: null
+                    }),
+                    window.UI.load
+                  );
+                }}
               >
                 <button className="load">Load</button>
               </Link>

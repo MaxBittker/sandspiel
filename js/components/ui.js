@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-// import { Link, } from "history";
 
 import { memory } from "../../crate/pkg/sandtable_bg";
 import { Species } from "../../crate/pkg/sandtable";
@@ -44,26 +43,17 @@ class Index extends React.Component {
       selectedElement: Species.Water
     };
     window.UI = this;
-    // if (initialId.length > 0) {
     this.load();
-    // }
   }
 
   componentDidUpdate(prevProps) {
-    console.log(this.props.location);
-    // if (this.props.location.state && this.props.location.state.isLoad) {
-    //   console.log("wasload");
-    //   this.setState({ currentSubmission: null });
-    // }
     if (
       this.props.location.pathname === "/" &&
       prevProps.location.pathname !== "/" &&
       this.state.currentSubmission
     ) {
-      console.log("replacing hash!");
-      console.log(this.state.currentSubmission);
       window.location = `#${this.state.currentSubmission.id}`;
-      // return;
+      return;
     }
     if (
       prevProps.location.hash === "" ||
@@ -173,13 +163,10 @@ class Index extends React.Component {
     if (id === "") {
       return;
     }
-    // if(id == this.sa)
-    // console.log(id)
-    debugger;
+
     if (this.state.currentSubmission && this.state.currentSubmission.id == id) {
       return;
     }
-    // window.location = `#${id}`;
 
     fetch(functions._url(`api/creations/${id}`), {
       method: "GET",
@@ -265,7 +252,11 @@ class Index extends React.Component {
   }
 
   render() {
-    let { size, paused, selectedElement } = this.state;
+    let { size, paused, selectedElement, currentSubmission } = this.state;
+    let hash =
+      currentSubmission && currentSubmission.id
+        ? `#${currentSubmission.id}`
+        : "";
     return (
       <React.Fragment>
         <button
@@ -284,12 +275,23 @@ class Index extends React.Component {
           )}
         </button>
         <button onClick={() => this.upload()}>Upload</button>
-        <Link to="/browse/" onClick={() => this.pause()}>
+        <Link
+          to={{
+            pathname: "/browse/",
+            hash
+          }}
+          onClick={() => this.pause()}
+        >
           <button>Browse</button>
         </Link>
 
         <button onClick={() => this.reset()}>Reset</button>
-        <Link to="/info/">
+        <Link
+          to={{
+            pathname: "/info/",
+            hash
+          }}
+        >
           <button>Info</button>
         </Link>
 
@@ -341,6 +343,7 @@ class Index extends React.Component {
             {this.state.currentSubmission.data.title}
           </div>
         )}
+
         {this.state.submissionMenuOpen && (
           <Menu close={() => this.closeMenu()}>
             <h4>Share your creation with the people!</h4>
@@ -359,11 +362,6 @@ class Index extends React.Component {
             </div>
           </Menu>
         )}
-        {/* {this.state.infoOpen && (
-          <Menu close={() => this.setState({ infoOpen: false })}>
-            <Info />
-          </Menu>
-        )} */}
       </React.Fragment>
     );
   }

@@ -12,13 +12,6 @@ let sizeMap = [2, 5, 10, 18, 30, 45];
 function BrowseRouter({ match, location }) {
   return (
     <Menu>
-      {/* <Route path={`${match.path}/:id`} component={Topic} /> */}
-      {/* <Route
-        exact
-        path={match.path}
-        render={() => <h3>Please select a topic.</h3>}
-      /> */}
-
       <Browse location={location} />
     </Menu>
   );

@@ -5,7 +5,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-// const { GenerateSW } = require("workbox-webpack-plugin");
+const { GenerateSW } = require("workbox-webpack-plugin");
 
 module.exports = {
   entry: "./js/bootstrap.js",
@@ -31,8 +31,8 @@ module.exports = {
       "manifest.json",
       "assets/*"
     ]),
-    new HtmlWebpackPlugin({ template: "index.html" })
-    // new GenerateSW({ navigateFallback: "index.html" })
+    new HtmlWebpackPlugin({ template: "index.html" }),
+    new GenerateSW({ navigateFallback: "index.html" })
   ],
   module: {
     rules: [
