@@ -6,12 +6,14 @@ import {} from "./paint";
 import {} from "./app";
 import { startFluid } from "./fluid";
 import { ratio } from "./constants";
+
 if (window.safari) {
   history.pushState(null, null, location.href);
   window.onpopstate = function(event) {
     history.go(1);
   };
 }
+
 function mobileAndTabletcheck() {
   var check = false;
   (function(a) {

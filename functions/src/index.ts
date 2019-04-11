@@ -10,6 +10,7 @@ import * as wordfilter from "wordfilter";
 
 wordfilter.removeWord("homo");
 wordfilter.removeWord("crazy");
+wordfilter.addWords(["rape"]);
 
 const T = new Twit({
   consumer_key: functions.config().twitter.consumer_key.key,

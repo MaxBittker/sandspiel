@@ -43,7 +43,7 @@
       href="https://fonts.googleapis.com/css?family=Inconsolata"
       rel="stylesheet"
     />
-    <link rel="stylesheet" type="text/css" href="styles.css" />
+    <link rel="stylesheet" type="text/css" href="/styles.css" />
     <!-- Firebase App is always required and must be first -->
     <script src="/__/firebase/5.7.0/firebase-app.js"></script>
 
@@ -68,7 +68,8 @@
   ></script>
   <script>
     Sentry.init({
-      dsn: "https://4bf8c3ab764f40569d573fc4021efe40@sentry.io/1331284"
+      dsn: "https://4bf8c3ab764f40569d573fc4021efe40@sentry.io/1331284",
+      release: "1.1.0"
     });
   </script>
 </html>
