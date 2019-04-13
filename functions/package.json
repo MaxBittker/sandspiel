@@ -12,11 +12,13 @@
   "main": "lib/index.js",
   "dependencies": {
     "@google-cloud/language": "^2.0.0",
+    "@types/pg": "^7.4.14",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "firebase": "^5.7.0",
     "firebase-admin": "~6.0.0",
     "firebase-functions": "^2.1.0",
+    "pg": "^7.9.0",
     "twit": "^2.2.11",
     "uuid": "^3.3.2",
     "wordfilter": "^0.2.6"

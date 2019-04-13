@@ -1,5 +1,3 @@
-// import * as stream from "stream";
-// import * as mimeTypes from "mimeTypes";
 import * as crypto from "crypto";
 
 import * as functions from "firebase-functions";
@@ -7,6 +5,28 @@ import * as c from "cors";
 
 import * as Twit from "twit";
 import * as wordfilter from "wordfilter";
+
+import * as pg from "pg";
+
+const connectionName = functions.config().pg.connection_name;
+const dbUser = functions.config().pg.user;
+const dbPassword = functions.config().pg.password;
+const dbName = functions.config().pg.name;
+
+const pgConfig: pg.PoolConfig = {
+  max: 1,
+  user: dbUser,
+  password: dbPassword,
+  database: dbName
+};
+
+if (process.env.NODE_ENV === "production") {
+  pgConfig["host"] = `/cloudsql/${connectionName}`;
+}
+
+// Connection pools reuse connections between invocations,
+// and handle dropped or expired connections automatically.
+let pgPool: pg.Pool;
 
 wordfilter.removeWord("homo");
 wordfilter.removeWord("crazy");
@@ -147,6 +167,13 @@ app.post("/creations", async (req, res) => {
     console.log("Error saving message", error.message);
     res.sendStatus(500);
   }
+
+  // const text = "INSERT INTO creations(id, ip) VALUES($1, $2)";
+  // try {
+  //   await pgPool.query(text, values);
+  // } catch (err) {
+  //   console.log(err.stack);
+  // }
 });
 
 // saving message Reference.push failed: first argument contains
@@ -210,26 +237,37 @@ app.get("/creations/:id", async (req, res) => {
 });
 
 app.put("/creations/:id/vote", async (req, res) => {
+  if (!pgPool) {
+    pgPool = new pg.Pool(pgConfig);
+  }
+
   const id = req.params.id;
   const ip = req.header("x-appengine-user-ip");
 
   try {
-    const vote = await admin
-      .firestore()
-      .collection("/votes")
-      .where("ip", "==", ip)
-      .where("id", "==", id)
-      .get();
+    const values = [id, ip];
 
-    if (!vote.empty) {
-      res.sendStatus(301);
-      return;
+    try {
+      const exists = await pgPool.query(
+        "SELECT exists( SELECT 1 FROM votes WHERE id = $1 AND ip = $2 )",
+        values
+      );
+      console.log("exists " + JSON.stringify(exists));
+      if (exists.rows[0].exists) {
+        res.sendStatus(301);
+        return;
+      }
+    } catch (err) {
+      console.log(err.stack);
+      res.sendStatus(500);
     }
 
-    await admin
-      .firestore()
-      .collection("/votes")
-      .add({ id, ip });
+    const text = "INSERT INTO votes(id, ip) VALUES($1, $2)";
+    try {
+      await pgPool.query(text, values);
+    } catch (err) {
+      console.log(err.stack);
+    }
 
     const doc_ref = await admin
       .firestore()
