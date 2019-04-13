@@ -1,11 +1,8 @@
 import * as crypto from "crypto";
-
 import * as functions from "firebase-functions";
 import * as c from "cors";
-
 import * as Twit from "twit";
 import * as wordfilter from "wordfilter";
-
 import * as pg from "pg";
 
 const connectionName = functions.config().pg.connection_name;
@@ -50,7 +47,7 @@ function Tweet(b64content, title, id) {
   ) {
     // now we can assign alt text to the media, for use by screen readers and
     // other text-based presentations and interpreters
-    const mediaIdStr = res_data.media_id_string;
+    const mediaIdStr = res_data["media_id_string"];
     const altText = title;
     const meta_params = {
       media_id: mediaIdStr,
@@ -176,8 +173,6 @@ app.post("/creations", async (req, res) => {
   // }
 });
 
-// saving message Reference.push failed: first argument contains
-// undefined in property 'creations.0.title'
 // GET /api/creations?q={q}
 // Get all creations, optionally specifying a string to filter on
 app.get("/creations", async (req, res) => {
@@ -187,7 +182,6 @@ app.get("/creations", async (req, res) => {
     .firestore()
     .collection(`/creations`)
     .orderBy(q === "score" ? "score" : "timestamp", "desc")
-    // .where("timestamp", "<=", 1545244187419)
     .limit(500);
 
   try {
@@ -211,6 +205,7 @@ app.get("/creations", async (req, res) => {
     res.sendStatus(500);
   }
 });
+
 // GET /api/creations/{id}
 // Get details about a message
 app.get("/creations/:id", async (req, res) => {
@@ -298,6 +293,28 @@ app.put("/creations/:id/vote", async (req, res) => {
     res.sendStatus(500);
   }
 });
+
+// app.get("/creations/metadata", async (req, res) => {
+//   const query = admin.firestore().collection(`/creations`);
+//   // .limit(500);
+
+//   try {
+//     const snapshot = await query.get();
+//     // snapshot
+//     const creations = [];
+//     snapshot.forEach(childSnapshot => {
+//       creations.push({
+//         id: childSnapshot.id
+//       });
+//       return true;
+//     });
+
+//     res.status(200).json({ count: creations.length });
+//   } catch (error) {
+//     console.log("Error getting creations", error.message);
+//     res.sendStatus(500);
+//   }
+// });
 
 // Expose the API as a function
 exports.api = functions.https.onRequest(app);
