@@ -23,7 +23,7 @@ if (process.env.NODE_ENV === "production") {
 
 // Connection pools reuse connections between invocations,
 // and handle dropped or expired connections automatically.
-let pgPool: pg.Pool;
+const pgPool: pg.Pool = new pg.Pool(pgConfig);
 
 wordfilter.removeWord("homo");
 wordfilter.removeWord("crazy");
@@ -63,10 +63,10 @@ function Tweet(b64content, title, id) {
         };
 
         T.post("statuses/update", params, function(_, _data) {
-          console.log(_data);
+          console.log("TWEETED" + JSON.stringify(_data));
         });
       } else {
-        console.log(err);
+        console.error("twitter api error" + err);
       }
     });
   });
@@ -81,8 +81,6 @@ import * as express from "express";
 
 const app = express();
 app.use(cors);
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
 
 // POST /api/creations
 // Create a new creation, and upload two image
@@ -101,6 +99,8 @@ app.post("/creations", async (req, res) => {
       .createHash("md5")
       .update(cells)
       .digest("hex");
+
+    const publicId = id.slice(0, 20);
 
     const exists = await admin
       .firestore()
@@ -148,10 +148,11 @@ app.post("/creations", async (req, res) => {
       uploadPNG(image, ".png")
     ]);
 
-    const doc = await admin
+    await admin
       .firestore()
       .collection("creations")
-      .add(data);
+      .doc(publicId)
+      .set(data);
 
     res.status(201).json({ id });
 
@@ -159,25 +160,33 @@ app.post("/creations", async (req, res) => {
     //
     const b64content = image.replace(/^data:image\/\w+;base64,/, "");
 
-    Tweet(b64content, trimmed_title, doc.id);
+    Tweet(b64content, trimmed_title, publicId);
+
+    const text =
+      "INSERT INTO creations(id, data_id, title, score, timestamp) VALUES($1, $2, $3, $4, to_timestamp( $5 / 1000.0) )";
+
+    const values = [publicId, data.id, data.title, data.score, data.timestamp];
+
+    pgPool.query(text, values, (err, result) => {
+      if (err) {
+        console.error(
+          "error writing creation" + err.message + err.name + err.stack
+        );
+      } else {
+        console.log("wrote creation" + JSON.stringify(result));
+      }
+    });
   } catch (error) {
     console.log("Error saving message", error.message);
     res.sendStatus(500);
   }
-
-  // const text = "INSERT INTO creations(id, ip) VALUES($1, $2)";
-  // try {
-  //   await pgPool.query(text, values);
-  // } catch (err) {
-  //   console.log(err.stack);
-  // }
 });
 
 // GET /api/creations?q={q}
 // Get all creations, optionally specifying a string to filter on
 app.get("/creations", async (req, res) => {
   const q = req.query.q;
-  console.log(q);
+  // console.log(q);
   const query = admin
     .firestore()
     .collection(`/creations`)
@@ -201,7 +210,7 @@ app.get("/creations", async (req, res) => {
     }
     res.status(200).json(creations);
   } catch (error) {
-    console.log("Error getting creations", error.message);
+    console.error("Error getting creations", error.message);
     res.sendStatus(500);
   }
 });
@@ -226,16 +235,12 @@ app.get("/creations/:id", async (req, res) => {
       });
     }
   } catch (error) {
-    console.log("Error incrementing vote", id, error.message);
+    console.error("Error incrementing vote", id, error.message);
     res.sendStatus(500);
   }
 });
 
 app.put("/creations/:id/vote", async (req, res) => {
-  if (!pgPool) {
-    pgPool = new pg.Pool(pgConfig);
-  }
-
   const id = req.params.id;
   const ip = req.header("x-appengine-user-ip");
 
@@ -247,7 +252,7 @@ app.put("/creations/:id/vote", async (req, res) => {
         "SELECT exists( SELECT 1 FROM votes WHERE id = $1 AND ip = $2 )",
         values
       );
-      console.log("exists " + JSON.stringify(exists));
+
       if (exists.rows[0].exists) {
         res.sendStatus(301);
         return;
@@ -257,11 +262,11 @@ app.put("/creations/:id/vote", async (req, res) => {
       res.sendStatus(500);
     }
 
-    const text = "INSERT INTO votes(id, ip) VALUES($1, $2)";
+    const insert = "INSERT INTO votes(id, ip) VALUES($1, $2)";
     try {
-      await pgPool.query(text, values);
+      await pgPool.query(insert, values);
     } catch (err) {
-      console.log(err.stack);
+      console.error(err.stack);
     }
 
     const doc_ref = await admin
@@ -285,13 +290,25 @@ app.put("/creations/:id/vote", async (req, res) => {
           }
         })
         .catch(error => {
-          console.log("Error incrementing vote", id, error.message);
+          console.error("Error incrementing vote", id, error.message);
         })
     );
   } catch (error) {
-    console.log("Error incrementing vote", id, error.message);
+    console.error("Error incrementing vote", id, error.message);
     res.sendStatus(500);
   }
+  const update = "UPDATE creations SET score=score+1 WHERE id = $1";
+  // try {
+  // await
+  pgPool.query(update, [id], (err, result) => {
+    if (err) {
+      console.error("error updating score" + err.message + err.stack);
+    } else {
+      console.log("updated a score! " + id + JSON.stringify(result));
+    }
+  });
+  // } catch (err) {
+  // }
 });
 
 // app.get("/creations/metadata", async (req, res) => {
