@@ -172,8 +172,6 @@ app.post("/creations", async (req, res) => {
         console.error(
           "error writing creation" + err.message + err.name + err.stack
         );
-      } else {
-        console.log("wrote creation" + JSON.stringify(result));
       }
     });
   } catch (error) {
@@ -186,23 +184,24 @@ app.post("/creations", async (req, res) => {
 // Get all creations, optionally specifying a string to filter on
 app.get("/creations", async (req, res) => {
   const q = req.query.q;
-  // console.log(q);
-  const query = admin
-    .firestore()
-    .collection(`/creations`)
-    .orderBy(q === "score" ? "score" : "timestamp", "desc")
-    .limit(500);
 
   try {
-    const snapshot = await query.get();
-    // snapshot
-    const creations = [];
-    snapshot.forEach(childSnapshot => {
-      creations.push({
-        id: childSnapshot.id,
-        data: childSnapshot.data()
-      });
-      return true;
+    const browse = await pgPool.query(
+      `SELECT *  FROM creations  order by ${
+        q === "score" ? "score" : "timestamp"
+      } desc LIMIT 500`
+    );
+
+    const creations = browse.rows.map(row => {
+      return {
+        id: row.id,
+        data: {
+          id: row.data_id,
+          title: row.title,
+          score: row.score,
+          timestamp: row.timestamp
+        }
+      };
     });
 
     if (q === "toprecent") {
@@ -220,14 +219,13 @@ app.get("/creations", async (req, res) => {
 app.get("/creations/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    const doc = await admin
-      .firestore()
-      .collection(`/creations`)
-      .doc(id)
-      .get();
+    const get = await pgPool.query("SELECT *  FROM creations WHERE id = $1", [
+      id
+    ]);
 
-    if (doc.exists) {
-      res.status(200).json({ ...doc.data() });
+    if (get.rowCount > 0) {
+      const { data_id, score, timestamp, title } = get.rows[0];
+      res.status(200).json({ id: data_id, score, timestamp, title, data_id });
     } else {
       res.status(404).json({
         errorCode: 404,
@@ -235,7 +233,7 @@ app.get("/creations/:id", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error incrementing vote", id, error.message);
+    console.error("Error finding creation", id, error.message);
     res.sendStatus(500);
   }
 });
@@ -298,8 +296,6 @@ app.put("/creations/:id/vote", async (req, res) => {
     res.sendStatus(500);
   }
   const update = "UPDATE creations SET score=score+1 WHERE id = $1";
-  // try {
-  // await
   pgPool.query(update, [id], (err, result) => {
     if (err) {
       console.error("error updating score" + err.message + err.stack);
@@ -307,8 +303,6 @@ app.put("/creations/:id/vote", async (req, res) => {
       console.log("updated a score! " + id + JSON.stringify(result));
     }
   });
-  // } catch (err) {
-  // }
 });
 
 // app.get("/creations/metadata", async (req, res) => {

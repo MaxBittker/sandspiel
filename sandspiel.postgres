@@ -1,14 +1,21 @@
 CREATE TABLE creations (
-    id      char(20) CONSTRAINT firstkey PRIMARY KEY NOT NULL UNIQUE,
-    data_id      char(32) NOT NULL,
-    title            varchar(220) NOT NULL,
-    score         integer NOT NULL,           
-    timestamp            timestamp NOT NULL DEFAULT NOW()
+    id char(20) CONSTRAINT firstkey PRIMARY KEY NOT NULL UNIQUE,
+    data_id char(32) NOT NULL,
+    title varchar(220) NOT NULL,
+    score integer NOT NULL,
+    timestamp timestamp NOT NULL DEFAULT NOW()
 );
 
+CREATE INDEX ON creations (timestamp);
+
+CREATE INDEX ON creations (score);
+
+CREATE INDEX ON creations (id);
+
 CREATE TABLE votes (
-    id      char(20),
-    ip      inet NOT NULL
+    id char(20),
+    ip inet NOT NULL
 );
 
 CREATE UNIQUE INDEX ON votes (id, ip);
+
