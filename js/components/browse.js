@@ -1,53 +1,61 @@
 import React from "react";
 import { functions, storage } from "../api.js";
-import { NavLink, Link } from "react-router-dom";
+import { NavLink, Link, withRouter } from "react-router-dom";
 
 let storageUrl =
   "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
 
-const Submissions = ({ submissions, voteFromBrowse, browseVotes }) => {
-  if (submissions.length == 0) {
-    return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
+class Submissions extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    return nextProps.submissions !== this.props.submissions;
   }
-  return (
-    <div className="submissions">
-      {submissions.map(submission => {
-        return (
-          <div key={submission.id} className="submission">
-            <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
-            <div style={{ width: "50%" }}>
-              <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
-                {submission.data.title}
-              </h3>
-              <h3 onClick={() => voteFromBrowse(submission)}>
-                ♡{browseVotes[submission.id] || submission.data.score}
-              </h3>
-              <h4>
-                {new Date(submission.data.timestamp).toLocaleDateString()}
-              </h4>
-              <Link
-                to={{
-                  pathname: "/",
-                  hash: `#${submission.id}`
-                }}
-                onClick={() => {
-                  window.UI.setState(
-                    () => ({
-                      currentSubmission: null
-                    }),
-                    window.UI.load
-                  );
-                }}
-              >
-                <button className="load">Load</button>
-              </Link>
+  render() {
+    let { submissions, voteFromBrowse, browseVotes } = this.props;
+
+    if (!submissions || submissions.length == 0) {
+      return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
+    }
+
+    return (
+      <div className="submissions">
+        {submissions.map(submission => {
+          return (
+            <div key={submission.id} className="submission">
+              <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
+              <div style={{ width: "50%" }}>
+                <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
+                  {submission.data.title}
+                </h3>
+                <h3 onClick={() => voteFromBrowse(submission)}>
+                  ♡{browseVotes[submission.id] || submission.data.score}
+                </h3>
+                <h4>
+                  {new Date(submission.data.timestamp).toLocaleDateString()}
+                </h4>
+                <Link
+                  to={{
+                    pathname: "/",
+                    hash: `#${submission.id}`
+                  }}
+                  onClick={() => {
+                    window.UI.setState(
+                      () => ({
+                        currentSubmission: null
+                      }),
+                      window.UI.load
+                    );
+                  }}
+                >
+                  <button className="load">Load</button>
+                </Link>
+              </div>
             </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+          );
+        })}
+      </div>
+    );
+  }
+}
 
 class Browse extends React.Component {
   constructor(props) {
@@ -65,7 +73,10 @@ class Browse extends React.Component {
     this.loadSubmissions();
   }
   componentDidUpdate(prevProps) {
-    if (prevProps.location.pathname != this.props.location.pathname) {
+    if (
+      prevProps.location.pathname != this.props.location.pathname ||
+      prevProps.location.search != this.props.location.search
+    ) {
       this.loadSubmissions();
     }
   }
@@ -83,16 +94,20 @@ class Browse extends React.Component {
 
   loadSubmissions() {
     let { location } = this.props;
-    let q = "";
+    let param = "";
     if (location.pathname.startsWith("/browse/top/")) {
-      q = "score";
+      param = "?q=score";
     }
     if (location.pathname.startsWith("/browse/top-recent/")) {
-      q = "toprecent";
+      param = "?q=toprecent";
     }
+    if (location.pathname.startsWith("/browse/search/")) {
+      param = location.search;
+    }
+
     console.log("fetching some data");
     this.setState({ submissions: [] });
-    fetch(functions._url("api/creations") + `?q=${q}`, {
+    fetch(functions._url("api/creations") + param, {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -128,30 +143,47 @@ class Browse extends React.Component {
       });
   }
   render() {
+    const { search, submissions, browseVotes } = this.state;
     return (
       <React.Fragment>
-        {this.state.submissions && (
-          <React.Fragment>
-            <NavLink exact to="/browse/">
-              <button>Latest</button>
+        <NavLink exact to="/browse/">
+          <button>New</button>
+        </NavLink>
+        <NavLink to="/browse/top-recent/">
+          <button>Top Recent</button>
+        </NavLink>
+        <NavLink to="/browse/top/">
+          <button>Top All Time</button>
+        </NavLink>
+        <span style={{ display: "inline-block" }}>
+          <input
+            onChange={e => this.setState({ search: e.target.value })}
+            onKeyDown={e =>
+              e.keyCode == 13 &&
+              this.props.history.push(`/browse/search/?title=${search}`)
+            }
+            placeholder="search"
+          />
+          {search && (
+            <NavLink
+              to={{
+                pathname: "/browse/search/",
+                search: `?title=${search}`
+              }}
+            >
+              <button>Search</button>
             </NavLink>
-            <NavLink to="/browse/top-recent/">
-              <button>Top Recent</button>
-            </NavLink>
-            <NavLink to="/browse/top/">
-              <button>Top All Time</button>
-            </NavLink>
+          )}
+        </span>
 
-            <Submissions
-              submissions={this.state.submissions}
-              voteFromBrowse={submission => this.voteFromBrowse(submission)}
-              browseVotes={this.state.browseVotes}
-            />
-          </React.Fragment>
-        )}
+        <Submissions
+          submissions={submissions}
+          voteFromBrowse={submission => this.voteFromBrowse(submission)}
+          browseVotes={browseVotes}
+        />
       </React.Fragment>
     );
   }
 }
 
-export default Browse;
+export default withRouter(Browse);

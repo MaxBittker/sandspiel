@@ -182,16 +182,25 @@ app.post("/creations", async (req, res) => {
 
 // GET /api/creations?q={q}
 // Get all creations, optionally specifying a string to filter on
-app.get("/creations", async (req, res) => {
-  const q = req.query.q;
-
+app.get("/creations", async (req: express.Request, res) => {
+  const { q, title } = req.query;
   try {
-    const browse = await pgPool.query(
-      `SELECT *  FROM creations  order by ${
-        q === "score" ? "score" : "timestamp"
-      } desc LIMIT 500`
-    );
-
+    let browse: pg.QueryResult;
+    if (title) {
+      browse = await pgPool.query(
+        `SELECT *  FROM creations
+         WHERE LOWER(title) ~ $1
+         ORDER BY score DESC,  timestamp DESC
+         LIMIT 500`,
+        [title.toLowerCase()]
+      );
+    } else {
+      browse = await pgPool.query(
+        `SELECT *  FROM creations  order by ${
+          q === "score" ? "score" : "timestamp"
+        } desc LIMIT 500`
+      );
+    }
     const creations = browse.rows.map(row => {
       return {
         id: row.id,
