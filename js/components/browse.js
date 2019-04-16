@@ -12,10 +12,12 @@ class Submissions extends React.Component {
   render() {
     let { submissions, voteFromBrowse, browseVotes } = this.props;
 
-    if (!submissions || submissions.length == 0) {
+    if (!submissions) {
       return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
     }
-
+    if (submissions.length == 0) {
+      return <div style={{ height: "90vh" }}>Didn't find anything!</div>;
+    }
     return (
       <div className="submissions">
         {submissions.map(submission => {
@@ -27,7 +29,8 @@ class Submissions extends React.Component {
                   {submission.data.title}
                 </h3>
                 <h3 onClick={() => voteFromBrowse(submission)}>
-                  ♡{browseVotes[submission.id] || submission.data.score}
+                  <larger>♡</larger>
+                  {browseVotes[submission.id] || submission.data.score}
                 </h3>
                 <h4>
                   {new Date(submission.data.timestamp).toLocaleDateString()}
@@ -106,7 +109,7 @@ class Browse extends React.Component {
     }
 
     console.log("fetching some data");
-    this.setState({ submissions: [] });
+    this.setState({ submissions: null });
     fetch(functions._url("api/creations") + param, {
       method: "GET",
       headers: {
