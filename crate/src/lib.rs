@@ -300,9 +300,10 @@ impl Universe {
     }
 
     fn blow_wind(cell: Cell, wind: Wind, mut api: SandApi) {
-        if cell.clock - api.universe.generation == 1 {
+        if cell.clock == api.universe.generation.wrapping_add(1) {
             return;
         }
+        
         let mut dx = 0;
         let mut dy = 0;
         let threshhold = 50;
@@ -344,7 +345,7 @@ impl Universe {
         }
     }
     fn update_cell(cell: Cell, api: SandApi) {
-        if cell.clock - api.universe.generation == 1 {
+        if cell.clock == api.universe.generation.wrapping_add(1) {
             return;
         }
 
