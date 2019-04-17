@@ -1,13 +1,19 @@
 import React from "react";
 import { functions, storage } from "../api.js";
 import { NavLink, Link, withRouter } from "react-router-dom";
+import HyperText from "./hypertext.js";
 
 let storageUrl =
   "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
 
 class Submissions extends React.Component {
   shouldComponentUpdate(nextProps) {
-    return nextProps.submissions !== this.props.submissions;
+    let { submissions, browseVotes } = this.props;
+    return (
+      nextProps.submissions !== submissions ||
+      Object.keys(nextProps.browseVotes).length !==
+        Object.keys(browseVotes).length
+    );
   }
   render() {
     let { submissions, voteFromBrowse, browseVotes } = this.props;
@@ -26,10 +32,12 @@ class Submissions extends React.Component {
               <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
               <div style={{ width: "50%" }}>
                 <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
-                  {submission.data.title}
+                  <HyperText text={submission.data.title} />
                 </h3>
                 <h3 onClick={() => voteFromBrowse(submission)}>
-                  <larger>♡</larger>
+                  <span className="heart">
+                    {browseVotes[submission.id] ? "🖤" : "♡"}
+                  </span>
                   {browseVotes[submission.id] || submission.data.score}
                 </h3>
                 <h4>
@@ -68,7 +76,8 @@ class Browse extends React.Component {
       submitting: false,
       dataURL: {},
       submissions: null,
-      browseVotes: {}
+      browseVotes: {},
+      search: ""
     };
   }
   componentWillMount() {
@@ -97,7 +106,11 @@ class Browse extends React.Component {
 
   loadSubmissions() {
     let { location } = this.props;
+    if (location.search.startsWith("?title=")) {
+      this.setState({ search: this.props.location.search.slice(7) });
+    }
     let param = "";
+
     if (location.pathname.startsWith("/browse/top/")) {
       param = "?q=score";
     }
@@ -160,6 +173,7 @@ class Browse extends React.Component {
         </NavLink>
         <span style={{ display: "inline-block" }}>
           <input
+            value={search}
             onChange={e => this.setState({ search: e.target.value })}
             onKeyDown={e =>
               e.keyCode == 13 &&

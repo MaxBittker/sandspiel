@@ -184,6 +184,7 @@ app.post("/creations", async (req, res) => {
 // Get all creations, optionally specifying a string to filter on
 app.get("/creations", async (req: express.Request, res) => {
   const { q, title } = req.query;
+
   try {
     let browse: pg.QueryResult;
     if (title) {

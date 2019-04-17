@@ -43,6 +43,11 @@ class Index extends React.Component {
       selectedElement: Species.Water
     };
     window.UI = this;
+    //if we start in the background, pause;
+    if (this.props.location.pathname !== "/") {
+      window.setTimeout(() => this.pause(), 50);
+    }
+
     this.load();
   }
 
