@@ -574,9 +574,9 @@ pub fn update_fire(cell: Cell, mut api: SandApi) {
     }
     if ra < 5 || api.get(dx, dy).species == Species::Water {
         api.set(0, 0, EMPTY_CELL);
-    } else if api.get(dx, -1).species == Species::Empty {
+    } else if api.get(dx, dy).species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
-        api.set(dx, -1, degraded);
+        api.set(dx, dy, degraded);
     } else {
         api.set(0, 0, degraded);
     }

@@ -303,9 +303,42 @@ impl Universe {
         if cell.clock - api.universe.generation == 1 {
             return;
         }
+        if cell.species == Species::Empty {
+            return;
+        }
         let mut dx = 0;
         let mut dy = 0;
-        let threshhold = 50;
+
+        let threshhold = match cell.species {
+            Species::Empty => 500,
+            Species::Wall => 500,
+            Species::Cloner => 500,
+
+            Species::Stone => 70,
+            Species::Wood => 70,
+            Species::Ice => 50,
+
+            Species::Plant => 60,
+            Species::Lava => 60,
+
+            Species::Fungus => 54,
+
+            Species::Oil => 50,
+
+            Species::Water => 40,
+            Species::Acid => 40,
+
+            Species::Seed => 35,
+
+            Species::Sand => 30,
+            Species::Mite => 30,
+            Species::Firework => 30,
+
+            Species::Dust => 10,
+            Species::Fire => 5,
+            Species::Gas => 5,
+        };
+
         let wx = (wind.dx as i32) - 126;
         let wy = (wind.dy as i32) - 126;
 
@@ -321,11 +354,7 @@ impl Universe {
         if wy < -threshhold {
             dy = 1;
         }
-        if cell.species != Species::Wall
-            && cell.species != Species::Cloner
-            && (dx != 0 || dy != 0)
-            && api.get(dx, dy).species == Species::Empty
-        {
+        if (dx != 0 || dy != 0) && api.get(dx, dy).species == Species::Empty {
             api.set(0, 0, EMPTY_CELL);
             if dy == -1
                 && api.get(dx, -2).species == Species::Empty
@@ -334,6 +363,8 @@ impl Universe {
                     || cell.species == Species::Lava
                     || cell.species == Species::Seed
                     || cell.species == Species::Acid
+                    || cell.species == Species::Mite
+                    || cell.species == Species::Dust
                     || cell.species == Species::Oil
                     || cell.species == Species::Firework)
             {

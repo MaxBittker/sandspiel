@@ -107,6 +107,7 @@ class Browse extends React.Component {
   loadSubmissions() {
     let { location } = this.props;
     if (location.search.startsWith("?title=")) {
+      // to load deep urls with a search query.
       this.setState({ search: this.props.location.search.slice(7) });
     }
     let param = "";
@@ -121,7 +122,6 @@ class Browse extends React.Component {
       param = location.search;
     }
 
-    console.log("fetching some data");
     this.setState({ submissions: null });
     fetch(functions._url("api/creations") + param, {
       method: "GET",
