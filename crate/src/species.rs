@@ -897,11 +897,11 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
     if rb == 0 {
         //falling
 
-        let dx = rand_dir();
-        let nbr_species = api.get(dx, 1).species;
-        if nbr_species == Species::Sand
-            || nbr_species == Species::Plant
-            || nbr_species == Species::Fungus
+        let dxf = rand_dir(); //falling dx
+        let nbr_species_below = api.get(dxf, 1).species;
+        if nbr_species_below == Species::Sand
+            || nbr_species_below == Species::Plant
+            || nbr_species_below == Species::Fungus
         {
             api.set(
                 0,
@@ -918,9 +918,9 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
         if nbr.species == Species::Empty {
             api.set(0, 0, EMPTY_CELL);
             api.set(0, 1, cell);
-        } else if api.get(dx, 1).species == Species::Empty {
+        } else if api.get(dxf, 1).species == Species::Empty {
             api.set(0, 0, EMPTY_CELL);
-            api.set(dx, 1, cell);
+            api.set(dxf, 1, cell);
         } else if nbr.species == Species::Water
             || nbr.species == Species::Gas
             || nbr.species == Species::Oil
@@ -934,32 +934,35 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
     } else {
         if ra > 60 {
             //stem
-            let dx = rand_dir();
-            if rand_int(100) > 75
-                && (api.get(dx, -1).species == Species::Empty
-                    || api.get(dx, -1).species == Species::Sand
-                    || api.get(dx, -1).species == Species::Seed)
-                && api.get(1, -1).species != Species::Plant
-                && api.get(-1, -1).species != Species::Plant
-            {
-                api.set(
-                    dx,
-                    -1,
-                    Cell {
-                        ra: (ra as i32 - rand_int(10)) as u8,
-                        ..cell
-                    },
-                );
-                api.set(
-                    0,
-                    0,
-                    Cell {
-                        species: Species::Plant,
-                        ra: 80 + (js_sys::Math::random() * 30.) as u8,
-                        rb: 0,
-                        clock: 0,
-                    },
-                )
+            let dxr = rand_dir(); //raising dx
+            if rand_int(100) > 75 {
+                if (api.get(dxr, -1).species == Species::Empty
+                    || api.get(dxr, -1).species == Species::Sand
+                    || api.get(dxr, -1).species == Species::Seed)
+                    && api.get(1, -1).species != Species::Plant
+                    && api.get(-1, -1).species != Species::Plant
+                {
+                    api.set(
+                        dxr,
+                        -1,
+                        Cell {
+                            ra: (ra as i32 - rand_int(10)) as u8,
+                            ..cell
+                        },
+                    );
+                    api.set(
+                        0,
+                        0,
+                        Cell {
+                            species: Species::Plant,
+                            ra: 80 + (js_sys::Math::random() * 30.) as u8,
+                            rb: 0,
+                            clock: 0,
+                        },
+                    )
+                } else {
+                    api.set(0, 0, EMPTY_CELL);
+                }
             }
         } else {
             if ra > 40 {
@@ -971,12 +974,13 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
                 let (ldx, ldy) = adjacency_left((mdx, mdy));
                 let (rdx, rdy) = adjacency_right((mdx, mdy));
 
-                if api.get(mdx, mdy).species == Species::Empty
+                if (api.get(mdx, mdy).species == Species::Empty
+                    || api.get(mdx, mdy).species == Species::Plant)
                     && (api.get(ldx, ldy).species == Species::Empty
                         || api.get(rdx, rdy).species == Species::Empty)
                 {
                     let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
-                    let dec = 10 - rand_int(3);
+                    let dec = 9 - rand_int(3);
                     if (i + ra as i32) > 100 {
                         api.set(
                             mdx,
@@ -987,6 +991,19 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
                             },
                         );
                     }
+                }
+            } else {
+                if nbr_species == Species::Water {
+                    api.set(
+                        dx,
+                        dy,
+                        Cell {
+                            species: Species::Seed,
+                            ra: 150,
+                            rb: 0,
+                            ..cell
+                        },
+                    )
                 }
             }
         }
