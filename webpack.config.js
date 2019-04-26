@@ -11,7 +11,7 @@ module.exports = {
   entry: "./js/bootstrap.js",
   output: {
     path: dist,
-    filename: "bundle.js",
+    filename: "[name].[contenthash].js",
     publicPath: "/"
   },
   devServer: {

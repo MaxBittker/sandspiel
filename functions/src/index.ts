@@ -102,15 +102,11 @@ app.post("/creations", async (req, res) => {
 
     const publicId = id.slice(0, 20);
 
-    const exists = await admin
-      .firestore()
-      .collection("creations")
-      .where("id", "==", id)
-      .get()
-      .then(function(querySnapShot) {
-        return !querySnapShot.empty;
-      });
-    if (exists) {
+    const exists = await pgPool.query(
+      "SELECT exists( SELECT 1 FROM creations WHERE id = $1 )",
+      [publicId]
+    );
+    if (exists.rows[0].exists) {
       res.sendStatus(202).json({ id: "already exists" });
       return;
     }
@@ -148,32 +144,30 @@ app.post("/creations", async (req, res) => {
       uploadPNG(image, ".png")
     ]);
 
+    const text =
+      "INSERT INTO creations(id, data_id, title, score, timestamp) VALUES($1, $2, $3, $4, to_timestamp( $5 / 1000.0) )";
+    const values = [publicId, data.id, data.title, data.score, data.timestamp];
+
+    try {
+      await pgPool.query(text, values);
+      res.status(201).json({ id });
+    } catch (err) {
+      console.error(
+        "error writing creation" + err.message + err.name + err.stack
+      );
+      res.sendStatus(500);
+    }
+
+    // post a tweet with media
+    const b64content = image.replace(/^data:image\/\w+;base64,/, "");
+
+    Tweet(b64content, trimmed_title, publicId);
+
     await admin
       .firestore()
       .collection("creations")
       .doc(publicId)
       .set(data);
-
-    res.status(201).json({ id });
-
-    // post a tweet with media
-    //
-    const b64content = image.replace(/^data:image\/\w+;base64,/, "");
-
-    Tweet(b64content, trimmed_title, publicId);
-
-    const text =
-      "INSERT INTO creations(id, data_id, title, score, timestamp) VALUES($1, $2, $3, $4, to_timestamp( $5 / 1000.0) )";
-
-    const values = [publicId, data.id, data.title, data.score, data.timestamp];
-
-    pgPool.query(text, values, (err, result) => {
-      if (err) {
-        console.error(
-          "error writing creation" + err.message + err.name + err.stack
-        );
-      }
-    });
   } catch (error) {
     console.log("Error saving message", error.message);
     res.sendStatus(500);
@@ -277,6 +271,16 @@ app.put("/creations/:id/vote", async (req, res) => {
       console.error(err.stack);
     }
 
+    const update =
+      "UPDATE creations SET score=score+1 WHERE id = $1 RETURNING *";
+    try {
+      const result: pg.QueryResult = await pgPool.query(update, [id]);
+      res.status(200).json({ ...result.rows[0] });
+    } catch (err) {
+      console.error("error updating score" + err.message + err.stack);
+      res.sendStatus(500);
+    }
+
     const doc_ref = await admin
       .firestore()
       .collection(`/creations`)
@@ -289,12 +293,6 @@ app.put("/creations/:id/vote", async (req, res) => {
           if (doc.exists) {
             const new_score = doc.data().score + 1;
             t.update(doc_ref, { score: new_score });
-            res.status(200).json({ ...doc.data(), score: new_score });
-          } else {
-            res.status(404).json({
-              errorCode: 404,
-              errorMessage: `submission '${id}' not found`
-            });
           }
         })
         .catch(error => {
@@ -303,16 +301,35 @@ app.put("/creations/:id/vote", async (req, res) => {
     );
   } catch (error) {
     console.error("Error incrementing vote", id, error.message);
+  }
+});
+
+// GET /api/trending
+// Get trending hashtags
+app.get("/trending", async (req: express.Request, res) => {
+  try {
+    const trending: pg.QueryResult = await pgPool.query(
+      `SELECT * FROM (
+          SELECT hashtag, count(hashtag) as htcount
+          FROM (
+              select  REGEXP_MATCHES(title, '#([^\s]+)', 'g') as hashtag
+              FROM (
+                  SELECT * FROM creations
+                  ORDER BY timestamp desc limit 3000
+              ) a
+              WHERE title LIKE '%#%'
+          ) b 
+          GROUP BY hashtag
+          ORDER by htcount desc
+        ) c
+        WHERE htcount > 3;`
+    );
+
+    res.status(200).json(trending.rows);
+  } catch (error) {
+    console.error("Error getting creations", error.message);
     res.sendStatus(500);
   }
-  const update = "UPDATE creations SET score=score+1 WHERE id = $1";
-  pgPool.query(update, [id], (err, result) => {
-    if (err) {
-      console.error("error updating score" + err.message + err.stack);
-    } else {
-      console.log("updated a score! " + id + JSON.stringify(result));
-    }
-  });
 });
 
 // app.get("/creations/metadata", async (req, res) => {
