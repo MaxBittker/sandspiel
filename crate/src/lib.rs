@@ -241,12 +241,19 @@ impl Universe {
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {
-                if js_sys::Math::random() < 0.9 || i < width * height / 3 {
+                if js_sys::Math::random() > 0.9995 && i < width * height / 4 {
+                    Cell {
+                        species: Species::Seed,
+                        ra: 80 + (js_sys::Math::random() * 70.) as u8,
+                        rb: 0,
+                        clock: 0,
+                    }
+                } else if js_sys::Math::random() < 0.9 || i < width * height / 3 {
                     EMPTY_CELL
                 } else {
                     Cell {
                         species: Species::Sand,
-                        ra: 80 + (js_sys::Math::random() * 90.) as u8,
+                        ra: 80 + (js_sys::Math::random() * 70.) as u8,
                         rb: 0,
                         clock: 0,
                     }
@@ -361,7 +368,6 @@ impl Universe {
                 && (cell.species == Species::Sand
                     || cell.species == Species::Water
                     || cell.species == Species::Lava
-                    || cell.species == Species::Seed
                     || cell.species == Species::Acid
                     || cell.species == Species::Mite
                     || cell.species == Species::Dust

@@ -317,7 +317,7 @@ app.get("/trending", async (req: express.Request, res) => {
           FROM(
             SELECT DISTINCT hashtag, id 
             FROM (
-                  SELECT REGEXP_MATCHES(LOWER(title), '#([^\s.?!]+)', 'g') AS hashtag, id 
+                  SELECT REGEXP_MATCHES(LOWER(title), '#([^\\s.?!]+)', 'g') AS hashtag, id 
                   FROM (
                       SELECT * FROM creations
                       ORDER BY timestamp DESC LIMIT 3000
