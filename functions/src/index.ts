@@ -95,6 +95,7 @@ app.post("/creations", async (req, res) => {
 
   try {
     const bucket = admin.storage().bucket();
+
     const id = crypto
       .createHash("md5")
       .update(cells)
@@ -128,7 +129,7 @@ app.post("/creations", async (req, res) => {
         /^data:image\/\w+;base64,/,
         ""
       );
-      const imageBuffer = new Buffer(base64EncodedImageString, "base64");
+      const imageBuffer = Buffer.from(base64EncodedImageString, "base64");
 
       const file = bucket.file(filename);
 
@@ -156,6 +157,7 @@ app.post("/creations", async (req, res) => {
         "error writing creation" + err.message + err.name + err.stack
       );
       res.sendStatus(500);
+      return;
     }
 
     // post a tweet with media
@@ -169,7 +171,7 @@ app.post("/creations", async (req, res) => {
       .doc(publicId)
       .set(data);
   } catch (error) {
-    console.log("Error saving message", error.message);
+    console.error("Error saving message", error.message);
     res.sendStatus(500);
   }
 });
@@ -262,6 +264,7 @@ app.put("/creations/:id/vote", async (req, res) => {
     } catch (err) {
       console.log(err.stack);
       res.sendStatus(500);
+      return;
     }
 
     const insert = "INSERT INTO votes(id, ip) VALUES($1, $2)";
@@ -310,49 +313,30 @@ app.get("/trending", async (req: express.Request, res) => {
   try {
     const trending: pg.QueryResult = await pgPool.query(
       `SELECT * FROM (
-          SELECT hashtag, count(hashtag) as htcount
-          FROM (
-              select  REGEXP_MATCHES(title, '#([^\s]+)', 'g') as hashtag
-              FROM (
-                  SELECT * FROM creations
-                  ORDER BY timestamp desc limit 3000
-              ) a
-              WHERE title LIKE '%#%'
-          ) b 
+          SELECT unnest(hashtag) as hashtag, count(hashtag) AS htcount
+          FROM(
+            SELECT DISTINCT hashtag, id 
+            FROM (
+                  SELECT REGEXP_MATCHES(LOWER(title), '#([^\s.?!]+)', 'g') AS hashtag, id 
+                  FROM (
+                      SELECT * FROM creations
+                      ORDER BY timestamp DESC LIMIT 3000
+                  ) a
+                  WHERE title LIKE '%#%'
+              ) b 
+          ) c
           GROUP BY hashtag
-          ORDER by htcount desc
-        ) c
-        WHERE htcount > 3;`
+          ORDER BY htcount desc
+        ) d
+        WHERE htcount > 2 and length(hashtag) > 1;`
     );
-
+    console.log(JSON.stringify(trending.rows));
     res.status(200).json(trending.rows);
   } catch (error) {
     console.error("Error getting creations", error.message);
     res.sendStatus(500);
   }
 });
-
-// app.get("/creations/metadata", async (req, res) => {
-//   const query = admin.firestore().collection(`/creations`);
-//   // .limit(500);
-
-//   try {
-//     const snapshot = await query.get();
-//     // snapshot
-//     const creations = [];
-//     snapshot.forEach(childSnapshot => {
-//       creations.push({
-//         id: childSnapshot.id
-//       });
-//       return true;
-//     });
-
-//     res.status(200).json({ count: creations.length });
-//   } catch (error) {
-//     console.log("Error getting creations", error.message);
-//     res.sendStatus(500);
-//   }
-// });
 
 // Expose the API as a function
 exports.api = functions.https.onRequest(app);

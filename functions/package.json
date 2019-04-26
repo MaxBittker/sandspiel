@@ -12,6 +12,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "@google-cloud/language": "^2.0.0",
+    "@google-cloud/storage": "^2.5.0",
     "@types/pg": "^7.4.14",
     "@types/twit": "^2.2.21",
     "cors": "^2.8.5",
@@ -26,7 +27,10 @@
   },
   "devDependencies": {
     "tslint": "~5.8.0",
-    "typescript": "~2.8.3"
+    "typescript": "^3.4.5"
   },
-  "private": true
+  "private": true,
+  "engines": {
+    "node": "8"
+  }
 }
