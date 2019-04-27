@@ -90,6 +90,8 @@ button.selected {
 .submission-title {
   z-index: 3;
   position: relative;
+  overflow-wrap: break-word;
+  overflow: hidden;
 }
 #ui {
   display: flex;
@@ -140,6 +142,7 @@ button.selected {
   max-width: 80vh;
   /* margin: auto; */
 }
+
 .menu-scrim {
   position: absolute;
   left: 0px;
@@ -189,12 +192,16 @@ img {
   display: flex;
 }
 .submission img {
-  max-width: 50%;
-  height: 50%;
-  display: inline-block;
+  width: 100%;
 }
+.img-link {
+  width: 50%;
+  /* height: 50%; */
+  /* display: inline-block; */
+}
+
 .submission div {
-  padding: 5px;
+  margin: 8px 8px 8px 16px;
   display: flex;
   flex-direction: column;
 }
@@ -209,5 +216,6 @@ img {
 }
 
 .heart {
+  cursor: pointer;
   font-size: 25px;
 }
