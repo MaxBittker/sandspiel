@@ -35,7 +35,8 @@
     "webpack": "^4.28.4",
     "webpack-cli": "^3.2.3",
     "webpack-dev-server": "^3.2.1",
-    "http-server": "^0.11.1"
+    "http-server": "^0.11.1",
+    "workbox-webpack-plugin": "^4.0.0"
   },
   "dependencies": {
     "dat.gui": "^0.7.5",
@@ -47,6 +48,6 @@
     "react-dom": "^16.8.3",
     "react-router-dom": "^5.0.0",
     "regl": "^1.3.11",
-    "workbox-webpack-plugin": "^4.0.0"
+    "timeago.js": "^3.0.2"
   }
 }

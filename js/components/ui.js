@@ -61,6 +61,12 @@ class Index extends React.Component {
       return;
     }
     if (
+      this.props.location.pathname !== "/" &&
+      prevProps.location.pathname == "/"
+    ) {
+      this.pause();
+    }
+    if (
       prevProps.location.hash === "" ||
       prevProps.location.hash != this.props.location.hash
     ) {
@@ -285,7 +291,6 @@ class Index extends React.Component {
             pathname: "/browse/",
             hash
           }}
-          onClick={() => this.pause()}
         >
           <button>Browse</button>
         </Link>
@@ -336,6 +341,7 @@ class Index extends React.Component {
             reset();
             universe.pop_undo();
           }}
+          style={{ fontSize: 35 }}
         >
           ↜
         </button>

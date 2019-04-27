@@ -384,7 +384,7 @@ pub fn update_cloner(cell: Cell, mut api: SandApi) {
                     break;
                 }
             } else {
-                if api.get(dx, dy).species == Species::Empty {
+                if rand_int(100) > 90 && api.get(dx, dy).species == Species::Empty {
                     api.set(
                         dx,
                         dy,

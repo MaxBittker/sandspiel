@@ -1,7 +1,12 @@
 import React from "react";
-import { functions, storage } from "../api.js";
 import { NavLink, Link, withRouter } from "react-router-dom";
+
+import timeago from "timeago.js";
+
 import HyperText from "./hypertext.js";
+import { functions, storage } from "../api.js";
+
+const ago = timeago();
 
 let storageUrl =
   "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
@@ -24,12 +29,39 @@ class Submissions extends React.Component {
     if (submissions.length == 0) {
       return <div style={{ height: "90vh" }}>Didn't find anything!</div>;
     }
+
     return (
       <div className="submissions">
         {submissions.map(submission => {
+          let displayTime = new Date(
+            submission.data.timestamp
+          ).toLocaleDateString();
+          let msAgo =
+            new Date().getTime() -
+            new Date(submission.data.timestamp).getTime();
+
+          if (msAgo < 24 * 60 * 60 * 1000) {
+            displayTime = ago.format(submission.data.timestamp);
+          }
           return (
             <div key={submission.id} className="submission">
-              <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
+              <Link
+                className="img-link"
+                to={{
+                  pathname: "/",
+                  hash: `#${submission.id}`
+                }}
+                onClick={() => {
+                  window.UI.setState(
+                    () => ({
+                      currentSubmission: null
+                    }),
+                    window.UI.load
+                  );
+                }}
+              >
+                <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
+              </Link>
               <div style={{ width: "50%" }}>
                 <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
                   <HyperText text={submission.data.title} />
@@ -40,9 +72,7 @@ class Submissions extends React.Component {
                   </span>
                   {browseVotes[submission.id] || submission.data.score}
                 </h3>
-                <h4>
-                  {new Date(submission.data.timestamp).toLocaleDateString()}
-                </h4>
+                <h4>{displayTime}</h4>
                 <Link
                   to={{
                     pathname: "/",
