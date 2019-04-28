@@ -316,24 +316,25 @@ impl Universe {
         let mut dx = 0;
         let mut dy = 0;
 
-        let threshhold = match cell.species {
+        let threshold = match cell.species {
             Species::Empty => 500,
             Species::Wall => 500,
             Species::Cloner => 500,
 
             Species::Stone => 70,
             Species::Wood => 70,
-            Species::Ice => 50,
 
             Species::Plant => 60,
             Species::Lava => 60,
+            Species::Ice => 60,
 
             Species::Fungus => 54,
 
             Species::Oil => 50,
 
-            Species::Water => 40,
-            Species::Acid => 40,
+            // Intentionally left out and covered by the default case
+            // Species::Water => 40,
+            // Species::Acid => 40,
 
             Species::Seed => 35,
 
@@ -344,21 +345,28 @@ impl Universe {
             Species::Dust => 10,
             Species::Fire => 5,
             Species::Gas => 5,
+            /* 
+             Some hacked species values exist outside of the enum values.
+             Making sure the default case is emitted allows "BELP" to have a defined wind threshold.
+             Originally, threshold was a hardcoded value, so this preserves that original glitch behavior.
+             See: https://sandspiel.club/#eMlYGC52XIto0NM1WjaJ
+            */
+            _ => 40, 
         };
 
         let wx = (wind.dx as i32) - 126;
         let wy = (wind.dy as i32) - 126;
 
-        if wx > threshhold {
+        if wx > threshold {
             dx = 1;
         }
-        if wy > threshhold {
+        if wy > threshold {
             dy = -1;
         }
-        if wx < -threshhold {
+        if wx < -threshold {
             dx = -1;
         }
-        if wy < -threshhold {
+        if wy < -threshold {
             dy = 1;
         }
         if (dx != 0 || dy != 0) && api.get(dx, dy).species == Species::Empty {
