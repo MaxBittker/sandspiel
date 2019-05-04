@@ -14,7 +14,7 @@ Ultimately, I want the platform to support editing and uploading of your own ele
 ### 🛠️ Build:
 
 ```
-wasm-pack build;
+cd crate && wasm-pack build && cd ..;
 npm run start
 ```
 
