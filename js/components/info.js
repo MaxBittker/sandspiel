@@ -3,10 +3,12 @@ import React from "react";
 const Info = () => {
   return (
     <div className="Info">
-      <h1>sandspiel </h1>
+      <h1>Sandspiel </h1>
       <p>
         Created by <a href="https://maxbittker.com">max bittker</a>
       </p>
+      <hr />
+      <br />
       <p>
         Welcome, and thanks for coming by! I hope that you enjoy exploring this
         small game, and it brings you some calm.{" "}
@@ -19,6 +21,12 @@ const Info = () => {
       </p>
       <br />
       <p>
+        If you want to read more the inspiration, architecture, and history of
+        the game, I wrote a blog post (it gets technical in the middle):&nbsp;
+        <a href="https://maxbittker.com/making-sandspiel">Making Sandspiel</a>
+      </p>
+      <br />
+      <p>
         You can follow sandspiel on twitter for updates and new uploads:
         <a href="https://twitter.com/sandspiel_feed">@sandspiel_feed</a>
       </p>
@@ -27,12 +35,19 @@ const Info = () => {
         If you'd like, you can view the{" "}
         <a href="https://github.com/maxbittker/sandspiel">source code</a> or{" "}
         <a href="https://github.com/maxbittker/sandspiel/issues">report bugs</a>{" "}
-        on github
+        on github or feel free to reach out on twitter and I'll try to answer!
       </p>
-      <h2>FAQs</h2>
-      <p>(TODO: write some FAQs)</p>
-      If you have any other questions, feel free to reach out on twitter and
-      I'll try to answer!
+      <br />
+      <p>
+        Lastly, I want to say that if you enjoy this game or share your artwork
+        on it, your opinion is important to me and I want to do my best to
+        ensure sandspiel is a friendly and kind place to play, without bullying,
+        racism, or homophobia. If something is wrong or there's some way I can
+        help, feel free to contact me at [FirstnameLastname]@gmail.com
+      </p>
+      <br />
+      <hr />
+      <br />
       <h2>Element Information:</h2>
       <h4>Wall </h4>
       Indestructible
@@ -70,6 +85,10 @@ const Info = () => {
       Produces smoke
       <h4>Firework </h4>
       Explodes into copies of the first element it touches
+      <hr />
+      <hr />
+      <hr />
+      <hr />
     </div>
   );
 };

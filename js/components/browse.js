@@ -73,22 +73,6 @@ class Submissions extends React.Component {
                   {browseVotes[submission.id] || submission.data.score}
                 </h3>
                 <h4>{displayTime}</h4>
-                <Link
-                  to={{
-                    pathname: "/",
-                    hash: `#${submission.id}`
-                  }}
-                  onClick={() => {
-                    window.UI.setState(
-                      () => ({
-                        currentSubmission: null
-                      }),
-                      window.UI.load
-                    );
-                  }}
-                >
-                  <button className="load">Load</button>
-                </Link>
               </div>
             </div>
           );
@@ -145,8 +129,14 @@ class Browse extends React.Component {
     if (location.pathname.startsWith("/browse/top/")) {
       param = "?q=score";
     }
-    if (location.pathname.startsWith("/browse/top-recent/")) {
-      param = "?q=toprecent";
+    if (location.pathname.startsWith("/browse/top/day")) {
+      param = "?q=score&d=1";
+    }
+    if (location.pathname.startsWith("/browse/top/week")) {
+      param = "?q=score&d=7";
+    }
+    if (location.pathname.startsWith("/browse/top/month")) {
+      param = "?q=score&d=30";
     }
     if (location.pathname.startsWith("/browse/search/")) {
       param = location.search;
@@ -195,11 +185,17 @@ class Browse extends React.Component {
         <NavLink exact to="/browse/">
           <button>New</button>
         </NavLink>
-        <NavLink to="/browse/top-recent/">
-          <button>Top Recent</button>
+        <NavLink to="/browse/top/day/">
+          <button>Day</button>
         </NavLink>
-        <NavLink to="/browse/top/">
-          <button>Top All Time</button>
+        <NavLink to="/browse/top/week/">
+          <button>Week</button>
+        </NavLink>
+        <NavLink to="/browse/top/month/">
+          <button>Month</button>
+        </NavLink>
+        <NavLink exact to="/browse/top/">
+          <button>All </button>
         </NavLink>
         <span style={{ display: "inline-block" }}>
           <input

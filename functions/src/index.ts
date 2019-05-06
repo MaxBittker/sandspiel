@@ -179,7 +179,7 @@ app.post("/creations", async (req, res) => {
 // GET /api/creations?q={q}
 // Get all creations, optionally specifying a string to filter on
 app.get("/creations", async (req: express.Request, res) => {
-  const { q, title } = req.query;
+  const { q, d, title } = req.query;
 
   try {
     let browse: pg.QueryResult;
@@ -190,6 +190,13 @@ app.get("/creations", async (req: express.Request, res) => {
          ORDER BY score DESC,  timestamp DESC
          LIMIT 500`,
         [title.toLowerCase()]
+      );
+    } else if (d) {
+      browse = await pgPool.query(
+        `SELECT *  FROM creations
+         WHERE timestamp > NOW() - INTERVAL '${parseInt(d, 10)} days'
+         ORDER BY score DESC
+         LIMIT 500`
       );
     } else {
       browse = await pgPool.query(
