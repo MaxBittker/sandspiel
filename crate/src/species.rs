@@ -41,14 +41,30 @@ fn adjacency_left(dir: (i32, i32)) -> (i32, i32) {
         _ => (0, 0),
     }
 }
-// fn rand_dir_2() -> i32 {
-//     let i = rand_int(1000);
-//     if (i % 2) == 0 {
-//         -1
-//     } else {
-//         1
-//     }
-// }
+fn joinDyDx(dx: i32, dy: i32) -> u8 {
+    (((dx + 1) * 3) + (dy + 1)) as u8
+}
+
+fn splitDyDx(s: u8) -> (i32, i32) {
+
+    let s: i32 = s as i32;
+
+    let dx: i32 = (s / 3) - 1;
+
+    let dy: i32 = (s % 3) - 1;
+
+    (dx, dy)
+}
+
+
+fn rand_dir_2() -> i32 {
+    let i = rand_int(1000);
+    if (i % 2) == 0 {
+        -1
+    } else {
+        1
+    }
+}
 #[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -403,7 +419,11 @@ pub fn update_cloner(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_firework(cell: Cell, mut api: SandApi) {
+    // firework has complicated behavior that is staged piecewise in ra.
+    // it would be awesome to diagram the ranges of values and their meaning
+
     if cell.rb == 0 {
+        //initialize
         api.set(
             0,
             0,
@@ -426,7 +446,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
     let sy = rand_dir();
     let sample = api.get(sx, sy);
 
-    if cell.rb == 100
+    if cell.rb == 100 //the type is unset
         && sample.species != Species::Empty
         && sample.species != Species::Firework
         && sample.species != Species::Wall
@@ -436,7 +456,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
             0,
             0,
             Cell {
-                rb: sample.species as u8,
+                rb: sample.species as u8, //store the type
                 ..cell
             },
         );
@@ -455,7 +475,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
     let ra = cell.ra;
 
     if ra == 0 {
-        //falling
+        //falling (dormant)
         let dx = rand_dir();
         let nbr = api.get(0, 1);
         if nbr.species == Species::Empty {
@@ -474,7 +494,28 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
         } else {
             api.set(0, 0, cell);
         }
-    } else if ra > 5 {
+    } else if ra == 1 {
+        //launch
+        api.set(
+            0,
+            0,
+            Cell {
+                ra: 150 + rand_int(40) as u8,
+
+                ..cell
+            },
+        );
+    } else if ra <= 5 {
+        //count down to launch
+        api.set(
+            0,
+            0,
+            Cell {
+                ra: ra.saturating_sub(1),
+                ..cell
+            },
+        );
+    } else if ra > 100 {
         //rising
 
         if api.get(0, -2).species == Species::Empty || api.get(0, -2).species == Species::Firework {
@@ -506,41 +547,74 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
             });
         }
         return;
-    } else {
-        api.set_fluid(Wind {
-            dx: 0,
-            dy: 90,
-            pressure: 80,
-            density: 90,
-        });
-        let spawned = Cell {
-            species: clone_species,
-            ra: 80 + (js_sys::Math::random() * 90.) as u8,
-            rb: 0,
-            clock: 0,
-        };
-        api.set(1, 0, spawned);
-        api.set(-1, 0, spawned);
-        api.set(0, 1, spawned);
-        api.set(0, -1, spawned);
-        api.set(0, 0, spawned);
+    } else if ra == 100 {
+
+        let mut dx = rand_dir();
+        let mut dy = rand_dir();
+        if dx == 0 && dy == 0 {
+            dx = rand_dir_2();
+            dy = rand_dir_2();
+        }
+        api.set(
+            0,
+            0,
+            Cell {
+                ra: 90 + joinDyDx(dx, dy),
+                ..cell
+            },
+        );
+
+        return;
+    } else if ra > 50 {
+
+        let (dx, dy) = splitDyDx(cell.ra - 90);
+
+        let nbr = api.get(dx, dy);
+
+        if (nbr.species == Species::Empty || nbr.species == Species::Fire) && rand_int(40) != 1 {
+
+            api.set(
+                0,
+                0,
+                Cell {
+                    species: clone_species,
+                    rb: 0,
+                    ra: 120 + rand_int(30) as u8,
+                    ..cell
+                },
+            );
+
+
+            let (ndx, ndy) = match rand_int(100) % 4 {
+                0 => adjacency_left((dx, dy)),
+                1 => adjacency_right((dx, dy)),
+                // 2 => adjacency_right((dx, dy)),
+                _ => (dx, dy),
+            };
+            api.set(
+                dx,
+                dy,
+                Cell {
+                    ra: 90 + joinDyDx(ndx, ndy),
+                    ..cell
+                },
+            );
+        } else {
+
+            api.set(0, 0, EMPTY_CELL);
+        }
         return;
     }
 
     if sample.species == Species::Fire
         || sample.species == Species::Lava
-        || (sample.species == Species::Firework && sample.ra > 5 && sample.rb != 0)
+        || (sample.species == Species::Firework && sample.ra > 0 && sample.ra < 5 && sample.rb != 0)
     {
-        api.set(
-            0,
-            0,
-            Cell {
-                ra: 50 + rand_int(40) as u8,
-                ..cell
-            },
-        );
+        api.set(0, 0, Cell { ra: 5, ..cell });
     }
 }
+
+
 pub fn update_fire(cell: Cell, mut api: SandApi) {
     let ra = cell.ra;
     let mut degraded = cell.clone();

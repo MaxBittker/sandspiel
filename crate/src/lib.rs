@@ -345,13 +345,13 @@ impl Universe {
             Species::Dust => 10,
             Species::Fire => 5,
             Species::Gas => 5,
-            /* 
+            /*
              Some hacked species values exist outside of the enum values.
              Making sure the default case is emitted allows "BELP" to have a defined wind threshold.
              Originally, threshold was a hardcoded value, so this preserves that original glitch behavior.
              See: https://sandspiel.club/#eMlYGC52XIto0NM1WjaJ
             */
-            _ => 40, 
+            _ => 40,
         };
 
         let wx = (wind.dx as i32) - 126;
