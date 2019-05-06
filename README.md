@@ -14,8 +14,13 @@ Ultimately, I want the platform to support editing and uploading of your own ele
 ### 🛠️ Build:
 
 ```
-wasm-pack build;
-npm run start
+# build the wasm once: 
+cd crate && wasm-pack build && cd ..;
+yarn install; # npm is giving me an error with peer deps right now
+npm run start;
+
+# then in a seperate terminal:
+cargo watch -s 'wasm-pack build'
 ```
 
 a successor to my previous efforts in [javascript](https://github.com/MaxBittker/dust) and [lua](https://github.com/MaxBittker/sand-toy)
