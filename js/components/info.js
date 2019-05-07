@@ -83,7 +83,7 @@ const Info = () => {
       Pretty, but dangerously explosive
       <h4>Oil </h4>
       Produces smoke
-      <h4>Firework </h4>
+      <h4>Rocket </h4>
       Explodes into copies of the first element it touches
       <hr />
       <hr />

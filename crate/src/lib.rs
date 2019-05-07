@@ -32,6 +32,14 @@ pub struct Cell {
 }
 
 impl Cell {
+    pub fn new(species: Species) -> Cell {
+        Cell {
+            species: species,
+            ra: 100 + (js_sys::Math::random() * 50.) as u8,
+            rb: 0,
+            clock: 0,
+        }
+    }
     pub fn update(&self, api: SandApi) {
         self.species.update(*self, api);
     }
@@ -242,21 +250,12 @@ impl Universe {
         let cells = (0..width * height)
             .map(|i| {
                 if js_sys::Math::random() > 0.9995 && i < width * height / 4 {
-                    Cell {
-                        species: Species::Seed,
-                        ra: 80 + (js_sys::Math::random() * 70.) as u8,
-                        rb: 0,
-                        clock: 0,
-                    }
+                    Cell::new(Species::Seed)
                 } else if js_sys::Math::random() < 0.9 || i < width * height / 3 {
                     EMPTY_CELL
                 } else {
-                    Cell {
-                        species: Species::Sand,
-                        ra: 80 + (js_sys::Math::random() * 70.) as u8,
-                        rb: 0,
-                        clock: 0,
-                    }
+                    Cell::new(Species::Sand)
+
                 }
             })
             .collect();
@@ -340,7 +339,7 @@ impl Universe {
 
             Species::Sand => 30,
             Species::Mite => 30,
-            Species::Firework => 30,
+            Species::Rocket => 30,
 
             Species::Dust => 10,
             Species::Fire => 5,
@@ -380,7 +379,7 @@ impl Universe {
                     || cell.species == Species::Mite
                     || cell.species == Species::Dust
                     || cell.species == Species::Oil
-                    || cell.species == Species::Firework)
+                    || cell.species == Species::Rocket)
             {
                 dy = -2;
             }

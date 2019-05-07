@@ -41,11 +41,11 @@ fn adjacency_left(dir: (i32, i32)) -> (i32, i32) {
         _ => (0, 0),
     }
 }
-fn joinDyDx(dx: i32, dy: i32) -> u8 {
+fn join_dy_dx(dx: i32, dy: i32) -> u8 {
     (((dx + 1) * 3) + (dy + 1)) as u8
 }
 
-fn splitDyDx(s: u8) -> (i32, i32) {
+fn split_dy_dx(s: u8) -> (i32, i32) {
 
     let s: i32 = s as i32;
 
@@ -65,6 +65,7 @@ fn rand_dir_2() -> i32 {
         1
     }
 }
+
 #[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -88,7 +89,7 @@ pub enum Species {
     Acid = 12,
     Dust = 14,
     Oil = 16,
-    Firework = 17,
+    Rocket = 17,
 }
 
 impl Species {
@@ -102,7 +103,7 @@ impl Species {
             Species::Stone => update_stone(cell, api),
             Species::Gas => update_gas(cell, api),
             Species::Cloner => update_cloner(cell, api),
-            Species::Firework => update_firework(cell, api),
+            Species::Rocket => update_rocket(cell, api),
             Species::Fire => update_fire(cell, api),
             Species::Wood => update_wood(cell, api),
             Species::Lava => update_lava(cell, api),
@@ -418,8 +419,8 @@ pub fn update_cloner(cell: Cell, mut api: SandApi) {
     }
 }
 
-pub fn update_firework(cell: Cell, mut api: SandApi) {
-    // firework has complicated behavior that is staged piecewise in ra.
+pub fn update_rocket(cell: Cell, mut api: SandApi) {
+    // rocket has complicated behavior that is staged piecewise in ra.
     // it would be awesome to diagram the ranges of values and their meaning
 
     if cell.rb == 0 {
@@ -448,7 +449,7 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
 
     if cell.rb == 100 //the type is unset
         && sample.species != Species::Empty
-        && sample.species != Species::Firework
+        && sample.species != Species::Rocket
         && sample.species != Species::Wall
         && sample.species != Species::Cloner
     {
@@ -456,22 +457,14 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
             0,
             0,
             Cell {
+                ra: 1,
                 rb: sample.species as u8, //store the type
                 ..cell
             },
         );
         return;
-    } else if cell.rb == 100 && sample.species == Species::Firework && sample.rb != 100 {
-        api.set(
-            0,
-            0,
-            Cell {
-                rb: sample.rb,
-                ..cell
-            },
-        );
-        return;
     }
+
     let ra = cell.ra;
 
     if ra == 0 {
@@ -500,54 +493,11 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
             0,
             0,
             Cell {
-                ra: 150 + rand_int(40) as u8,
-
+                ra: 2  ,
                 ..cell
             },
         );
-    } else if ra <= 5 {
-        //count down to launch
-        api.set(
-            0,
-            0,
-            Cell {
-                ra: ra.saturating_sub(1),
-                ..cell
-            },
-        );
-    } else if ra > 100 {
-        //rising
-
-        if api.get(0, -2).species == Species::Empty || api.get(0, -2).species == Species::Firework {
-            api.set(
-                0,
-                -2,
-                Cell {
-                    ra: ra.saturating_sub(1),
-                    ..cell
-                },
-            );
-            api.set(0, 0, EMPTY_CELL);
-        } else {
-            api.set(
-                0,
-                0,
-                Cell {
-                    ra: ra.saturating_sub(1),
-                    ..cell
-                },
-            );
-        }
-        if ra < 10 {
-            api.set_fluid(Wind {
-                dx: 0,
-                dy: 90,
-                pressure: 80,
-                density: 90,
-            });
-        }
-        return;
-    } else if ra == 100 {
+    } else if ra == 2 {
 
         let mut dx = rand_dir();
         let mut dy = rand_dir();
@@ -555,37 +505,33 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
             dx = rand_dir_2();
             dy = rand_dir_2();
         }
+        let nbr = api.get(dx, dy);
+        if nbr.species != Species::Empty {
+            dx *= -1;
+            dy *= -1;
+        }
         api.set(
             0,
             0,
             Cell {
-                ra: 90 + joinDyDx(dx, dy),
+                ra: 100 + join_dy_dx(dx, dy),
                 ..cell
             },
         );
-
-        return;
     } else if ra > 50 {
 
-        let (dx, dy) = splitDyDx(cell.ra - 90);
+        let (dx, dy) = split_dy_dx(cell.ra - 100);
 
-        let nbr = api.get(dx, dy);
+        let nbr = api.get(dx, dy * 2);
 
-        if (nbr.species == Species::Empty || nbr.species == Species::Fire) && rand_int(40) != 1 {
+        if nbr.species == Species::Empty
+            || nbr.species == Species::Fire
+            || nbr.species == Species::Rocket
+        {
+            api.set(0, 0, Cell::new(clone_species));
+            api.set(0, dy, Cell::new(clone_species));
 
-            api.set(
-                0,
-                0,
-                Cell {
-                    species: clone_species,
-                    rb: 0,
-                    ra: 120 + rand_int(30) as u8,
-                    ..cell
-                },
-            );
-
-
-            let (ndx, ndy) = match rand_int(100) % 4 {
+            let (ndx, ndy) = match rand_int(100) % 5 {
                 0 => adjacency_left((dx, dy)),
                 1 => adjacency_right((dx, dy)),
                 // 2 => adjacency_right((dx, dy)),
@@ -593,25 +539,18 @@ pub fn update_firework(cell: Cell, mut api: SandApi) {
             };
             api.set(
                 dx,
-                dy,
+                dy * 2,
                 Cell {
-                    ra: 90 + joinDyDx(ndx, ndy),
+                    ra: 100 + join_dy_dx(ndx, ndy),
                     ..cell
                 },
             );
         } else {
-
+            //fizzle
             api.set(0, 0, EMPTY_CELL);
         }
-        return;
     }
 
-    if sample.species == Species::Fire
-        || sample.species == Species::Lava
-        || (sample.species == Species::Firework && sample.ra > 0 && sample.ra < 5 && sample.rb != 0)
-    {
-        api.set(0, 0, Cell { ra: 5, ..cell });
-    }
 }
 
 
@@ -1068,16 +1007,7 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
                 }
             } else {
                 if nbr_species == Species::Water {
-                    api.set(
-                        dx,
-                        dy,
-                        Cell {
-                            species: Species::Seed,
-                            ra: 150,
-                            rb: 0,
-                            ..cell
-                        },
-                    )
+                    api.set(dx, dy, Cell::new(Species::Seed))
                 }
             }
         }

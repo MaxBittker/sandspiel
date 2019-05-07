@@ -105,7 +105,7 @@ void main() {
 
     saturation = 0.2;
     lightness = 0.3;
-  } else if (type == 17) { // firework
+  } else if (type == 17) { // Rocket
     hue = 0.0;
     saturation = 0.4 + data.b;
     lightness = 0.9;
