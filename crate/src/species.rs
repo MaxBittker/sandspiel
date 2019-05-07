@@ -1,97 +1,13 @@
+use super::utils::*;
 use Cell;
 use SandApi;
 use Wind;
 use EMPTY_CELL;
 
+
 use std::mem;
 use wasm_bindgen::prelude::*;
 // use web_sys::console;
-
-fn rand_int(n: i32) -> i32 {
-    (js_sys::Math::random() * n as f64) as i32
-}
-
-fn rand_dir() -> i32 {
-    let i = rand_int(1000);
-    (i % 3) - 1
-}
-fn rand_dir_2() -> i32 {
-    let i = rand_int(1000);
-    if (i % 2) == 0 {
-        -1
-    } else {
-        1
-    }
-}
-
-fn rand_vec() -> (i32, i32) {
-    let i = rand_int(2000);
-    match i % 9 {
-        0 => (1, 1),
-        1 => (1, 0),
-        2 => (1, -1),
-        3 => (0, -1),
-        4 => (-1, -1),
-        5 => (-1, 0),
-        6 => (-1, 1),
-        7 => (0, 1),
-        _ => (0, 0),
-    }
-}
-
-fn rand_vec_8() -> (i32, i32) {
-    let i = rand_int(2000);
-    match i % 8 {
-        0 => (1, 1),
-        1 => (1, 0),
-        2 => (1, -1),
-        3 => (0, -1),
-        4 => (-1, -1),
-        5 => (-1, 0),
-        6 => (-1, 1),
-        _ => (0, 1),
-    }
-}
-fn adjacency_right(dir: (i32, i32)) -> (i32, i32) {
-    match dir {
-        (0, 1) => (1, 1),
-        (1, 1) => (1, 0),
-        (1, 0) => (1, -1),
-        (1, -1) => (0, -1),
-        (0, -1) => (-1, -1),
-        (-1, -1) => (-1, 0),
-        (-1, 0) => (-1, 1),
-        (-1, 1) => (0, 1),
-        _ => (0, 0),
-    }
-}
-fn adjacency_left(dir: (i32, i32)) -> (i32, i32) {
-    match dir {
-        (0, 1) => (-1, 1),
-        (1, 1) => (0, 1),
-        (1, 0) => (1, 1),
-        (1, -1) => (1, 0),
-        (0, -1) => (1, -1),
-        (-1, -1) => (0, -1),
-        (-1, 0) => (-1, -1),
-        (-1, 1) => (-1, 0),
-        _ => (0, 0),
-    }
-}
-fn join_dy_dx(dx: i32, dy: i32) -> u8 {
-    (((dx + 1) * 3) + (dy + 1)) as u8
-}
-
-fn split_dy_dx(s: u8) -> (i32, i32) {
-
-    let s: i32 = s as i32;
-
-    let dx: i32 = (s / 3) - 1;
-
-    let dy: i32 = (s % 3) - 1;
-
-    (dx, dy)
-}
 
 
 #[wasm_bindgen]
