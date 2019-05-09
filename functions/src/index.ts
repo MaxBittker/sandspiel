@@ -164,12 +164,6 @@ app.post("/creations", async (req, res) => {
     const b64content = image.replace(/^data:image\/\w+;base64,/, "");
 
     Tweet(b64content, trimmed_title, publicId);
-
-    await admin
-      .firestore()
-      .collection("creations")
-      .doc(publicId)
-      .set(data);
   } catch (error) {
     console.error("Error saving message", error.message);
     res.sendStatus(500);
@@ -290,27 +284,43 @@ app.put("/creations/:id/vote", async (req, res) => {
       console.error("error updating score" + err.message + err.stack);
       res.sendStatus(500);
     }
-
-    const doc_ref = await admin
-      .firestore()
-      .collection(`/creations`)
-      .doc(id);
-
-    await admin.firestore().runTransaction(t =>
-      t
-        .get(doc_ref)
-        .then(doc => {
-          if (doc.exists) {
-            const new_score = doc.data().score + 1;
-            t.update(doc_ref, { score: new_score });
-          }
-        })
-        .catch(error => {
-          console.error("Error incrementing vote", id, error.message);
-        })
-    );
   } catch (error) {
     console.error("Error incrementing vote", id, error.message);
+  }
+});
+
+app.put("/creations/:id/report", async (req, res) => {
+  const id = req.params.id;
+  const ip = req.header("x-appengine-user-ip");
+
+  try {
+    const values = [id, ip];
+
+    try {
+      const exists = await pgPool.query(
+        "SELECT exists( SELECT 1 FROM reports WHERE id = $1 AND ip = $2 )",
+        values
+      );
+
+      if (exists.rows[0].exists) {
+        res.sendStatus(301);
+        return;
+      }
+    } catch (err) {
+      console.log(err.stack);
+      res.sendStatus(500);
+      return;
+    }
+
+    const insert = "INSERT INTO reports(id, ip) VALUES($1, $2)";
+    try {
+      await pgPool.query(insert, values);
+    } catch (err) {
+      console.error(err.stack);
+    }
+    res.status(200).json({ result: "success" });
+  } catch (error) {
+    console.error("Error reporting post", id, error.message);
   }
 });
 
