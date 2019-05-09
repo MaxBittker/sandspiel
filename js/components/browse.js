@@ -21,7 +21,7 @@ class Submissions extends React.Component {
     );
   }
   render() {
-    let { submissions, voteFromBrowse, browseVotes } = this.props;
+    let { submissions, voteFromBrowse, browseVotes, report } = this.props;
 
     if (!submissions) {
       return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
@@ -66,13 +66,25 @@ class Submissions extends React.Component {
                 <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
                   <HyperText text={submission.data.title} />
                 </h3>
-                <h3 onClick={() => voteFromBrowse(submission)}>
-                  <span className="heart">
+                <button
+                  className="heart"
+                  onClick={() => voteFromBrowse(submission)}
+                >
+                  <h3>
                     {browseVotes[submission.id] ? "🖤" : "♡"}
-                  </span>
-                  {browseVotes[submission.id] || submission.data.score}
-                </h3>
+                    {browseVotes[submission.id] || submission.data.score}
+                  </h3>
+                </button>
+
                 <h4>{displayTime}</h4>
+
+                <button
+                  className="report"
+                  title="report"
+                  onClick={() => report(submission.id)}
+                >
+                  ✋
+                </button>
               </div>
             </div>
           );
@@ -178,6 +190,23 @@ class Browse extends React.Component {
         console.log(e);
       });
   }
+  report(id) {
+    fetch(functions._url(`api/creations/${id}/report`), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        // this.setState(({ browseVotes }) => ({
+        //   browseVotes: { [submission.id]: data.score, ...browseVotes }
+        // }));
+      })
+      .catch(e => {
+        console.log(e);
+      });
+  }
   render() {
     const { search, submissions, browseVotes } = this.state;
     return (
@@ -223,6 +252,7 @@ class Browse extends React.Component {
           submissions={submissions}
           voteFromBrowse={submission => this.voteFromBrowse(submission)}
           browseVotes={browseVotes}
+          report={id => this.report(id)}
         />
       </React.Fragment>
     );
