@@ -223,15 +223,15 @@ img {
   transform: scale(1.5);
 }
 .heart {
-  display: inline;
+  display: inline-block;
   background-color: transparent;
   border-color: transparent;
   flex-grow: 0;
   line-break: auto;
-  font-size: 25px;
   text-align: left;
   padding: 0;
   margin: 0;
+  width: 40px;
 }
 
 .heart:active h3 {
@@ -239,4 +239,22 @@ img {
   filter: none;
   transform: scale(1.5);
   display: inline-block;
+}
+
+.submission .adminButtons {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+}
+.delete {
+  background-color: lightpink;
+}
+
+.pardon {
+  background-color: aliceblue;
+}
+
+.adminButtons button:active {
+  transform: scale(1.2);
+  z-index: 5;
 }

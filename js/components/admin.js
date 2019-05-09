@@ -27,7 +27,9 @@ class Submissions extends React.Component {
       return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
     }
     if (submissions.length == 0) {
-      return <div style={{ height: "90vh" }}>Didn't find anything!</div>;
+      return (
+        <div style={{ height: "90vh" }}>No actionable reports! Thanks ♡♡♡</div>
+      );
     }
 
     return (
@@ -77,14 +79,24 @@ class Submissions extends React.Component {
                 </button>
 
                 <h4>{displayTime}</h4>
+                <h3>✋{submission.data.reports} reports</h3>
 
-                <button
-                  className="report"
-                  title="report"
-                  onClick={() => report(submission.id)}
-                >
-                  🏴
-                </button>
+                <div className="adminButtons">
+                  <button
+                    className="delete"
+                    title="delete"
+                    onClick={() => report(submission.id)}
+                  >
+                    delete 💥
+                  </button>
+                  <button
+                    className="pardon"
+                    title="pardon"
+                    onClick={() => report(submission.id)}
+                  >
+                    pardon 🐣
+                  </button>
+                </div>
               </div>
             </div>
           );
@@ -99,63 +111,47 @@ class Browse extends React.Component {
     super(props);
     this.state = {
       paused: false,
-      submitting: false,
-      dataURL: {},
       submissions: null,
       browseVotes: {},
-      search: ""
+      search: "",
+      currentUser: firebase.auth().currentUser
     };
   }
   componentWillMount() {
     console.log("mounted");
     this.loadSubmissions();
+
+    firebase
+      .auth()
+      .getRedirectResult()
+      .then(result => {
+        if (result.credential) {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          var token = result.credential.accessToken;
+          // ...
+        }
+        // The signed-in user info.
+        var user = result.user;
+        this.setState({ currentUser: result.user });
+        console.log(user);
+        console.log(token);
+      })
+      .catch(function(error) {
+        // Handle Errors here.
+        var errorCode = error.code;
+        var errorMessage = error.message;
+        console.error(errorMessage);
+      });
   }
   componentDidUpdate(prevProps) {
-    if (
-      prevProps.location.pathname != this.props.location.pathname ||
-      prevProps.location.search != this.props.location.search
-    ) {
+    if (prevProps.location.pathname != this.props.location.pathname) {
       this.loadSubmissions();
     }
   }
-  togglePause() {
-    window.paused = !this.state.paused;
-    this.setState({ paused: !this.state.paused });
-  }
-
-  setSize(event, size) {
-    event.preventDefault();
-    this.setState({
-      size
-    });
-  }
 
   loadSubmissions() {
-    let { location } = this.props;
-    if (location.search.startsWith("?title=")) {
-      // to load deep urls with a search query.
-      this.setState({ search: this.props.location.search.slice(7) });
-    }
-    let param = "";
-
-    if (location.pathname.startsWith("/browse/top/")) {
-      param = "?q=score";
-    }
-    if (location.pathname.startsWith("/browse/top/day")) {
-      param = "?q=score&d=1";
-    }
-    if (location.pathname.startsWith("/browse/top/week")) {
-      param = "?q=score&d=7";
-    }
-    if (location.pathname.startsWith("/browse/top/month")) {
-      param = "?q=score&d=30";
-    }
-    if (location.pathname.startsWith("/browse/search/")) {
-      param = location.search;
-    }
-
     this.setState({ submissions: null });
-    fetch(functions._url("api/creations") + param, {
+    fetch(functions._url("api/reports"), {
       method: "GET",
       headers: {
         "Content-Type": "application/json"
@@ -171,88 +167,40 @@ class Browse extends React.Component {
         console.error("Error:", error);
       });
   }
-
-  voteFromBrowse(submission) {
-    // creations/:id/vote
-    fetch(functions._url(`api/creations/${submission.id}/vote`), {
+  judge(id, ruling) {
+    fetch(functions._url(`api/creations/${id}/judge`) + `?ruling=${ruling}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
       }
     })
       .then(res => res.json())
-      .then(data => {
-        this.setState(({ browseVotes }) => ({
-          browseVotes: { [submission.id]: data.score, ...browseVotes }
-        }));
-      })
+      .then(data => {})
       .catch(e => {
         console.log(e);
       });
   }
-  report(id) {
-    fetch(functions._url(`api/creations/${id}/report`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        // this.setState(({ browseVotes }) => ({
-        //   browseVotes: { [submission.id]: data.score, ...browseVotes }
-        // }));
-      })
-      .catch(e => {
-        console.log(e);
-      });
+  doSignInWithGoogle() {
+    var provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithRedirect(provider);
   }
   render() {
-    const { search, submissions, browseVotes } = this.state;
+    const { submissions, browseVotes } = this.state;
     return (
       <React.Fragment>
-        <NavLink exact to="/browse/">
-          <button>New</button>
-        </NavLink>
-        <NavLink to="/browse/top/day/">
-          <button>Day</button>
-        </NavLink>
-        <NavLink to="/browse/top/week/">
-          <button>Week</button>
-        </NavLink>
-        <NavLink to="/browse/top/month/">
-          <button>Month</button>
-        </NavLink>
-        <NavLink exact to="/browse/top/">
-          <button>All </button>
-        </NavLink>
-        <span style={{ display: "inline-block" }}>
-          <input
-            value={search}
-            onChange={e => this.setState({ search: e.target.value })}
-            onKeyDown={e =>
-              e.keyCode == 13 &&
-              this.props.history.push(`/browse/search/?title=${search}`)
-            }
-            placeholder="search"
-          />
-          {search && (
-            <NavLink
-              to={{
-                pathname: "/browse/search/",
-                search: `?title=${search}`
-              }}
-            >
-              <button>Search</button>
-            </NavLink>
-          )}
-        </span>
+        <h2 style={{ display: "inline-block" }}>do it for doona </h2>
+        {this.currentUser ? (
+          currentUser.email
+        ) : (
+          <button onClick={this.doSignInWithGoogle}>Sign in</button>
+        )}
+        {submissions && <h3>{submissions.length} actionable reports:</h3>}
 
         <Submissions
           submissions={submissions}
           voteFromBrowse={submission => this.voteFromBrowse(submission)}
           browseVotes={browseVotes}
-          report={id => this.report(id)}
+          judge={(id, ruling) => this.judge(id, ruling)}
         />
       </React.Fragment>
     );

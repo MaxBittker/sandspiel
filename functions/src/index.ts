@@ -221,6 +221,37 @@ app.get("/creations", async (req: express.Request, res) => {
   }
 });
 
+// GET /api/reports
+// Get all actionable reports,
+app.get("/reports", async (req: express.Request, res) => {
+  try {
+    const browse: pg.QueryResult = await pgPool.query(`
+      SELECT C.ID, c.data_id, c.title, c.timestamp, c.score, COUNT(R.id) as reportcount
+      FROM creations AS C
+      RIGHT JOIN reports AS R ON R.id = C.ID
+      GROUP BY C.ID
+      ORDER BY reportcount DESC
+      LIMIT 500`);
+    const creations = browse.rows.map(row => {
+      return {
+        id: row.id,
+        data: {
+          id: row.data_id,
+          title: row.title,
+          score: row.score,
+          timestamp: row.timestamp,
+          reports: row.reportcount
+        }
+      };
+    });
+
+    res.status(200).json(creations);
+  } catch (error) {
+    console.error("Error getting reports", error.message);
+    res.sendStatus(500);
+  }
+});
+
 // GET /api/creations/{id}
 // Get details about a message
 app.get("/creations/:id", async (req, res) => {
