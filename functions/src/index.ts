@@ -3,6 +3,7 @@ import * as functions from "firebase-functions";
 import * as c from "cors";
 import * as Twit from "twit";
 import * as wordfilter from "wordfilter";
+import * as cookieParser from "cookie-parser";
 import * as pg from "pg";
 
 const connectionName = functions.config().pg.connection_name;
@@ -81,6 +82,7 @@ import * as express from "express";
 
 const app = express();
 app.use(cors);
+app.use(cookieParser());
 
 // POST /api/creations
 // Create a new creation, and upload two image
@@ -187,16 +189,27 @@ app.get("/creations", async (req: express.Request, res) => {
       );
     } else if (d) {
       browse = await pgPool.query(
-        `SELECT *  FROM creations
-         WHERE timestamp > NOW() - INTERVAL '${parseInt(d, 10)} days'
+        `SELECT * 
+        FROM creations c
+        WHERE timestamp > NOW() - INTERVAL '${parseInt(d, 10)} days'
+        AND NOT EXISTS(
+          SELECT
+          FROM rulings as r
+          WHERE r.id = c.id and r.bad = 'yes'
+        )
          ORDER BY score DESC
          LIMIT 500`
       );
     } else {
       browse = await pgPool.query(
-        `SELECT *  FROM creations  order by ${
-          q === "score" ? "score" : "timestamp"
-        } desc LIMIT 500`
+        `SELECT *  
+        FROM creations c 
+        WHERE NOT EXISTS(
+          SELECT
+          FROM rulings as r
+          WHERE r.id = c.id and r.bad = 'yes'
+        )
+        ORDER BY ${q === "score" ? "score" : "timestamp"} desc LIMIT 500`
       );
     }
     const creations = browse.rows.map(row => {
@@ -226,11 +239,22 @@ app.get("/creations", async (req: express.Request, res) => {
 app.get("/reports", async (req: express.Request, res) => {
   try {
     const browse: pg.QueryResult = await pgPool.query(`
-      SELECT C.ID, c.data_id, c.title, c.timestamp, c.score, COUNT(R.id) as reportcount
-      FROM creations AS C
-      RIGHT JOIN reports AS R ON R.id = C.ID
-      GROUP BY C.ID
-      ORDER BY reportcount DESC
+      SELECT
+          C.ID,
+          c.data_id,
+          c.title,
+          c.timestamp,
+          c.score,
+          COUNT(R.id) AS reportcount
+      FROM
+          creations AS C
+          RIGHT JOIN reports AS R ON R.id = C.ID
+          LEFT JOIN rulings AS J ON J.id = C.ID
+      WHERE j.id is NULL
+      GROUP BY
+          C.ID
+      ORDER BY
+          reportcount DESC
       LIMIT 500`);
     const creations = browse.rows.map(row => {
       return {
@@ -352,6 +376,80 @@ app.put("/creations/:id/report", async (req, res) => {
     res.status(200).json({ result: "success" });
   } catch (error) {
     console.error("Error reporting post", id, error.message);
+  }
+});
+
+const validateFirebaseIdToken = async (req, res, next) => {
+  console.log("Check if request is authorized with Firebase ID token");
+
+  if (
+    (!req.headers.authorization ||
+      !req.headers.authorization.startsWith("Bearer ")) &&
+    !(req.cookies && req.cookies.__session)
+  ) {
+    console.error(
+      "No Firebase ID token was passed as a Bearer token in the Authorization header.",
+      "Make sure you authorize your request by providing the following HTTP header:",
+      "Authorization: Bearer <Firebase ID Token>",
+      'or by passing a "__session" cookie.'
+    );
+    res.status(403).send("Unauthorized");
+    return;
+  }
+
+  let idToken;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer ")
+  ) {
+    console.log('Found "Authorization" header');
+    // Read the ID Token from the Authorization header.
+    idToken = req.headers.authorization.split("Bearer ")[1];
+  } else if (req.cookies) {
+    console.log('Found "__session" cookie');
+    // Read the ID Token from cookie.
+    idToken = req.cookies.__session;
+  } else {
+    // No cookie
+    res.status(403).send("Unauthorized");
+    return;
+  }
+
+  try {
+    const decodedIdToken = await admin.auth().verifyIdToken(idToken);
+    console.log("ID Token correctly decoded", decodedIdToken);
+    req.user = decodedIdToken;
+    next();
+    return;
+  } catch (error) {
+    console.error("Error while verifying Firebase ID token:", error);
+    res.status(403).send("Unauthorized");
+    return;
+  }
+};
+
+app.put("/creations/:id/judge", validateFirebaseIdToken, async (req, res) => {
+  const id = req.params.id;
+  // const ip = req.header("x-appengine-user-ip");
+  const { ruling } = req.query;
+  const admins = ["maxbittker@gmail.com"];
+  const { email } = req["user"];
+  if (!admins.includes(email)) {
+    res.status(403).send("Not Admin");
+  }
+  // res.status(200).json({ result: "success", ruling, user: req["user"].email });
+  try {
+    const values = [id, ruling];
+
+    const insert = "INSERT INTO rulings(id, bad) VALUES($1, $2)";
+    try {
+      await pgPool.query(insert, values);
+    } catch (err) {
+      console.error(err.stack);
+    }
+    res.status(200).json({ result: "success" });
+  } catch (error) {
+    console.error("Error making ruling post", id, error.message);
   }
 });
 

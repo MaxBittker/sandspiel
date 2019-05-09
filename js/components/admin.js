@@ -21,7 +21,7 @@ class Submissions extends React.Component {
     );
   }
   render() {
-    let { submissions, voteFromBrowse, browseVotes, report } = this.props;
+    let { submissions, voteFromBrowse, browseVotes, judge } = this.props;
 
     if (!submissions) {
       return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
@@ -85,14 +85,14 @@ class Submissions extends React.Component {
                   <button
                     className="delete"
                     title="delete"
-                    onClick={() => report(submission.id)}
+                    onClick={() => judge(submission.id, true)}
                   >
                     delete 💥
                   </button>
                   <button
                     className="pardon"
                     title="pardon"
-                    onClick={() => report(submission.id)}
+                    onClick={() => judge(submission.id, false)}
                   >
                     pardon 🐣
                   </button>
@@ -118,6 +118,11 @@ class Browse extends React.Component {
     };
   }
   componentWillMount() {
+    firebase.auth().onAuthStateChanged(user => {
+      if (user) {
+        this.setState({ currentUser: user });
+      }
+    });
     console.log("mounted");
     this.loadSubmissions();
 
@@ -132,7 +137,7 @@ class Browse extends React.Component {
         }
         // The signed-in user info.
         var user = result.user;
-        this.setState({ currentUser: result.user });
+        this.setState({ currentUser: user });
         console.log(user);
         console.log(token);
       })
@@ -147,6 +152,25 @@ class Browse extends React.Component {
     if (prevProps.location.pathname != this.props.location.pathname) {
       this.loadSubmissions();
     }
+  }
+
+  voteFromBrowse(submission) {
+    // creations/:id/vote
+    fetch(functions._url(`api/creations/${submission.id}/vote`), {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    })
+      .then(res => res.json())
+      .then(data => {
+        this.setState(({ browseVotes }) => ({
+          browseVotes: { [submission.id]: data.score, ...browseVotes }
+        }));
+      })
+      .catch(e => {
+        console.log(e);
+      });
   }
 
   loadSubmissions() {
@@ -168,16 +192,26 @@ class Browse extends React.Component {
       });
   }
   judge(id, ruling) {
-    fetch(functions._url(`api/creations/${id}/judge`) + `?ruling=${ruling}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => res.json())
-      .then(data => {})
-      .catch(e => {
-        console.log(e);
+    firebase
+      .auth()
+      .currentUser.getIdToken(true)
+      .then(function(token) {
+        // set the __session cookie
+        fetch(
+          functions._url(`api/creations/${id}/judge`) + `?ruling=${ruling}`,
+          {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + token
+            }
+          }
+        )
+          .then(res => res.json())
+          .then(data => {})
+          .catch(e => {
+            console.log(e);
+          });
       });
   }
   doSignInWithGoogle() {
@@ -185,15 +219,25 @@ class Browse extends React.Component {
     firebase.auth().signInWithRedirect(provider);
   }
   render() {
-    const { submissions, browseVotes } = this.state;
+    const { submissions, browseVotes, currentUser } = this.state;
     return (
       <React.Fragment>
-        <h2 style={{ display: "inline-block" }}>do it for doona </h2>
-        {this.currentUser ? (
-          currentUser.email
+        {currentUser ? (
+          <div>
+            <img
+              style={{ height: "50px", width: "50px", borderRadius: 50 }}
+              src={currentUser.photoURL}
+            />
+            {currentUser.email}
+          </div>
         ) : (
-          <button onClick={this.doSignInWithGoogle}>Sign in</button>
+          <div>
+            <h1>Log in to moderate or the buttons won't work:</h1>
+            <button onClick={this.doSignInWithGoogle}>Sign in</button>
+          </div>
         )}
+        <h2 style={{ display: "inline-block" }}>do it for doona </h2>
+
         {submissions && <h3>{submissions.length} actionable reports:</h3>}
 
         <Submissions

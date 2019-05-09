@@ -17,6 +17,7 @@
     "@google-cloud/storage": "^2.5.0",
     "@types/pg": "^7.4.14",
     "@types/twit": "^2.2.21",
+    "cookie-parser": "^1.4.4",
     "cors": "^2.8.5",
     "express": "^4.16.4",
     "firebase": "^5.7.0",

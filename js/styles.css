@@ -214,8 +214,8 @@ img {
   position: absolute;
   right: 5px;
   bottom: 5px;
-  filter: grayscale(100%);
-  line-height: 29px;
+  /* filter: grayscale(100%); */
+  /* line-height: 29px; */
 }
 .report:active {
   color: red;

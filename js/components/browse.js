@@ -83,7 +83,7 @@ class Submissions extends React.Component {
                   title="report"
                   onClick={() => report(submission.id)}
                 >
-                  🏴
+                  !
                 </button>
               </div>
             </div>
