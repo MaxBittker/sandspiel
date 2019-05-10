@@ -70,10 +70,8 @@ class Submissions extends React.Component {
                   className="heart"
                   onClick={() => voteFromBrowse(submission)}
                 >
-                  <h3>
-                    {browseVotes[submission.id] ? "🖤" : "♡"}
-                    {browseVotes[submission.id] || submission.data.score}
-                  </h3>
+                  {browseVotes[submission.id] ? "🖤" : "♡"}
+                  {browseVotes[submission.id] || submission.data.score}
                 </button>
 
                 <h4>{displayTime}</h4>

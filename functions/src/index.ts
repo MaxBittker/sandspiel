@@ -5,6 +5,7 @@ import * as Twit from "twit";
 import * as wordfilter from "wordfilter";
 import * as cookieParser from "cookie-parser";
 import * as pg from "pg";
+import admins from "./admins";
 
 const connectionName = functions.config().pg.connection_name;
 const dbUser = functions.config().pg.user;
@@ -432,10 +433,10 @@ app.put("/creations/:id/judge", validateFirebaseIdToken, async (req, res) => {
   const id = req.params.id;
   // const ip = req.header("x-appengine-user-ip");
   const { ruling } = req.query;
-  const admins = ["maxbittker@gmail.com"];
   const { email } = req["user"];
   if (!admins.includes(email)) {
     res.status(403).send("Not Admin");
+    return;
   }
   // res.status(200).json({ result: "success", ruling, user: req["user"].email });
   try {

@@ -204,6 +204,7 @@ img {
   margin: 8px 8px 8px 16px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
 }
 .submission div h2 {
   display: inline-block;
@@ -223,7 +224,7 @@ img {
   transform: scale(1.5);
 }
 .heart {
-  display: inline-block;
+  display: block;
   background-color: transparent;
   border-color: transparent;
   flex-grow: 0;
@@ -231,14 +232,13 @@ img {
   text-align: left;
   padding: 0;
   margin: 0;
-  width: 40px;
+  font-size: 24px;
+  font-weight: bold;
 }
-
-.heart:active h3 {
+.heart:active {
   color: red;
   filter: none;
   transform: scale(1.5);
-  display: inline-block;
 }
 
 .submission .adminButtons {
