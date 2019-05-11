@@ -185,7 +185,7 @@ app.get("/creations", async (req: express.Request, res) => {
         `SELECT *  FROM creations
          WHERE LOWER(title) ~ $1
          ORDER BY score DESC,  timestamp DESC
-         LIMIT 500`,
+         LIMIT 300`,
         [title.toLowerCase()]
       );
     } else if (d) {
@@ -199,7 +199,7 @@ app.get("/creations", async (req: express.Request, res) => {
           WHERE r.id = c.id and r.bad = 'yes'
         )
          ORDER BY score DESC
-         LIMIT 500`
+         LIMIT 300`
       );
     } else {
       browse = await pgPool.query(
@@ -210,7 +210,7 @@ app.get("/creations", async (req: express.Request, res) => {
           FROM rulings as r
           WHERE r.id = c.id and r.bad = 'yes'
         )
-        ORDER BY ${q === "score" ? "score" : "timestamp"} desc LIMIT 500`
+        ORDER BY ${q === "score" ? "score" : "timestamp"} desc LIMIT 300`
       );
     }
     const creations = browse.rows.map(row => {
@@ -255,8 +255,8 @@ app.get("/reports", async (req: express.Request, res) => {
       GROUP BY
           C.ID
       ORDER BY
-          reportcount DESC
-      LIMIT 500`);
+          reportcount DESC, c.timestamp DESC
+      LIMIT 300`);
     const creations = browse.rows.map(row => {
       return {
         id: row.id,
@@ -467,7 +467,7 @@ app.get("/trending", async (req: express.Request, res) => {
                   SELECT REGEXP_MATCHES(LOWER(title), '#([^\\s.?!]+)', 'g') AS hashtag, id 
                   FROM (
                       SELECT * FROM creations
-                      ORDER BY timestamp DESC LIMIT 3000
+                      ORDER BY timestamp DESC LIMIT 1000
                   ) a
                   WHERE title LIKE '%#%'
               ) b 

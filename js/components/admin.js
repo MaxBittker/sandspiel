@@ -79,7 +79,7 @@ class Submissions extends React.Component {
                 </button>
 
                 <h4>{displayTime}</h4>
-                <h3>✋{submission.data.reports} reports</h3>
+                <h3>{submission.data.reports} reports</h3>
 
                 <div className="adminButtons">
                   <button
@@ -174,7 +174,7 @@ class Browse extends React.Component {
   }
 
   loadSubmissions() {
-    this.setState({ submissions: null });
+    // this.setState({ submissions: null });
     fetch(functions._url("api/reports"), {
       method: "GET",
       headers: {
@@ -192,10 +192,13 @@ class Browse extends React.Component {
       });
   }
   judge(id, ruling) {
+    this.setState(({ submissions }) => ({
+      submissions: submissions.filter(s => s.id != id)
+    }));
     firebase
       .auth()
       .currentUser.getIdToken(true)
-      .then(function(token) {
+      .then(token => {
         // set the __session cookie
         fetch(
           functions._url(`api/creations/${id}/judge`) + `?ruling=${ruling}`,
@@ -208,7 +211,9 @@ class Browse extends React.Component {
           }
         )
           .then(res => res.json())
-          .then(data => {})
+          .then(data => {
+            this.loadSubmissions();
+          })
           .catch(e => {
             console.log(e);
           });
@@ -239,7 +244,9 @@ class Browse extends React.Component {
         <h2 style={{ display: "inline-block" }}>do it for doona </h2>
 
         {submissions && <h3>{submissions.length} actionable reports:</h3>}
-
+        <NavLink to="/browse/">
+          <button>Browse new</button>
+        </NavLink>
         <Submissions
           submissions={submissions}
           voteFromBrowse={submission => this.voteFromBrowse(submission)}

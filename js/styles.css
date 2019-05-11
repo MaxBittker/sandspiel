@@ -206,6 +206,9 @@ img {
   flex-direction: column;
   align-items: flex-start;
 }
+.submission div h3 {
+  width: 100%;
+}
 .submission div h2 {
   display: inline-block;
   max-width: 50vw;
@@ -215,7 +218,8 @@ img {
   position: absolute;
   right: 5px;
   bottom: 5px;
-  /* filter: grayscale(100%); */
+  color: grey;
+  /* filter: graysca
   /* line-height: 29px; */
 }
 .report:active {
@@ -232,8 +236,8 @@ img {
   text-align: left;
   padding: 0;
   margin: 0;
-  font-size: 24px;
-  font-weight: bold;
+  font-size: 22px;
+  font-weight: bolder;
 }
 .heart:active {
   color: red;
