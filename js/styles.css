@@ -85,6 +85,7 @@ button.selected {
   color: whitesmoke;
   border-color: grey;
   fill: whitesmoke;
+  font-weight: bold;
 }
 
 .submission-title {

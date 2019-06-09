@@ -4,7 +4,7 @@ use SandApi;
 use Wind;
 use EMPTY_CELL;
 
-
+use std::cmp;
 use std::mem;
 use wasm_bindgen::prelude::*;
 // use web_sys::console;
@@ -18,6 +18,7 @@ pub enum Species {
     Wall = 1,
     Sand = 2,
     Water = 3,
+    // X = 21,
     Stone = 13,
     Ice = 9,
     Gas = 4,
@@ -61,12 +62,13 @@ impl Species {
             Species::Oil => update_oil(cell, api),
             Species::Fungus => update_fungus(cell, api),
             Species::Seed => update_seed(cell, api),
+            // Species::X => update_x(cell, api),
         }
     }
 }
 
 pub fn update_sand(cell: Cell, mut api: SandApi) {
-    let dx = rand_dir();
+    let dx = rand_dir_2();
 
     let nbr = api.get(0, 1);
     if nbr.species == Species::Empty {
@@ -168,23 +170,27 @@ pub fn update_water(cell: Cell, mut api: SandApi) {
     let below = api.get(0, 1);
     let dx1 = api.get(dx, 1);
     let dx0 = api.get(dx, 0);
-    if below.species == Species::Empty || below.species == Species::Oil {
+    if below.species == Species::Empty
+        || below.species == Species::Oil
+    {
         api.set(0, 0, below);
         api.set(0, 1, cell);
-    } else if dx1.species == Species::Empty || dx1.species == Species::Oil {
+    } else if dx1.species == Species::Empty
+        || dx1.species == Species::Oil
+    {
         api.set(0, 0, dx1);
         api.set(dx, 1, cell);
     } else if api.get(-dx, 1).species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
         api.set(-dx, 1, cell);
-    } else if dx0.species == Species::Empty || dx0.species == Species::Oil {
+    } else if dx0.species == Species::Empty
+        || dx0.species == Species::Oil
+    {
         api.set(0, 0, dx0);
         api.set(dx, 0, cell);
     } else if api.get(-dx, 0).species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
         api.set(-dx, 0, cell);
-    } else {
-        api.set(0, 0, cell);
     }
 }
 
@@ -317,6 +323,20 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
         );
     }
 }
+// pub fn update_x(cell: Cell, mut api: SandApi) {
+//     let (dx, dy) = rand_vec_8();
+
+//     let nbr = api.get(dx, dy);
+
+//     if nbr.species == Species::X {
+//         let opposite = api.get(-dx, -dy);
+//         if opposite.species == Species::Empty {
+//             api.set(0, 0, EMPTY_CELL);
+//             api.set(-dx, -dy, cell);
+//         }
+//     }
+// }
+
 
 pub fn update_cloner(cell: Cell, mut api: SandApi) {
     let mut clone_species = unsafe { mem::transmute(cell.rb as u8) };
@@ -545,7 +565,8 @@ pub fn update_lava(cell: Cell, mut api: SandApi) {
             },
         );
     }
-    if api.get(dx, dy).species == Species::Water {
+    let sample = api.get(dx, dy);
+    if sample.species == Species::Water {
         api.set(
             0,
             0,
@@ -624,7 +645,13 @@ pub fn update_wood(cell: Cell, mut api: SandApi) {
                     rb: 0,
                     clock: 0,
                 },
-            )
+            );
+            api.set_fluid(Wind {
+                dx: 0,
+                dy: 0,
+                pressure: 0,
+                density: 220,
+            });
         }
     } else if rb == 1 {
         api.set(

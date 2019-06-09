@@ -27,10 +27,6 @@ if (process.env.NODE_ENV === "production") {
 // and handle dropped or expired connections automatically.
 const pgPool: pg.Pool = new pg.Pool(pgConfig);
 
-wordfilter.removeWord("homo");
-wordfilter.removeWord("crazy");
-wordfilter.addWords(["rape"]);
-
 const T = new Twit({
   consumer_key: functions.config().twitter.consumer_key.key,
   consumer_secret: functions.config().twitter.consumer_secret,
@@ -164,9 +160,9 @@ app.post("/creations", async (req, res) => {
     }
 
     // post a tweet with media
-    const b64content = image.replace(/^data:image\/\w+;base64,/, "");
+    // const b64content = image.replace(/^data:image\/\w+;base64,/, "");
 
-    Tweet(b64content, trimmed_title, publicId);
+    // Tweet(b64content, trimmed_title, publicId);
   } catch (error) {
     console.error("Error saving message", error.message);
     res.sendStatus(500);
@@ -182,10 +178,15 @@ app.get("/creations", async (req: express.Request, res) => {
     let browse: pg.QueryResult;
     if (title) {
       browse = await pgPool.query(
-        `SELECT *  FROM creations
+        `SELECT *  FROM creations c
          WHERE LOWER(title) ~ $1
+         AND NOT EXISTS(
+          SELECT
+          FROM rulings as r
+          WHERE r.id = c.id and r.bad = 'yes'
+        )
          ORDER BY score DESC,  timestamp DESC
-         LIMIT 300`,
+         LIMIT 500`,
         [title.toLowerCase()]
       );
     } else if (d) {
@@ -484,6 +485,12 @@ app.get("/trending", async (req: express.Request, res) => {
     res.sendStatus(500);
   }
 });
+
+wordfilter.removeWord("homo");
+wordfilter.removeWord("crazy");
+wordfilter.removeWord("crip");
+wordfilter.removeWord("kraut");
+wordfilter.addWords(["rape"]);
 
 // Expose the API as a function
 exports.api = functions.https.onRequest(app);

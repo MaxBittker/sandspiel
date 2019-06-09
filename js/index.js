@@ -74,20 +74,27 @@ let resize = () => {
   let screen_height = window.innerHeight - uiheight;
 
   let canvasStyle = "";
+  let uiStyle = "";
   if (screen_width > screen_height) {
-    if (screen_width - window.innerHeight < 225) {
+    if (screen_width - window.innerHeight < 300) {
+      // landscape compressed
+
       canvasStyle = `height: ${window.innerHeight}px; margin:3px`;
-      ui.style = `width: ${screen_width -
+      uiStyle = `width: ${screen_width -
         window.innerHeight -
         12}px; margin: 2px;`;
     } else {
+      // landscape wide
       canvasStyle = `height: ${window.innerHeight}px`;
-      ui.style = `width: ${(screen_width - window.innerHeight) / 2 -
+      uiStyle = `width: ${(screen_width - window.innerHeight) / 2 -
         7}px; margin: 2px;`;
     }
   } else {
+    //portrait (mobile)
     canvasStyle = `width: ${screen_width}px; bottom:3px;`;
+    uiStyle = "";
   }
+  ui.style = uiStyle;
   canvas.style = canvasStyle;
   canvas2.style = canvasStyle;
 };

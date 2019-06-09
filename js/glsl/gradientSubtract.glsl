@@ -31,6 +31,11 @@ void main() {
   if (type == 1 || type == 5) {
     velocity = vec2(0.);
   }
+  if (type == 0 || type == 4 || type == 6) {
+
+  } else {
+    velocity = velocity * 0.95;
+  }
   // velocity = cell.rg * 100.;
   gl_FragColor = vec4(velocity, 0.0, 1.0);
 }

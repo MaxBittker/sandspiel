@@ -5,19 +5,29 @@ import { memory } from "../../crate/pkg/sandtable_bg";
 import { Species } from "../../crate/pkg/sandtable";
 
 import { height, universe, width, reset } from "../index.js";
-import { snapshot } from "../render.js";
+import { snapshot, pallette } from "../render.js";
 import { functions, storage } from "../api.js";
 
 import Menu from "./menu";
+import { cpus } from "os";
+
+window.species = Species;
+let pallette_data = pallette();
 
 const ElementButton = (name, selectedElement, setElement) => {
   let elementID = Species[name];
+
+  let color = pallette_data[elementID];
+  let selected = elementID == selectedElement;
   return (
     <button
-      className={elementID == selectedElement ? "selected" : ""}
+      className={selected ? "selected" : ""}
       key={name}
       onClick={() => {
         setElement(elementID);
+      }}
+      style={{
+        backgroundColor: selected ? color.replace("0.25", "1.5") : color
       }}
     >
       {"  "}

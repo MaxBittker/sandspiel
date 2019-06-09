@@ -112,6 +112,7 @@ class Browse extends React.Component {
     this.state = {
       paused: false,
       submissions: null,
+      decidedIds: [],
       browseVotes: {},
       search: "",
       currentUser: firebase.auth().currentUser
@@ -192,8 +193,8 @@ class Browse extends React.Component {
       });
   }
   judge(id, ruling) {
-    this.setState(({ submissions }) => ({
-      submissions: submissions.filter(s => s.id != id)
+    this.setState(({ decidedIds }) => ({
+      decidedIds: [...decidedIds, id]
     }));
     firebase
       .auth()
@@ -224,7 +225,11 @@ class Browse extends React.Component {
     firebase.auth().signInWithRedirect(provider);
   }
   render() {
-    const { submissions, browseVotes, currentUser } = this.state;
+    let { submissions, browseVotes, currentUser, decidedIds } = this.state;
+
+    submissions =
+      submissions &&
+      submissions.filter(submission => !decidedIds.includes(submission.id));
     return (
       <React.Fragment>
         {currentUser ? (

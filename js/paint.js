@@ -30,6 +30,7 @@ const sub = (a, b) => {
 let painting = false;
 let lastPaint = null;
 let repeat = null;
+
 canvas.addEventListener("mousedown", event => {
   event.preventDefault();
   universe.push_undo();
@@ -39,6 +40,7 @@ canvas.addEventListener("mousedown", event => {
   paint(event);
   lastPaint = event;
 });
+
 document.body.addEventListener("mouseup", event => {
   clearInterval(repeat);
   if (painting) {
@@ -47,14 +49,17 @@ document.body.addEventListener("mouseup", event => {
     painting = false;
   }
 });
+
 canvas.addEventListener("mousemove", event => {
   clearInterval(repeat);
   smoothPaint(event);
 });
+
 canvas.addEventListener("mouseleave", event => {
   clearInterval(repeat);
   lastPaint = null;
 });
+
 canvas.addEventListener("touchstart", event => {
   universe.push_undo();
   event.preventDefault();
@@ -62,12 +67,14 @@ canvas.addEventListener("touchstart", event => {
   lastPaint = event;
   handleTouches(event);
 });
+
 canvas.addEventListener("touchend", event => {
   event.preventDefault();
   lastPaint = null;
   painting = false;
   clearInterval(repeat);
 });
+
 canvas.addEventListener("touchmove", event => {
   if (!window.paused) {
     event.preventDefault();
@@ -75,6 +82,7 @@ canvas.addEventListener("touchmove", event => {
   clearInterval(repeat);
   handleTouches(event);
 });
+
 function smoothPaint(event) {
   clearInterval(repeat);
   repeat = window.setInterval(() => paint(event), 100);
@@ -86,11 +94,11 @@ function smoothPaint(event) {
   let i = 0;
   paint(startEvent);
   if (lastPaint) {
-    while (eventDistance(startEvent, lastPaint) > size / 2) {
+    while (eventDistance(startEvent, lastPaint) > size / 3) {
       let d = eventDistance(startEvent, lastPaint);
       startEvent = add(
         startEvent,
-        scale(norm(sub(lastPaint, event)), Math.min(size / 2, d))
+        scale(norm(sub(lastPaint, event)), Math.min(size / 3, d))
       );
       i++;
       if (i > 1000) {
@@ -99,7 +107,6 @@ function smoothPaint(event) {
       paint(startEvent);
     }
   }
-
   lastPaint = event;
 }
 

@@ -1,5 +1,7 @@
 const reglBuilder = require("regl");
 import { memory } from "../crate/pkg/sandtable_bg";
+import { Species } from "../crate/pkg/sandtable";
+import { Universe } from "../crate/pkg";
 
 let fsh = require("./glsl/sand.glsl");
 let vsh = require("./glsl/sandVertex.glsl");
@@ -54,7 +56,7 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   };
 };
 
-let snapshot = (universe, cb) => {
+let snapshot = universe => {
   let canvas = document.createElement("canvas");
   canvas.width = universe.width() / 2;
   canvas.height = universe.height() / 2;
@@ -64,4 +66,32 @@ let snapshot = (universe, cb) => {
   return canvas.toDataURL("image/png");
 };
 
-export { startWebGL, snapshot };
+let pallette = () => {
+  let canvas = document.createElement("canvas");
+
+  let species = Object.values(Species);
+  let range = Math.max(...species) + 1;
+  let universe = Universe.new(range, 1);
+  canvas.width = range;
+  canvas.height = 3;
+  universe.reset();
+
+  species.forEach(id => universe.paint(id, 0, 2, id));
+
+  let render = startWebGL({ universe, canvas, isSnapshot: true });
+  render();
+  let ctx = canvas.getContext("webgl");
+  let data = new Uint8Array(range * 4);
+  ctx.readPixels(0, 0, range, 1, ctx.RGBA, ctx.UNSIGNED_BYTE, data);
+  let colors = {};
+  species.forEach(id => {
+    let index = id * 4;
+    let color = `rgba(${data[index]},${data[index + 1]}, ${
+      data[index + 2]
+    }, 0.25)`;
+    colors[id] = color;
+  });
+  return colors;
+};
+
+export { startWebGL, snapshot, pallette };
