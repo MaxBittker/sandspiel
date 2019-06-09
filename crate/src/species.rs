@@ -716,23 +716,73 @@ pub fn update_ice(cell: Cell, mut api: SandApi) {
 pub fn update_plant(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
-    let mut i = rand_int(100);
-    let (dx, dy) = rand_vec();
-
-    let nbr_species = api.get(dx, dy).species;
-    if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
+    if rb == 0 {
+        //initialize
         api.set(
             0,
             0,
             Cell {
-                species: Species::Plant,
-                ra: cell.ra,
-                rb: 20,
-                clock: 0,
+                rb: 155 + rand_int(40) as u8,
+                ..cell
+            },
+        );
+        return;
+    }
+
+    let mut i = rand_int(11100);
+    let (dx, dy) = rand_vec_8();
+
+    let nbr = api.get(dx, dy);
+    let nbr_species = nbr.species;
+    if nbr_species == Species::Fire || nbr_species == Species::Lava {
+        // dry out
+        api.set(
+            0,
+            0,
+            Cell {
+                rb: rb.saturating_sub(20),
+                ..cell
             },
         );
     }
-    if nbr_species == Species::Wood {
+    if nbr_species == Species::Plant {
+        //diffuse water
+
+        let shared_rb = (rb / 2) + (nbr.rb / 2);
+        let cappilary_action = if rb > 120 && nbr.rb > 120 { dy * -2 } else { 0 };
+
+        //higher is faster
+        let diffusion_factor = 1.5;
+        let diffusion_factor_c = 1.0 - diffusion_factor;
+
+        let new_rb =
+            (((rb as f32) * diffusion_factor_c) + ((shared_rb as f32) * diffusion_factor)) as u8;
+        let new_nbr_rb = (((nbr.rb as f32) * diffusion_factor_c)
+            + ((shared_rb as f32) * diffusion_factor)) as u8;
+
+        let conservation = (nbr.rb + rb) - (new_nbr_rb + new_rb);
+        // let new_rb =cmp::min(
+        //             (((rb / 2) + (shared_rb / 2)) as i32).saturating_sub(cappilary_action),
+        //             255,
+        //         ) as u8;
+
+        // let new_nbr_rb = cmp::min(
+        //             (((nbr.rb / 2) + (shared_rb / 2)) as i32).saturating_add(cappilary_action),
+        //             255,
+        //         ) as u8,
+        api.set(
+            dx,
+            dy,
+            Cell {
+                rb: new_nbr_rb + conservation,
+                ..nbr
+            },
+        );
+        api.set(0, 0, Cell { rb: new_rb, ..cell });
+    }
+
+    if nbr_species == Species::Wood && rb > 70 {
+        //grow along wood
         let (dx, dy) = rand_vec();
 
         let drift = (i % 15) - 7;
@@ -744,14 +794,31 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
                 Cell {
                     species: Species::Plant,
                     ra: newra,
-                    rb: 0,
+                    rb: rb,
                     clock: 0,
                 },
             );
         }
     }
-    if rand_int(100) > 80
-        && (nbr_species == Species::Water
+    if nbr_species == Species::Water && rb < 240 {
+        //dampen
+        api.set(
+            0,
+            0,
+            Cell {
+                rb: rb.saturating_add(40),
+                ..cell
+            },
+        );
+        if rand_int(100) > 80 {
+            api.set(dx, dy, EMPTY_CELL);
+        }
+    }
+
+    //grow
+    if rand_int(100) > 95
+        && rb > 200
+        && (nbr_species == Species::Empty
             || nbr_species == Species::Fungus
                 && (api.get(-dx, dy).species == Species::Empty
                     || api.get(-dx, dy).species == Species::Water
@@ -765,20 +832,26 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
             dy,
             Cell {
                 ra: newra,
-                rb: 0,
+                rb: rb.saturating_sub(20),
                 ..cell
             },
         );
-        api.set(-dx, dy, EMPTY_CELL);
+        if api.get(-dx, dy).species != Species::Water {
+            api.set(-dx, dy, EMPTY_CELL);
+        }
     }
 
-    if rb > 1 {
+    if rb == 1 {
+        //burned away
+        api.set(0, 0, EMPTY_CELL);
+    } else if rb < 20 {
+        //burn
         api.set(
             0,
             0,
             Cell {
                 ra: cell.ra,
-                rb: rb - 1,
+                rb: rb.saturating_sub(1),
                 ..cell
             },
         );
@@ -794,30 +867,28 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
                     clock: 0,
                 },
             );
+            api.set_fluid(Wind {
+                dx: 0,
+                dy: 0,
+                pressure: 00,
+                density: 150,
+            });
+
         }
-        if nbr_species == Species::Water {
-            api.set(
-                0,
-                0,
-                Cell {
-                    ra: 50,
-                    rb: 0,
-                    ..cell
-                },
-            )
-        }
-    } else if rb == 1 {
-        api.set(0, 0, EMPTY_CELL);
+
     }
+
+    //drip
     let ra = cell.ra;
     if ra > 50
+        && rb > 60
         && api.get(1, 1).species != Species::Plant
         && api.get(-1, 1).species != Species::Plant
     {
         if api.get(0, 1).species == Species::Empty {
             let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
             let dec = rand_int(30) - 20;
-            if (i + ra as i32) > 165 {
+            if (i + ra as i32) > 175 {
                 api.set(
                     0,
                     1,
@@ -923,7 +994,7 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
                         Cell {
                             species: Species::Plant,
                             ra: 80 + (js_sys::Math::random() * 30.) as u8,
-                            rb: 0,
+                            rb: 180,
                             clock: 0,
                         },
                     )
