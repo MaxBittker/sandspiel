@@ -19,6 +19,21 @@ const ElementButton = (name, selectedElement, setElement) => {
 
   let color = pallette_data[elementID];
   let selected = elementID == selectedElement;
+
+  let background = "inherit";
+  if (elementID == 14) {
+    background = `linear-gradient(45deg, 
+    rgba(202, 121, 125, 0.25), 
+    rgba(169, 120, 200, 0.25), 
+    rgba(117, 118, 195, 0.25), 
+    rgba(117, 196, 193, 0.25), 
+    rgba(122, 203, 168, 0.25), 
+    rgba(185, 195, 117, 0.25), 
+    rgba(204, 186, 122, 0.25))`;
+    if (selected) {
+      background = background.replace(/0.25/g, "1.0");
+    }
+  }
   return (
     <button
       className={selected ? "selected" : ""}
@@ -27,6 +42,7 @@ const ElementButton = (name, selectedElement, setElement) => {
         setElement(elementID);
       }}
       style={{
+        background,
         backgroundColor: selected ? color.replace("0.25", "1.5") : color
       }}
     >
@@ -330,22 +346,6 @@ class Index extends React.Component {
             </button>
           ))}
         </span>
-
-        {Object.keys(Species).map(n =>
-          ElementButton(n, selectedElement, id =>
-            this.setState({ selectedElement: id })
-          )
-        )}
-        <button
-          className={-1 == selectedElement ? "selected" : ""}
-          key={name}
-          onClick={() => {
-            this.setState({ selectedElement: -1 });
-          }}
-        >
-          Wind
-        </button>
-
         <button
           onClick={() => {
             reset();
@@ -355,6 +355,20 @@ class Index extends React.Component {
         >
           ↜
         </button>
+        <button
+          className={-1 == selectedElement ? "selected" : ""}
+          key={name}
+          onClick={() => {
+            this.setState({ selectedElement: -1 });
+          }}
+        >
+          Wind
+        </button>
+        {Object.keys(Species).map(n =>
+          ElementButton(n, selectedElement, id =>
+            this.setState({ selectedElement: id })
+          )
+        )}
 
         {this.state.currentSubmission && (
           <div className="submission-title">

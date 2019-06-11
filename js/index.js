@@ -76,7 +76,7 @@ let resize = () => {
   let canvasStyle = "";
   let uiStyle = "";
   if (screen_width > screen_height) {
-    if (screen_width - window.innerHeight < 300) {
+    if (screen_width - window.innerHeight < 400) {
       // landscape compressed
 
       canvasStyle = `height: ${window.innerHeight}px; margin:3px`;
@@ -100,9 +100,8 @@ let resize = () => {
 };
 
 resize();
-window.addEventListener("resize", () => {
-  resize();
-});
+window.addEventListener("deviceorientation", resize, true);
+window.addEventListener("resize", resize);
 
 let fluid = startFluid({ universe });
 
