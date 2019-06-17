@@ -5,6 +5,7 @@ import timeago from "timeago.js";
 
 import HyperText from "./hypertext.js";
 import { functions, storage } from "../api.js";
+import SignInScreen from "./signin.js";
 
 const ago = timeago();
 
@@ -209,6 +210,7 @@ class Browse extends React.Component {
     const { search, submissions, browseVotes } = this.state;
     return (
       <React.Fragment>
+        <SignInScreen />
         <NavLink exact to="/browse/">
           <button>New</button>
         </NavLink>
@@ -229,7 +231,7 @@ class Browse extends React.Component {
             value={search}
             onChange={e => this.setState({ search: e.target.value })}
             onKeyDown={e =>
-              e.keyCode == 13 &&
+              e.keyCode == 13 && // I think that's enter
               this.props.history.push(`/browse/search/?title=${search}`)
             }
             placeholder="search"

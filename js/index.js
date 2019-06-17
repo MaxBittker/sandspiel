@@ -1,3 +1,4 @@
+import "./api";
 import { Universe } from "../crate/pkg";
 
 import { startWebGL } from "./render";

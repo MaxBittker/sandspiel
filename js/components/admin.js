@@ -4,6 +4,7 @@ import { NavLink, Link, withRouter } from "react-router-dom";
 import timeago from "timeago.js";
 
 import HyperText from "./hypertext.js";
+import SignInScreen from "./signin";
 import { functions, storage } from "../api.js";
 
 const ago = timeago();
@@ -106,7 +107,7 @@ class Submissions extends React.Component {
   }
 }
 
-class Browse extends React.Component {
+class AdminBrowse extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -119,35 +120,7 @@ class Browse extends React.Component {
     };
   }
   componentWillMount() {
-    firebase.auth().onAuthStateChanged(user => {
-      if (user) {
-        this.setState({ currentUser: user });
-      }
-    });
-    console.log("mounted");
     this.loadSubmissions();
-
-    firebase
-      .auth()
-      .getRedirectResult()
-      .then(result => {
-        if (result.credential) {
-          // This gives you a Google Access Token. You can use it to access the Google API.
-          var token = result.credential.accessToken;
-          // ...
-        }
-        // The signed-in user info.
-        var user = result.user;
-        this.setState({ currentUser: user });
-        console.log(user);
-        console.log(token);
-      })
-      .catch(function(error) {
-        // Handle Errors here.
-        var errorCode = error.code;
-        var errorMessage = error.message;
-        console.error(errorMessage);
-      });
   }
   componentDidUpdate(prevProps) {
     if (prevProps.location.pathname != this.props.location.pathname) {
@@ -232,20 +205,7 @@ class Browse extends React.Component {
       submissions.filter(submission => !decidedIds.includes(submission.id));
     return (
       <React.Fragment>
-        {currentUser ? (
-          <div>
-            <img
-              style={{ height: "50px", width: "50px", borderRadius: 50 }}
-              src={currentUser.photoURL}
-            />
-            {currentUser.email}
-          </div>
-        ) : (
-          <div>
-            <h1>Log in to moderate or the buttons won't work:</h1>
-            <button onClick={this.doSignInWithGoogle}>Sign in</button>
-          </div>
-        )}
+        <SignInScreen />
         <h2 style={{ display: "inline-block" }}>do it for doona </h2>
 
         {submissions && <h3>{submissions.length} actionable reports:</h3>}
@@ -263,4 +223,4 @@ class Browse extends React.Component {
   }
 }
 
-export default withRouter(Browse);
+export default withRouter(AdminBrowse);

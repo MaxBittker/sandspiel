@@ -7,6 +7,7 @@ import { Index } from "./components/ui";
 import Browse from "./components/browse";
 import Admin from "./components/admin";
 import Menu from "./components/menu";
+import SignInScreen from "./components/signin";
 
 let sizeMap = [2, 5, 10, 18, 30, 45];
 
@@ -26,6 +27,14 @@ function AdminRouter({ match, location }) {
   );
 }
 
+function SigninRouter({ match, location }) {
+  return (
+    <Menu>
+      <SignInScreen location={location} />
+    </Menu>
+  );
+}
+
 function AppRouter() {
   return (
     <Router>
@@ -41,6 +50,7 @@ function AppRouter() {
       />
       <Route path="/browse" component={BrowseRouter} />
       <Route path="/admin" component={AdminRouter} />
+      <Route path="/login" component={SigninRouter} />
     </Router>
   );
 }

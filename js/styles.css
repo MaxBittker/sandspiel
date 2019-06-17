@@ -63,7 +63,7 @@ button {
   border: 2px solid whitesmoke;
   border-color: gainsboro;
   flex-grow: 1;
-  max-width: 200px;
+  max-width: 150px;
   fill: black;
   line-height: 0px;
   cursor: pointer;

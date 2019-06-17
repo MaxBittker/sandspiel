@@ -849,7 +849,7 @@ function startFluid({ universe }) {
     gl.uniform3f(splatProgram.uniforms.color, dx, -dy, 1.0);
     gl.uniform1f(
       splatProgram.uniforms.radius,
-      (window.UI.state.size + 1) / 700
+      (window.UI.state.size + 1) / 600
     );
     blit(velocity.write[1]);
     velocity.swap();
@@ -886,6 +886,7 @@ function startFluid({ universe }) {
   };
   resize();
   window.addEventListener("resize", resize);
+  window.addEventListener("deviceorientation", resize, true);
 
   sandCanvas.addEventListener("mousemove", e => {
     const canvasLeft = (e.clientX - boundingRect.left) * scaleX;
