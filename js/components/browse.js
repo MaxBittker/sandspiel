@@ -173,20 +173,26 @@ class Browse extends React.Component {
 
   voteFromBrowse(submission) {
     // creations/:id/vote
-    fetch(functions._url(`api/creations/${submission.id}/vote`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        this.setState(({ browseVotes }) => ({
-          browseVotes: { [submission.id]: data.score, ...browseVotes }
-        }));
-      })
-      .catch(e => {
-        console.log(e);
+    firebase
+      .auth()
+      .currentUser.getIdToken(true)
+      .then(token => {
+        fetch(functions._url(`api/creations/${submission.id}/vote`), {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+            this.setState(({ browseVotes }) => ({
+              browseVotes: { [submission.id]: data.score, ...browseVotes }
+            }));
+          })
+          .catch(e => {
+            console.log(e);
+          });
       });
   }
   report(id) {

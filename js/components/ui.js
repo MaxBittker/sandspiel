@@ -270,21 +270,29 @@ class Index extends React.Component {
     let { currentSubmission } = this.state;
     let { id } = currentSubmission;
     // creations/:id/vote
-    fetch(functions._url(`api/creations/${id}/vote`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json"
-      }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (currentSubmission != null) {
-          console.log(data);
-          this.setState({ currentSubmission: { ...currentSubmission, data } });
-        }
-      })
-      .catch(e => {
-        console.log(e);
+    firebase
+      .auth()
+      .currentUser.getIdToken(true)
+      .then(token => {
+        fetch(functions._url(`api/creations/${id}/vote`), {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (currentSubmission != null) {
+              console.log(data);
+              this.setState({
+                currentSubmission: { ...currentSubmission, data }
+              });
+            }
+          })
+          .catch(e => {
+            console.log(e);
+          });
       });
   }
 

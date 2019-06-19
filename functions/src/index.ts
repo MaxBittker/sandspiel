@@ -81,6 +81,55 @@ const app = express();
 app.use(cors);
 app.use(cookieParser());
 
+const validateFirebaseIdToken = async (req, res, next) => {
+  console.log("Check if request is authorized with Firebase ID token");
+
+  if (
+    (!req.headers.authorization ||
+      !req.headers.authorization.startsWith("Bearer ")) &&
+    !(req.cookies && req.cookies.__session)
+  ) {
+    console.error(
+      "No Firebase ID token was passed as a Bearer token in the Authorization header.",
+      "Make sure you authorize your request by providing the following HTTP header:",
+      "Authorization: Bearer <Firebase ID Token>",
+      'or by passing a "__session" cookie.'
+    );
+    res.status(403).send("Unauthorized");
+    return;
+  }
+
+  let idToken;
+  if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("Bearer ")
+  ) {
+    console.log('Found "Authorization" header');
+    // Read the ID Token from the Authorization header.
+    idToken = req.headers.authorization.split("Bearer ")[1];
+  } else if (req.cookies) {
+    console.log('Found "__session" cookie');
+    // Read the ID Token from cookie.
+    idToken = req.cookies.__session;
+  } else {
+    // No cookie
+    res.status(403).send("Unauthorized");
+    return;
+  }
+
+  try {
+    const decodedIdToken = await admin.auth().verifyIdToken(idToken);
+    console.log("ID Token correctly decoded", decodedIdToken);
+    req.user = decodedIdToken;
+    next();
+    return;
+  } catch (error) {
+    console.error("Error while verifying Firebase ID token:", error);
+    res.status(403).send("Unauthorized");
+    return;
+  }
+};
+
 // POST /api/creations
 // Create a new creation, and upload two image
 app.post("/creations", async (req, res) => {
@@ -302,16 +351,18 @@ app.get("/creations/:id", async (req, res) => {
   }
 });
 
-app.put("/creations/:id/vote", async (req, res) => {
+app.put("/creations/:id/vote", validateFirebaseIdToken, async (req, res) => {
   const id = req.params.id;
-  const ip = req.header("x-appengine-user-ip");
+  // const ip = req.header("x-appengine-user-ip");
+
+  const { uid } = req["user"];
 
   try {
-    const values = [id, ip];
+    const values = [id, uid];
 
     try {
       const exists = await pgPool.query(
-        "SELECT exists( SELECT 1 FROM votes WHERE id = $1 AND ip = $2 )",
+        "SELECT exists( SELECT 1 FROM votes WHERE id = $1 AND uid = $2 )",
         values
       );
 
@@ -325,7 +376,7 @@ app.put("/creations/:id/vote", async (req, res) => {
       return;
     }
 
-    const insert = "INSERT INTO votes(id, ip) VALUES($1, $2)";
+    const insert = "INSERT INTO votes(id, uid) VALUES($1, $2)";
     try {
       await pgPool.query(insert, values);
     } catch (err) {
@@ -380,55 +431,6 @@ app.put("/creations/:id/report", async (req, res) => {
     console.error("Error reporting post", id, error.message);
   }
 });
-
-const validateFirebaseIdToken = async (req, res, next) => {
-  console.log("Check if request is authorized with Firebase ID token");
-
-  if (
-    (!req.headers.authorization ||
-      !req.headers.authorization.startsWith("Bearer ")) &&
-    !(req.cookies && req.cookies.__session)
-  ) {
-    console.error(
-      "No Firebase ID token was passed as a Bearer token in the Authorization header.",
-      "Make sure you authorize your request by providing the following HTTP header:",
-      "Authorization: Bearer <Firebase ID Token>",
-      'or by passing a "__session" cookie.'
-    );
-    res.status(403).send("Unauthorized");
-    return;
-  }
-
-  let idToken;
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith("Bearer ")
-  ) {
-    console.log('Found "Authorization" header');
-    // Read the ID Token from the Authorization header.
-    idToken = req.headers.authorization.split("Bearer ")[1];
-  } else if (req.cookies) {
-    console.log('Found "__session" cookie');
-    // Read the ID Token from cookie.
-    idToken = req.cookies.__session;
-  } else {
-    // No cookie
-    res.status(403).send("Unauthorized");
-    return;
-  }
-
-  try {
-    const decodedIdToken = await admin.auth().verifyIdToken(idToken);
-    console.log("ID Token correctly decoded", decodedIdToken);
-    req.user = decodedIdToken;
-    next();
-    return;
-  } catch (error) {
-    console.error("Error while verifying Firebase ID token:", error);
-    res.status(403).send("Unauthorized");
-    return;
-  }
-};
 
 app.put("/creations/:id/judge", validateFirebaseIdToken, async (req, res) => {
   const id = req.params.id;

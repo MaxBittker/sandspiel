@@ -14,10 +14,10 @@ CREATE INDEX ON creations (id);
 
 CREATE TABLE votes (
     id char(20),
-    ip inet NOT NULL
+    uid text
 );
 
-CREATE UNIQUE INDEX ON votes (id, ip);
+CREATE UNIQUE INDEX ON votes (id, uid);
 
 
 CREATE TABLE reports (
