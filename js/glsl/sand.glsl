@@ -83,12 +83,7 @@ void main() {
     lightness = 1.0;
   } else if (type == 11) { // plant
     hue = 0.4;
-    lightness = 0.9 - (data.b + data.g) * 0.2;
-
-    // hue = -0.10 + (data.b * 0.5);
-    // lightness = 0.3 + ((1.0 - data.b) + data.g) * 0.25;
-
-    saturation = 0.27 + data.b * 0.35;
+    saturation = 0.4;
   } else if (type == 12) { // acid
     hue = 0.18;
     saturation = 0.9;
