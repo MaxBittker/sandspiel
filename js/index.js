@@ -63,7 +63,9 @@ canvas.width = n * window.devicePixelRatio;
 
 document.getElementById("background").addEventListener("touchmove", e => {
   if (!window.paused) {
-    e.preventDefault();
+    if (e.cancelable) {
+      e.preventDefault();
+    }
   }
 });
 

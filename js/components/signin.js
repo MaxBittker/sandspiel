@@ -5,7 +5,8 @@ import StyledFirebaseAuth from "react-firebaseui/StyledFirebaseAuth";
 class SignInScreen extends React.Component {
   // The component's Local state.
   state = {
-    isSignedIn: false // Local signed-in state.
+    isSignedIn: false, // Local signed-in state.
+    expanded: false
   };
 
   // Configure FirebaseUI.
@@ -15,6 +16,7 @@ class SignInScreen extends React.Component {
     // We will display Google and email as auth providers.
     signInOptions: [
       firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+      firebase.auth.GithubAuthProvider.PROVIDER_ID,
       {
         provider: firebase.auth.EmailAuthProvider.PROVIDER_ID,
         requireDisplayName: false
@@ -41,15 +43,27 @@ class SignInScreen extends React.Component {
 
   render() {
     if (!this.state.isSignedIn) {
-      return (
-        <div>
-          <p>Please sign-in to vote:</p>
-          <StyledFirebaseAuth
-            uiConfig={this.uiConfig}
-            firebaseAuth={firebase.auth()}
-          />
-        </div>
-      );
+      if (this.state.expanded) {
+        return (
+          <div>
+            <p>Sign-in to vote:</p>
+            <StyledFirebaseAuth
+              uiConfig={this.uiConfig}
+              firebaseAuth={firebase.auth()}
+            />
+          </div>
+        );
+      } else {
+        return (
+          <p>
+            Please{" "}
+            <button onClick={() => this.setState({ expanded: true })}>
+              Sign in
+            </button>{" "}
+            to vote!{" "}
+          </p>
+        );
+      }
     }
     let { currentUser } = firebase.auth();
     return (

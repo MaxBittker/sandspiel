@@ -62,14 +62,18 @@ canvas.addEventListener("mouseleave", event => {
 
 canvas.addEventListener("touchstart", event => {
   universe.push_undo();
-  event.preventDefault();
+  if (event.cancelable) {
+    event.preventDefault();
+  }
   painting = true;
   lastPaint = event;
   handleTouches(event);
 });
 
 canvas.addEventListener("touchend", event => {
-  event.preventDefault();
+  if (event.cancelable) {
+    event.preventDefault();
+  }
   lastPaint = null;
   painting = false;
   clearInterval(repeat);
@@ -77,7 +81,9 @@ canvas.addEventListener("touchend", event => {
 
 canvas.addEventListener("touchmove", event => {
   if (!window.paused) {
-    event.preventDefault();
+    if (event.cancelable) {
+      event.preventDefault();
+    }
   }
   clearInterval(repeat);
   handleTouches(event);

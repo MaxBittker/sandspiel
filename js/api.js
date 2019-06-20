@@ -10,7 +10,7 @@ window.firebase = firebase;
 firebase.initializeApp({
   apiKey: "AIzaSyD2APPEyxCi9vB2olvUgzSsbgH1Pyz-as0",
   storageBucket: "sandtable-8d0f7.appspot.com",
-  authDomain: "sandtable-8d0f7.firebaseapp.com",
+  authDomain: "sandspiel.club",
   projectId: "sandtable-8d0f7"
 });
 

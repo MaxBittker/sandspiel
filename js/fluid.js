@@ -902,7 +902,9 @@ function startFluid({ universe }) {
     "touchmove",
     e => {
       if (!window.paused) {
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
       }
       const touches = e.targetTouches;
       for (let i = 0; i < touches.length; i++) {
@@ -927,7 +929,9 @@ function startFluid({ universe }) {
   });
 
   sandCanvas.addEventListener("touchstart", e => {
-    e.preventDefault();
+    if (e.cancelable) {
+      e.preventDefault();
+    }
     const touches = e.targetTouches;
     for (let i = 0; i < touches.length; i++) {
       if (i >= pointers.length) pointers.push(new pointerPrototype());
