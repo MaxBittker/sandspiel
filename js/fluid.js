@@ -23,7 +23,6 @@
 import * as dat from "dat.gui";
 import { memory } from "../crate/pkg/sandtable_bg";
 import { compileShaders } from "./fluidShaders";
-import { ratio } from "./constants";
 const canvas = document.getElementById("fluid-canvas");
 const sandCanvas = document.getElementById("sand-canvas");
 
@@ -881,8 +880,14 @@ function startFluid({ universe }) {
 
   let resize = () => {
     boundingRect = sandCanvas.getBoundingClientRect();
-    scaleX = sandCanvas.width / window.devicePixelRatio / boundingRect.width;
-    scaleY = sandCanvas.height / window.devicePixelRatio / boundingRect.height;
+    scaleX =
+      sandCanvas.width /
+      Math.ceil(window.devicePixelRatio) /
+      boundingRect.width;
+    scaleY =
+      sandCanvas.height /
+      Math.ceil(window.devicePixelRatio) /
+      boundingRect.height;
   };
   resize();
   window.addEventListener("resize", resize);

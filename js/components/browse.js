@@ -175,7 +175,7 @@ class Browse extends React.Component {
     // creations/:id/vote
     firebase
       .auth()
-      .currentUser.getIdToken(true)
+      .currentUser.getIdToken()
       .then(token => {
         fetch(functions._url(`api/creations/${submission.id}/vote`), {
           method: "PUT",

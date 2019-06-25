@@ -7,11 +7,14 @@ import "firebase/storage";
 import "firebase/functions";
 
 window.firebase = firebase;
+
 firebase.initializeApp({
   apiKey: "AIzaSyD2APPEyxCi9vB2olvUgzSsbgH1Pyz-as0",
   storageBucket: "sandtable-8d0f7.appspot.com",
   authDomain: "sandspiel.club",
-  projectId: "sandtable-8d0f7"
+  projectId: "sandtable-8d0f7",
+  appId: "1:239719651525:web:80d3674408670521",
+  messagingSenderId: "239719651525"
 });
 
 const storage = firebase.storage();

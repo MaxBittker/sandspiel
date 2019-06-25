@@ -131,8 +131,10 @@ const paint = event => {
   }
   const boundingRect = canvas.getBoundingClientRect();
 
-  const scaleX = canvas.width / window.devicePixelRatio / boundingRect.width;
-  const scaleY = canvas.height / window.devicePixelRatio / boundingRect.height;
+  const scaleX =
+    canvas.width / Math.ceil(window.devicePixelRatio) / boundingRect.width;
+  const scaleY =
+    canvas.height / Math.ceil(window.devicePixelRatio) / boundingRect.height;
 
   const canvasLeft = (event.clientX - boundingRect.left) * scaleX;
   const canvasTop = (event.clientY - boundingRect.top) * scaleY;

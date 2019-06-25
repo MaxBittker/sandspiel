@@ -356,7 +356,10 @@ app.put("/creations/:id/vote", validateFirebaseIdToken, async (req, res) => {
   // const ip = req.header("x-appengine-user-ip");
 
   const { uid } = req["user"];
-
+  const user = await admin.auth().getUser(uid);
+  if (!user.emailVerified) {
+    res.sendStatus(301);
+  }
   try {
     const values = [id, uid];
 

@@ -9,7 +9,6 @@ import { snapshot, pallette } from "../render.js";
 import { functions, storage } from "../api.js";
 
 import Menu from "./menu";
-import { cpus } from "os";
 
 window.species = Species;
 let pallette_data = pallette();
@@ -272,7 +271,7 @@ class Index extends React.Component {
     // creations/:id/vote
     firebase
       .auth()
-      .currentUser.getIdToken(true)
+      .currentUser.getIdToken()
       .then(token => {
         fetch(functions._url(`api/creations/${id}/vote`), {
           method: "PUT",
@@ -390,7 +389,7 @@ class Index extends React.Component {
         {this.state.submissionMenuOpen && (
           <Menu close={() => this.closeMenu()}>
             <h4>Share your creation with the people!</h4>
-            <img src={this.state.data.dataURL} />
+            <img src={this.state.data.dataURL} className="submissionImg" />
             <div style={{ display: "flex" }}>
               <input
                 placeholder="title"

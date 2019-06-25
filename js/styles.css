@@ -141,8 +141,13 @@ button.selected {
   max-width: 900px;
   margin: auto;
 }
-.menu img {
+.submission img,
+.submissionImg {
   max-width: 80vh;
+  background-color: #f0e4e3;
+  width: calc(100% - 10px);
+  margin: 5px;
+  box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.2);
   /* margin: auto; */
 }
 
@@ -175,10 +180,6 @@ input {
   fill: black;
 }
 img {
-  background-color: #f0e4e3;
-  width: calc(100% - 10px);
-  margin: 5px;
-  box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.2);
 }
 
 @media only screen and (min-width: 700px) {

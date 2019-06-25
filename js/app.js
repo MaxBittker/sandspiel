@@ -51,6 +51,7 @@ function AppRouter() {
       <Route path="/browse" component={BrowseRouter} />
       <Route path="/admin" component={AdminRouter} />
       <Route path="/login" component={SigninRouter} />
+      <Route path="/__/auth/handler" component={SigninRouter} />
     </Router>
   );
 }

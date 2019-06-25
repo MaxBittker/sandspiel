@@ -6,7 +6,6 @@ import { fps } from "./fps";
 import {} from "./paint";
 import {} from "./app";
 import { startFluid } from "./fluid";
-import { ratio } from "./constants";
 
 if (window.safari) {
   history.pushState(null, null, location.href);
@@ -58,8 +57,8 @@ let height = n;
 const canvas = document.getElementById("sand-canvas");
 const canvas2 = document.getElementById("fluid-canvas");
 
-canvas.height = n * window.devicePixelRatio;
-canvas.width = n * window.devicePixelRatio;
+canvas.height = n * Math.ceil(window.devicePixelRatio);
+canvas.width = n * Math.ceil(window.devicePixelRatio);
 
 document.getElementById("background").addEventListener("touchmove", e => {
   if (!window.paused) {
@@ -132,4 +131,4 @@ function reset() {
   universe.reset();
 }
 window.u = universe;
-export { canvas, width, height, universe, ratio, reset };
+export { canvas, width, height, universe, reset };

@@ -6,7 +6,7 @@ class SignInScreen extends React.Component {
   // The component's Local state.
   state = {
     isSignedIn: false, // Local signed-in state.
-    expanded: false
+    expanded: true
   };
 
   // Configure FirebaseUI.
@@ -31,6 +31,8 @@ class SignInScreen extends React.Component {
 
   // Listen to the Firebase Auth state and set the local state.
   componentDidMount() {
+    this.setState({ isSignedIn: !!firebase.auth().currentUser });
+
     this.unregisterAuthObserver = firebase
       .auth()
       .onAuthStateChanged(user => this.setState({ isSignedIn: !!user }));
@@ -43,7 +45,26 @@ class SignInScreen extends React.Component {
 
   render() {
     if (!this.state.isSignedIn) {
-      if (this.state.expanded) {
+      if (!this.state.expanded) {
+        return (
+          <span>
+            <p>
+              Please{" "}
+              <button onClick={() => this.setState({ expanded: true })}>
+                Sign in
+              </button>{" "}
+              to vote!{" "}
+            </p>
+            <span style={{ display: "none" }}>
+              {/* gross hack for completing login */}
+              <StyledFirebaseAuth
+                uiConfig={this.uiConfig}
+                firebaseAuth={firebase.auth()}
+              />
+            </span>
+          </span>
+        );
+      } else {
         return (
           <div>
             <p>Sign-in to vote:</p>
@@ -53,19 +74,10 @@ class SignInScreen extends React.Component {
             />
           </div>
         );
-      } else {
-        return (
-          <p>
-            Please{" "}
-            <button onClick={() => this.setState({ expanded: true })}>
-              Sign in
-            </button>{" "}
-            to vote!{" "}
-          </p>
-        );
       }
     }
     let { currentUser } = firebase.auth();
+
     return (
       <div>
         <div style={{ display: "flex", alignItems: "center" }}>
@@ -73,6 +85,8 @@ class SignInScreen extends React.Component {
             style={{ height: "35px", width: "35px", borderRadius: 50 }}
             src={currentUser.photoURL}
           />
+          {!currentUser.emailVerified &&
+            `Please Verify your email ${currentUser.email} to vote!`}
           <button onClick={() => firebase.auth().signOut()}>Sign-out</button>
         </div>
       </div>
