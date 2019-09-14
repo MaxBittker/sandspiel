@@ -5,7 +5,7 @@ import * as Twit from "twit";
 import * as wordfilter from "wordfilter";
 import * as cookieParser from "cookie-parser";
 import * as pg from "pg";
-import admins from "./admins";
+import admins from "./admin";
 
 const connectionName = functions.config().pg.connection_name;
 const dbUser = functions.config().pg.user;
