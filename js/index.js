@@ -77,6 +77,7 @@ let resize = () => {
 
   let canvasStyle = "";
   let uiStyle = "";
+  let adStyle = "display:none;";
   if (screen_width > screen_height) {
     if (screen_width - window.innerHeight < 400) {
       // landscape compressed
@@ -87,9 +88,20 @@ let resize = () => {
         12}px; margin: 2px;`;
     } else {
       // landscape wide
-      canvasStyle = `height: ${window.innerHeight}px`;
-      uiStyle = `width: ${(screen_width - window.innerHeight) / 2 -
-        7}px; margin: 2px;`;
+      canvasStyle = `
+       height: ${window.innerHeight}px;
+       width:${window.innerHeight}px;
+       margin:0;
+       left: auto;
+       right: 206px`;
+
+      // uiStyle = `width: ${(screen_width - window.innerHeight) / 2 -
+      //   7}px; margin: 2px;`;
+      uiStyle = `width: 200px; margin: 2px;`;
+
+      adStyle = `width: ${screen_width -
+        window.innerHeight -
+        (206 + 150)}px; margin: 1px;`;
     }
   } else {
     //portrait (mobile)
@@ -99,6 +111,7 @@ let resize = () => {
   ui.style = uiStyle;
   canvas.style = canvasStyle;
   canvas2.style = canvasStyle;
+  document.getElementsByClassName("adslot_1")[0].style = adStyle;
 };
 
 resize();
