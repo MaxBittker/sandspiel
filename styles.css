@@ -63,7 +63,7 @@ button {
   border: 2px solid whitesmoke;
   border-color: gainsboro;
   flex-grow: 1;
-  max-width: 200px;
+  max-width: 150px;
   fill: black;
   line-height: 0px;
   cursor: pointer;
@@ -85,6 +85,9 @@ button.selected {
   color: whitesmoke;
   border-color: grey;
   fill: whitesmoke;
+  /* font-weight: bold; */
+  text-shadow: 1.6px 1.5px 0 grey, -1px -1px 0 grey, 1px -1px 0 grey,
+    -1px 1px 0 grey, 1px 1px 0 grey;
 }
 
 .submission-title {
@@ -138,8 +141,13 @@ button.selected {
   max-width: 900px;
   margin: auto;
 }
-.menu img {
+.submission img,
+.submissionImg {
   max-width: 80vh;
+  background-color: #f0e4e3;
+  width: calc(100% - 10px);
+  margin: 5px;
+  box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.2);
   /* margin: auto; */
 }
 
@@ -172,10 +180,6 @@ input {
   fill: black;
 }
 img {
-  background-color: #f0e4e3;
-  width: calc(100% - 10px);
-  margin: 5px;
-  box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.2);
 }
 
 @media only screen and (min-width: 700px) {
@@ -204,18 +208,61 @@ img {
   margin: 8px 8px 8px 16px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+}
+.submission div h3 {
+  width: 100%;
 }
 .submission div h2 {
   display: inline-block;
   max-width: 50vw;
 }
-.submission div button {
+
+.report {
   position: absolute;
   right: 5px;
   bottom: 5px;
+  color: grey;
+  /* filter: graysca
+  /* line-height: 29px; */
+}
+.report:active {
+  color: red;
+  filter: none;
+  transform: scale(1.5);
+}
+.heart {
+  display: block;
+  background-color: transparent;
+  border-color: transparent;
+  flex-grow: 0;
+  line-break: auto;
+  text-align: left;
+  padding: 0;
+  margin: 0;
+  font-size: 22px;
+  font-weight: bolder;
+}
+.heart:active {
+  color: red;
+  filter: none;
+  transform: scale(1.5);
 }
 
-.heart {
-  cursor: pointer;
-  font-size: 25px;
+.submission .adminButtons {
+  display: flex;
+  flex-direction: row;
+  margin: 0;
+}
+.delete {
+  background-color: lightpink;
+}
+
+.pardon {
+  background-color: aliceblue;
+}
+
+.adminButtons button:active {
+  transform: scale(1.2);
+  z-index: 5;
 }
