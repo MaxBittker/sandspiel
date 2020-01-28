@@ -253,7 +253,6 @@ class Browse extends React.Component {
             </NavLink>
           )}
         </span>
-
         <Submissions
           submissions={submissions}
           voteFromBrowse={submission => this.voteFromBrowse(submission)}

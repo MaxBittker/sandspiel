@@ -319,14 +319,16 @@ class Index extends React.Component {
           )}
         </button>
         <button onClick={() => this.upload()}>Upload</button>
-        <Link
-          to={{
-            pathname: "/browse/",
-            hash
-          }}
-        >
-          <button>Browse</button>
-        </Link>
+        {!window.location.pathname.includes("school") && (
+          <Link
+            to={{
+              pathname: "/browse/",
+              hash
+            }}
+          >
+            <button>Browse</button>
+          </Link>
+        )}
 
         <button onClick={() => this.reset()}>Reset</button>
         <Link

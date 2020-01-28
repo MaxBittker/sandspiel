@@ -16,9 +16,9 @@ Ultimately, I want the platform to support editing and uploading of your own ele
 ### 🛠️ Build:
 
 ```
-# build the wasm once: 
+# build the wasm once:
 cd crate && wasm-pack build && cd ..;
-yarn install; # npm is giving me an error with peer deps right now
+npm install;
 npm run start;
 
 # then in a seperate terminal:
