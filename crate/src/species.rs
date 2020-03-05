@@ -4,7 +4,7 @@ use SandApi;
 use Wind;
 use EMPTY_CELL;
 
-use std::cmp;
+// use std::cmp;
 use std::mem;
 use wasm_bindgen::prelude::*;
 // use web_sys::console;

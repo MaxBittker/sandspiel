@@ -28,6 +28,9 @@ wasm-bindgen-test = "0.2"
 opt-level = 3
 lto = true
 
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-O4']
+
 [dependencies.web-sys]
 version = "0.3"
 features = [
