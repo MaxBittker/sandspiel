@@ -233,27 +233,70 @@ app.get("/creations", async (req: express.Request, res) => {
         [title.toLowerCase()]
       );
     } else if (d) {
-      browse = await pgPool.query(`SELECT * 
-        FROM creations c
-        WHERE timestamp > NOW() - INTERVAL '${parseInt(d, 10)} days'
-        AND NOT EXISTS(
-          SELECT
-          FROM rulings as r
-          WHERE r.id = c.id and r.bad = 'yes'
-        )
-         ORDER BY score DESC
-         LIMIT 300`);
+      browse = await pgPool.query(`
+    WITH subset AS(
+      SELECT *
+      FROM creations c
+      WHERE timestamp > NOW() - INTERVAL '${parseInt(d, 10)} days'
+      AND NOT EXISTS(
+        SELECT
+        FROM rulings as r
+        WHERE r.id = c.id and r.bad = 'yes'
+      )
+      ORDER BY score DESC
+      LIMIT 300
+    )
+    SELECT 
+        cs.ID,
+        MAX(cs.data_id) as data_id,
+        MAX(cs.title) as title ,
+        MAX(cs.timestamp) as timestamp ,
+        MAX(cs.score) as score ,
+    COUNT(RP.id) AS reportcount
+    from SUBSET cs
+    Left JOIN reports AS RP ON RP.id = cs.ID
+    group by cs.id
+    ORDER BY score DESC
+        `);
     } else {
-      browse = await pgPool.query(`SELECT *  
+      browse = await pgPool.query(`
+      WITH SUBSET AS(
+        SELECT 
+          C.ID,
+          C.data_id,
+          C.title,
+          C.timestamp,
+          C.score
         FROM creations c 
         WHERE NOT EXISTS(
           SELECT
           FROM rulings as r
           WHERE r.id = c.id and r.bad = 'yes'
         )
-        ORDER BY ${q === "score" ? "score" : "timestamp"} desc LIMIT 300`);
+        ORDER BY ${q === "score" ? "score" : "timestamp"} desc
+        LIMIT 300
+      )
+      SELECT 
+        cs.ID,
+        MAX(cs.data_id) as data_id,
+        MAX(cs.title) as title ,
+        MAX(cs.timestamp) as timestamp ,
+        MAX(cs.score) as score ,
+        COUNT(RP.id) AS reportcount
+      from SUBSET cs
+      Left JOIN reports AS RP ON RP.id = cs.ID
+      group by cs.id
+      ORDER BY ${q === "score" ? "score" : "timestamp"} desc
+     `);
     }
-    const creations = browse.rows.map(row => {
+
+    const filteredCreations = browse.rows.filter(row => {
+      let reportcount = row.reportcount;
+      let score = row.score;
+      return reportcount < 2 || score > reportcount * 4;
+    });
+
+    const creations = filteredCreations.map(row => {
       return {
         id: row.id,
         data: {
