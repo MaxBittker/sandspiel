@@ -221,15 +221,30 @@ app.get("/creations", async (req: express.Request, res) => {
     let browse: pg.QueryResult;
     if (title) {
       browse = await pgPool.query(
-        `SELECT *  FROM creations c
-         WHERE LOWER(title) ~ $1
-         AND NOT EXISTS(
-          SELECT
-          FROM rulings as r
-          WHERE r.id = c.id and r.bad = 'yes'
+        `
+        WITH subset AS(
+          SELECT *  FROM creations c
+          WHERE LOWER(title) ~ $1
+          AND NOT EXISTS(
+           SELECT
+           FROM rulings as r
+           WHERE r.id = c.id and r.bad = 'yes'
+         )
+          ORDER BY score DESC,  timestamp DESC
+          LIMIT 500
         )
-         ORDER BY score DESC,  timestamp DESC
-         LIMIT 500`,
+        SELECT 
+          cs.ID,
+          MAX(cs.data_id) as data_id,
+          MAX(cs.title) as title,
+          MAX(cs.timestamp) as timestamp,
+          MAX(cs.score) as score,
+        COUNT(RP.id) AS reportcount
+        from SUBSET cs
+        Left JOIN reports AS RP ON RP.id = cs.ID
+        group by cs.id
+        ORDER BY score DESC,  timestamp DESC
+        `,
         [title.toLowerCase()]
       );
     } else if (d) {

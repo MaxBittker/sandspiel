@@ -26,6 +26,7 @@ CREATE TABLE reports (
 );
 
 CREATE UNIQUE INDEX ON reports (id, ip);
+CREATE INDEX ON reports (id);
 
 
 CREATE TABLE rulings (
