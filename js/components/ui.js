@@ -169,6 +169,16 @@ class Index extends React.Component {
       submissionMenuOpen: true
     });
   }
+  rateLimited() {
+    var postList = JSON.parse(localStorage.getItem("postList") || "[]");
+    postList = postList.filter(post => Date.now() - 1000 * 60 * 5 < post);
+
+    if (postList.length >= 3) {
+      Sentry.captureMessage("RATELIMIT");
+      return true;
+    }
+    return false;
+  }
   submit() {
     let { title, data } = this.state;
     let { dataURL, cells } = data;
@@ -176,11 +186,6 @@ class Index extends React.Component {
 
     var postList = JSON.parse(localStorage.getItem("postList") || "[]");
     postList = postList.filter(post => Date.now() - 1000 * 60 * 5 < post);
-
-    if (postList.length >= 3) {
-      Sentry.captureMessage("RATELIMIT");
-    }
-
     postList.push(Date.now());
     localStorage.setItem("postList", JSON.stringify(postList));
 
@@ -409,7 +414,7 @@ class Index extends React.Component {
                 onChange={e => this.setState({ title: e.target.value })}
               />
               <button
-                disabled={this.state.submitting}
+                disabled={this.state.submitting || this.rateLimited()}
                 onClick={() => this.submit()}
               >
                 Submit
