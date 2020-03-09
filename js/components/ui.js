@@ -173,6 +173,17 @@ class Index extends React.Component {
     let { title, data } = this.state;
     let { dataURL, cells } = data;
     let payload = { title, image: dataURL, cells };
+
+    var postList = JSON.parse(localStorage.getItem("postList") || "[]");
+    postList = postList.filter(post => Date.now() - 1000 * 60 * 5 < post);
+
+    if (postList.length >= 3) {
+      Sentry.captureMessage("RATELIMIT");
+    }
+
+    postList.push(Date.now());
+    localStorage.setItem("postList", JSON.stringify(postList));
+
     this.setState({ submitting: true });
 
     fetch(functions._url("api/creations"), {
