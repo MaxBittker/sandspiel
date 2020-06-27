@@ -464,6 +464,20 @@ app.put("/creations/:id/report", async (req, res) => {
         res.sendStatus(301);
         return;
       }
+
+      const countRows = await pgPool.query(
+        `
+        SELECT COUNT(id) 
+        FROM reports
+         WHERE ip = $1 and
+        timestamp > NOW() - INTERVAL '2 hours'
+         `,
+        [ip]
+      );
+      if (countRows[0] && countRows[0].count > 100) {
+        res.sendStatus(302);
+        return;
+      }
     } catch (err) {
       console.log(err.stack);
       res.sendStatus(500);
