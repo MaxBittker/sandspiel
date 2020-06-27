@@ -22,7 +22,8 @@ CREATE UNIQUE INDEX ON votes (id, uid);
 
 CREATE TABLE reports (
     id char(20) REFERENCES creations(id),
-    ip inet NOT NULL
+    ip inet NOT NULL,
+    timestamp timestamp NOT NULL DEFAULT NOW()
 );
 
 CREATE UNIQUE INDEX ON reports (id, ip);
