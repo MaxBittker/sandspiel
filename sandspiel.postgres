@@ -1,10 +1,12 @@
 CREATE TABLE creations (
     id char(20) CONSTRAINT firstkey PRIMARY KEY NOT NULL UNIQUE,
+    ip inet,
     data_id char(32) NOT NULL,
     title varchar(220) NOT NULL,
     score integer NOT NULL,
     timestamp timestamp NOT NULL DEFAULT NOW()
 );
+
 
 CREATE INDEX ON creations (timestamp);
 

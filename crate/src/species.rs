@@ -9,7 +9,6 @@ use std::mem;
 use wasm_bindgen::prelude::*;
 // use web_sys::console;
 
-
 #[wasm_bindgen]
 #[repr(u8)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -170,22 +169,16 @@ pub fn update_water(cell: Cell, mut api: SandApi) {
     let below = api.get(0, 1);
     let dx1 = api.get(dx, 1);
     let dx0 = api.get(dx, 0);
-    if below.species == Species::Empty
-        || below.species == Species::Oil
-    {
+    if below.species == Species::Empty || below.species == Species::Oil {
         api.set(0, 0, below);
         api.set(0, 1, cell);
-    } else if dx1.species == Species::Empty
-        || dx1.species == Species::Oil
-    {
+    } else if dx1.species == Species::Empty || dx1.species == Species::Oil {
         api.set(0, 0, dx1);
         api.set(dx, 1, cell);
     } else if api.get(-dx, 1).species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
         api.set(-dx, 1, cell);
-    } else if dx0.species == Species::Empty
-        || dx0.species == Species::Oil
-    {
+    } else if dx0.species == Species::Empty || dx0.species == Species::Oil {
         api.set(0, 0, dx0);
         api.set(dx, 0, cell);
     } else if api.get(-dx, 0).species == Species::Empty {
@@ -337,7 +330,6 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
 //     }
 // }
 
-
 pub fn update_cloner(cell: Cell, mut api: SandApi) {
     let mut clone_species = unsafe { mem::transmute(cell.rb as u8) };
     let g = api.universe.generation;
@@ -468,7 +460,6 @@ pub fn update_rocket(cell: Cell, mut api: SandApi) {
             },
         );
     } else if ra > 50 {
-
         let (dx, dy) = split_dy_dx(cell.ra - 100);
 
         let nbr = api.get(dx, dy * 2);
@@ -499,9 +490,7 @@ pub fn update_rocket(cell: Cell, mut api: SandApi) {
             api.set(0, 0, EMPTY_CELL);
         }
     }
-
 }
-
 
 pub fn update_fire(cell: Cell, mut api: SandApi) {
     let ra = cell.ra;
@@ -986,7 +975,6 @@ pub fn update_fungus(cell: Cell, mut api: SandApi) {
         );
     }
     let mut i = rand_int(100);
-
 
     if nbr_species != Species::Empty
         && nbr_species != Species::Fungus

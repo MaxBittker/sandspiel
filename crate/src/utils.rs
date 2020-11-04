@@ -1,10 +1,12 @@
 use cfg_if::cfg_if;
 
-
 pub fn rand_int(n: i32) -> i32 {
     (js_sys::Math::random() * n as f64) as i32
 }
 
+pub fn once_in(n: i32) -> bool {
+    rand_int(n) == 0
+}
 pub fn rand_dir() -> i32 {
     let i = rand_int(1000);
     (i % 3) - 1
@@ -77,7 +79,6 @@ pub fn join_dy_dx(dx: i32, dy: i32) -> u8 {
 }
 
 pub fn split_dy_dx(s: u8) -> (i32, i32) {
-
     let s: i32 = s as i32;
 
     let dx: i32 = (s / 3) - 1;
@@ -86,7 +87,6 @@ pub fn split_dy_dx(s: u8) -> (i32, i32) {
 
     (dx, dy)
 }
-
 
 cfg_if! {
     // When the `console_error_panic_hook` feature is enabled, we can call the

@@ -185,7 +185,7 @@ class Index extends React.Component {
     let payload = { title, image: dataURL, cells };
 
     var postList = JSON.parse(localStorage.getItem("postList") || "[]");
-    postList = postList.filter(post => Date.now() - 1000 * 60 * 5 < post);
+    postList = postList.filter(post => Date.now() - 1000 * 60 * 3 < post);
     postList.push(Date.now());
     localStorage.setItem("postList", JSON.stringify(postList));
 
@@ -394,7 +394,12 @@ class Index extends React.Component {
             this.setState({ selectedElement: id })
           )
         )}
-
+        <span className="promo">
+          *new*{" "}
+          <a href="https://orb.farm" target="_blank">
+            orb.farm
+          </a>
+        </span>
         {this.state.currentSubmission && (
           <div className="submission-title">
             <button onClick={() => this.incScore()}>

@@ -21,7 +21,7 @@ cd crate && wasm-pack build && cd ..;
 npm install;
 npm run start;
 
-# then in a seperate terminal:
+# then in a separate terminal:
 cargo watch -s 'wasm-pack build'
 ```
 

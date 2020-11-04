@@ -144,4 +144,6 @@ function reset() {
   universe.reset();
 }
 window.u = universe;
+
+(adsbygoogle = window.adsbygoogle || []).push({});
 export { canvas, width, height, universe, reset };

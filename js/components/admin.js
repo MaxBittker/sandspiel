@@ -10,7 +10,7 @@ import { functions, storage } from "../api.js";
 const ago = timeago();
 
 let storageUrl =
-  "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
+  "https://firebasestorage.googleapis.com/v1/b/sandtable-8d0f7.appspot.com/o/creations%2F";
 
 class Submissions extends React.Component {
   shouldComponentUpdate(nextProps) {

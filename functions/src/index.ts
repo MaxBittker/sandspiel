@@ -3,8 +3,10 @@ import * as c from "cors";
 import * as crypto from "crypto";
 import * as functions from "firebase-functions";
 import * as pg from "pg";
+import * as ipRangeCheck from "ip-range-check";
 import * as Twit from "twit";
 import * as wordfilter from "wordfilter";
+import { banned } from "./ranges";
 
 import admins from "./admin";
 
@@ -133,6 +135,13 @@ const validateFirebaseIdToken = async (req, res, next) => {
 // Create a new creation, and upload two image
 app.post("/creations", async (req, res) => {
   const { title, image, cells } = req.body;
+  const ip = req.header("x-appengine-user-ip");
+
+  if (banned.some(r => ipRangeCheck(ip, r))) {
+    res.sendStatus(303);
+    console.log("reject google IP");
+    return;
+  }
 
   if (wordfilter.blacklisted(title)) {
     res.sendStatus(418);
@@ -156,6 +165,19 @@ app.post("/creations", async (req, res) => {
     );
     if (exists.rows[0].exists) {
       res.sendStatus(202).json({ id: "already exists" });
+      return;
+    }
+    const countRows = await pgPool.query(
+      `
+      SELECT COUNT(id)
+      FROM creations
+       WHERE ip = $1 and
+      timestamp > NOW() - INTERVAL '24 hours'
+       `,
+      [ip]
+    );
+    if (countRows[0] && countRows[0].count > 40) {
+      res.sendStatus(302);
       return;
     }
 
@@ -188,8 +210,15 @@ app.post("/creations", async (req, res) => {
     ]);
 
     const text =
-      "INSERT INTO creations(id, data_id, title, score, timestamp) VALUES($1, $2, $3, $4, to_timestamp( $5 / 1000.0) )";
-    const values = [publicId, data.id, data.title, data.score, data.timestamp];
+      "INSERT INTO creations(id, data_id, title, score, ip, timestamp) VALUES($1, $2, $3, $4, $5, to_timestamp( $6 / 1000.0) )";
+    const values = [
+      publicId,
+      data.id,
+      data.title,
+      data.score,
+      ip,
+      data.timestamp
+    ];
 
     try {
       await pgPool.query(text, values);
@@ -259,7 +288,7 @@ app.get("/creations", async (req: express.Request, res) => {
         WHERE r.id = c.id and r.bad = 'yes'
       )
       ORDER BY score DESC
-      LIMIT 300
+      LIMIT 85
     )
     SELECT 
         cs.ID,
@@ -289,7 +318,7 @@ app.get("/creations", async (req: express.Request, res) => {
           WHERE r.id = c.id and r.bad = 'yes'
         )
         ORDER BY ${q === "score" ? "score" : "timestamp"} desc
-        LIMIT 300
+        LIMIT 85
       )
       SELECT 
         cs.ID,
@@ -354,7 +383,7 @@ app.get("/reports", async (req: express.Request, res) => {
           C.ID
       ORDER BY
           reportcount DESC, c.timestamp DESC
-      LIMIT 300`);
+      LIMIT 85`);
     const creations = browse.rows.map(row => {
       return {
         id: row.id,
