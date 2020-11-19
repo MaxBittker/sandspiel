@@ -9,14 +9,14 @@ import { startFluid } from "./fluid";
 
 if (window.safari) {
   history.pushState(null, null, location.href);
-  window.onpopstate = function(event) {
+  window.onpopstate = function (event) {
     history.go(1);
   };
 }
 
 function mobileAndTabletcheck() {
   var check = false;
-  (function(a) {
+  (function (a) {
     if (
       /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino|android|ipad|playbook|silk/i.test(
         a
@@ -31,7 +31,7 @@ function mobileAndTabletcheck() {
 }
 
 if (mobileAndTabletcheck()) {
-  window.onbeforeunload = function() {
+  window.onbeforeunload = function () {
     return true;
   };
 }
@@ -40,10 +40,10 @@ if ("serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker
       .register("/service-worker.js")
-      .then(registration => {
+      .then((registration) => {
         console.log("SW registered: ", registration);
       })
-      .catch(registrationError => {
+      .catch((registrationError) => {
         console.log("SW registration failed: ", registrationError);
       });
   });
@@ -60,7 +60,7 @@ const canvas2 = document.getElementById("fluid-canvas");
 canvas.height = n * Math.ceil(window.devicePixelRatio);
 canvas.width = n * Math.ceil(window.devicePixelRatio);
 
-document.getElementById("background").addEventListener("touchmove", e => {
+document.getElementById("background").addEventListener("touchmove", (e) => {
   if (!window.paused) {
     if (e.cancelable) {
       e.preventDefault();
@@ -83,9 +83,9 @@ let resize = () => {
       // landscape compressed
 
       canvasStyle = `height: ${window.innerHeight}px; margin:3px`;
-      uiStyle = `width: ${screen_width -
-        window.innerHeight -
-        12}px; margin: 2px;`;
+      uiStyle = `width: ${
+        screen_width - window.innerHeight - 12
+      }px; margin: 2px;`;
     } else {
       // landscape wide
       canvasStyle = `
@@ -99,9 +99,9 @@ let resize = () => {
       //   7}px; margin: 2px;`;
       uiStyle = `width: 200px; margin: 2px;`;
 
-      adStyle = `width: ${screen_width -
-        window.innerHeight -
-        (206 + 150)}px; margin: 1px;`;
+      adStyle = `width: ${
+        screen_width - window.innerHeight - (206 + 150)
+      }px; margin: 1px;`;
     }
   } else {
     //portrait (mobile)
