@@ -51,6 +51,18 @@ img {
 #fluid-canvas {
 }
 
+.promo {
+  z-index: 3;
+  position: relative;
+  height: 30px;
+  min-width: 30px;
+  font-size: 19px;
+  padding: 1px 5px;
+  color: black;
+  flex-grow: 1;
+  max-width: 150px;
+  line-height: 24px !important;
+}
 button {
   z-index: 3;
   position: relative;
