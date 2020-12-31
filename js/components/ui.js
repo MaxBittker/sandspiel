@@ -42,7 +42,7 @@ const ElementButton = (name, selectedElement, setElement) => {
       }}
       style={{
         background,
-        backgroundColor: selected ? color.replace("0.25", "1.5") : color
+        backgroundColor: selected ? color.replace("0.25", "1.5") : color,
       }}
     >
       {"  "}
@@ -52,7 +52,7 @@ const ElementButton = (name, selectedElement, setElement) => {
   );
 };
 
-let sizeMap = [2, 5, 10, 18, 30, 45];
+let sizeMap = [2, 5, 7, 18, 25];
 
 class Index extends React.Component {
   constructor(props) {
@@ -372,7 +372,7 @@ class Index extends React.Component {
               style={{ padding: "0px" }}
             >
               <svg height="23" width="23" id="d" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r={2 + v} />
+                <circle cx="50" cy="50" r={3 + v} />
               </svg>
             </button>
           ))}
