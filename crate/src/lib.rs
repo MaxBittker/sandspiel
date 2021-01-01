@@ -201,10 +201,15 @@ impl Universe {
     }
 
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
-        let radius = size / 2;
-        for dx in -radius..radius + 1 {
-            for dy in -radius..radius + 1 {
-                if dx * dx + dy * dy > (radius * radius) - 1 {
+        let size = size;
+        let radius: f64 = (size as f64) / 2.0;
+
+        let floor = (radius + 1.0) as i32;
+        let ciel = (radius + 1.5) as i32;
+
+        for dx in -floor..ciel {
+            for dy in -floor..ciel {
+                if (((dx * dx) + (dy * dy)) as f64) > (radius * radius) {
                     continue;
                 };
                 let px = x + dx;
@@ -218,7 +223,8 @@ impl Universe {
                 if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
                         species: species,
-                        ra: 80
+                        ra: 60
+                            + (size as u8)
                             + (js_sys::Math::random() * 30.) as u8
                             + ((self.generation % 127) as i8 - 60).abs() as u8,
                         rb: 0,

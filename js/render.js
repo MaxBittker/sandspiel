@@ -9,7 +9,7 @@ let vsh = require("./glsl/sandVertex.glsl");
 let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   const regl = reglBuilder({
     canvas,
-    attributes: { preserveDrawingBuffer: isSnapshot }
+    attributes: { preserveDrawingBuffer: isSnapshot },
   });
   // const lastFrame = regl.texture();
   const width = universe.width();
@@ -34,20 +34,24 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
       },
       resolution: ({ viewportWidth, viewportHeight }) => [
         viewportWidth,
-        viewportHeight
+        viewportHeight,
       ],
       dpi: window.devicePixelRatio * 2,
-      isSnapshot
+      isSnapshot,
       // backBuffer: lastFrame
     },
 
     vert: vsh,
     attributes: {
       // Full screen triangle
-      position: [[-1, 4], [-1, -1], [4, -1]]
+      position: [
+        [-1, 4],
+        [-1, -1],
+        [4, -1],
+      ],
     },
     // Our triangle has 3 vertices
-    count: 3
+    count: 3,
   });
 
   return () => {
@@ -56,7 +60,7 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   };
 };
 
-let snapshot = universe => {
+let snapshot = (universe) => {
   let canvas = document.createElement("canvas");
   canvas.width = universe.width() / 2;
   canvas.height = universe.height() / 2;
@@ -76,7 +80,7 @@ let pallette = () => {
   canvas.height = 3;
   universe.reset();
 
-  species.forEach(id => universe.paint(id, 0, 2, id));
+  species.forEach((id) => universe.paint(id, 0, 1, id));
 
   let render = startWebGL({ universe, canvas, isSnapshot: true });
   render();
@@ -84,7 +88,7 @@ let pallette = () => {
   let data = new Uint8Array(range * 4);
   ctx.readPixels(0, 0, range, 1, ctx.RGBA, ctx.UNSIGNED_BYTE, data);
   let colors = {};
-  species.forEach(id => {
+  species.forEach((id) => {
     let index = id * 4;
     let color = `rgba(${data[index]},${data[index + 1]}, ${
       data[index + 2]
