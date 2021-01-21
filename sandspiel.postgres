@@ -14,6 +14,8 @@ CREATE INDEX ON creations (score);
 
 CREATE INDEX ON creations (id);
 
+CREATE INDEX ON creations (ip);
+
 CREATE TABLE votes (
     id char(20),
     uid text
