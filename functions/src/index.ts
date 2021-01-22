@@ -252,15 +252,15 @@ app.get("/creations", async (req: express.Request, res) => {
       browse = await pgPool.query(
         `
         WITH subset AS(
-          SELECT *  FROM creations c
-          WHERE LOWER(title) ~ $1
+          SELECT *  FROM creations as c, plainto_tsquery('$1') as q
+          WHERE (tsv @@ q)
           AND NOT EXISTS(
            SELECT
            FROM rulings as r
            WHERE r.id = c.id and r.bad = 'yes'
          )
           ORDER BY score DESC,  timestamp DESC
-          LIMIT 500
+          LIMIT 150
         )
         SELECT 
           cs.ID,

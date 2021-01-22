@@ -7,6 +7,26 @@ CREATE TABLE creations (
     timestamp timestamp NOT NULL DEFAULT NOW()
 );
 
+-- https://blog.lateral.io/2015/05/full-text-search-in-milliseconds-with-postgresql/
+ALTER TABLE creations ADD COLUMN tsv tsvector;
+CREATE INDEX tsv_idx ON creations USING gin(tsv);
+UPDATE creations SET tsv = to_tsvector(coalesce(title,''));
+
+-- UPDATE creations SET tsv = to_tsvector(coalesce(title,'')) WHERE timestamp > NOW() - INTERVAL '1 days';
+
+
+
+CREATE FUNCTION creations_search_trigger() RETURNS trigger AS $$
+begin
+  new.tsv :=
+    to_tsvector(coalesce(new.title,''));
+  return new;
+end
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
+ON creations FOR EACH ROW EXECUTE PROCEDURE creations_search_trigger();
+
 
 CREATE INDEX ON creations (timestamp);
 
