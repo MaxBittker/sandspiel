@@ -395,7 +395,7 @@ class Index extends React.Component {
         >
           Wind
         </button>
-        {Object.keys(Species).map((n) =>
+        {Object.keys(Species).filter(x => !Number.isInteger(Number.parseInt(x))).map((n) =>
           ElementButton(n, selectedElement, (id) =>
             this.setState({ selectedElement: id })
           )
