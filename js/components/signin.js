@@ -90,14 +90,10 @@ class SignInScreen extends React.Component {
       }
     }
     let { currentUser } = firebase.auth();
-
+    console.log(currentUser);
     return (
       <div>
         <div style={{ display: "flex", alignItems: "center" }}>
-          <img
-            style={{ height: "35px", width: "35px", borderRadius: 50 }}
-            src={currentUser.photoURL}
-          />
           {!currentUser.emailVerified &&
             `Please Verify your email ${currentUser.email} to vote!`}
           <button onClick={() => firebase.auth().signOut()}>Sign-out</button>

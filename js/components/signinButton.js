@@ -80,7 +80,7 @@ class SignInButton extends React.Component {
       } else {
         return (
           <div>
-            <p>Sign-in to post and to vote!</p>
+            <p>Sign-in to post!</p>
             <FirebaseAuth
               uiConfig={this.uiConfig}
               firebaseAuth={firebase.auth()}
@@ -91,7 +91,7 @@ class SignInButton extends React.Component {
     }
     let { currentUser } = firebase.auth();
 
-    return <>{props.children}</>;
+    return <>{this.props.children}</>;
   }
 }
 

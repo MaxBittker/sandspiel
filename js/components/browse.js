@@ -217,6 +217,12 @@ class Browse extends React.Component {
     return (
       <React.Fragment>
         <SignInScreen />
+        <p style={{ gridColumn: "auto / span 2" }}>
+          Developer update: I'm working on implementing a new user system for
+          sandspiel! If you have trouble posting, please try signing in via
+          email or "hard refreshing" your browser tab. Please bear with me as I
+          work out the issues. - Max
+        </p>
         <NavLink exact to="/browse/">
           <button>New</button>
         </NavLink>

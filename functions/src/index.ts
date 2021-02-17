@@ -140,9 +140,15 @@ const validateFirebaseIdToken = async (req, res, next) => {
 
 // POST /api/creations
 // Create a new creation, and upload two image
-app.post("/creations", async (req, res) => {
+app.post("/creations", validateFirebaseIdToken, async (req, res) => {
   const { title, image, cells } = req.body;
   const ip = req.header("x-appengine-user-ip");
+
+  const { uid } = req["user"];
+  const user = await admin.auth().getUser(uid);
+  if (!user.emailVerified) {
+    res.sendStatus(301);
+  }
 
   if (banned.some((r) => ipRangeCheck(ip, r))) {
     res.sendStatus(303);
