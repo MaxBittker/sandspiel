@@ -19,7 +19,7 @@ const pgConfig: pg.PoolConfig = {
   max: 1,
   user: dbUser,
   password: dbPassword,
-  database: dbName
+  database: dbName,
 };
 
 if (process.env.NODE_ENV === "production") {
@@ -36,39 +36,46 @@ const T = new Twit({
   access_token: functions.config().twitter.access_token,
   access_token_secret: functions.config().twitter.access_token_secret,
   timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
-  strictSSL: false // optional - requires SSL certificates to be valid.
+  strictSSL: false, // optional - requires SSL certificates to be valid.
 });
 
 function Tweet(b64content, title, id) {
   // first we must post the media to Twitter
-  T.post("media/upload", { media_data: b64content }, function(
-    err,
-    res_data,
-    response
-  ) {
-    // now we can assign alt text to the media, for use by screen readers
-    // and other text-based presentations and interpreters
-    const mediaIdStr = res_data["media_id_string"];
-    const altText = title;
-    const meta_params = { media_id: mediaIdStr, alt_text: { text: altText } };
+  T.post(
+    "media/upload",
+    { media_data: b64content },
+    function (err, res_data, response) {
+      // now we can assign alt text to the media, for use by screen readers
+      // and other text-based presentations and interpreters
+      const mediaIdStr = res_data["media_id_string"];
+      const altText = title;
+      const meta_params = { media_id: mediaIdStr, alt_text: { text: altText } };
 
-    T.post("media/metadata/create", meta_params, function(post_err, post_data) {
-      if (!err) {
-        // now we can reference the media and post a tweet (media will
-        // attach to the tweet)
-        const params = {
-          status: `${title.replace(/@/g, "")}\n https://sandspiel.club/#${id}`,
-          media_ids: [mediaIdStr]
-        };
+      T.post(
+        "media/metadata/create",
+        meta_params,
+        function (post_err, post_data) {
+          if (!err) {
+            // now we can reference the media and post a tweet (media will
+            // attach to the tweet)
+            const params = {
+              status: `${title.replace(
+                /@/g,
+                ""
+              )}\n https://sandspiel.club/#${id}`,
+              media_ids: [mediaIdStr],
+            };
 
-        T.post("statuses/update", params, function(_, _data) {
-          console.log("TWEETED" + JSON.stringify(_data));
-        });
-      } else {
-        console.error("twitter api error" + err);
-      }
-    });
-  });
+            T.post("statuses/update", params, function (_, _data) {
+              console.log("TWEETED" + JSON.stringify(_data));
+            });
+          } else {
+            console.error("twitter api error" + err);
+          }
+        }
+      );
+    }
+  );
 }
 
 const cors = c({ origin: true });
@@ -137,7 +144,7 @@ app.post("/creations", async (req, res) => {
   const { title, image, cells } = req.body;
   const ip = req.header("x-appengine-user-ip");
 
-  if (banned.some(r => ipRangeCheck(ip, r))) {
+  if (banned.some((r) => ipRangeCheck(ip, r))) {
     res.sendStatus(303);
     console.log("reject google IP");
     return;
@@ -152,10 +159,7 @@ app.post("/creations", async (req, res) => {
   try {
     const bucket = admin.storage().bucket();
 
-    const id = crypto
-      .createHash("md5")
-      .update(cells)
-      .digest("hex");
+    const id = crypto.createHash("md5").update(cells).digest("hex");
 
     const publicId = id.slice(0, 20);
 
@@ -200,13 +204,13 @@ app.post("/creations", async (req, res) => {
       return file.save(imageBuffer, {
         metadata: { contentType: mimeType },
         public: true,
-        validation: "md5"
+        validation: "md5",
       });
     }
 
     await Promise.all([
       uploadPNG(cells, ".data.png"),
-      uploadPNG(image, ".png")
+      uploadPNG(image, ".png"),
     ]);
 
     const text =
@@ -217,7 +221,7 @@ app.post("/creations", async (req, res) => {
       data.title,
       data.score,
       ip,
-      data.timestamp
+      data.timestamp,
     ];
 
     try {
@@ -252,7 +256,7 @@ app.get("/creations", async (req: express.Request, res) => {
       browse = await pgPool.query(
         `
         WITH subset AS(
-          SELECT *  FROM creations as c, plainto_tsquery('$1') as q
+          SELECT *  FROM creations as c, plainto_tsquery($1) as q
           WHERE (tsv @@ q)
           AND NOT EXISTS(
            SELECT
@@ -334,21 +338,21 @@ app.get("/creations", async (req: express.Request, res) => {
      `);
     }
 
-    const filteredCreations = browse.rows.filter(row => {
+    const filteredCreations = browse.rows.filter((row) => {
       let reportcount = row.reportcount;
       let score = row.score;
       return reportcount < 2 || score > reportcount * 4;
     });
 
-    const creations = filteredCreations.map(row => {
+    const creations = filteredCreations.map((row) => {
       return {
         id: row.id,
         data: {
           id: row.data_id,
           title: row.title,
           score: row.score,
-          timestamp: row.timestamp
-        }
+          timestamp: row.timestamp,
+        },
       };
     });
 
@@ -384,7 +388,7 @@ app.get("/reports", async (req: express.Request, res) => {
       ORDER BY
           reportcount DESC, c.timestamp DESC
       LIMIT 85`);
-    const creations = browse.rows.map(row => {
+    const creations = browse.rows.map((row) => {
       return {
         id: row.id,
         data: {
@@ -392,8 +396,8 @@ app.get("/reports", async (req: express.Request, res) => {
           title: row.title,
           score: row.score,
           timestamp: row.timestamp,
-          reports: row.reportcount
-        }
+          reports: row.reportcount,
+        },
       };
     });
 
@@ -410,7 +414,7 @@ app.get("/creations/:id", async (req, res) => {
   const id = req.params.id;
   try {
     const get = await pgPool.query("SELECT *  FROM creations WHERE id = $1", [
-      id
+      id,
     ]);
 
     if (get.rowCount > 0) {
