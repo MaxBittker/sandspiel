@@ -2,7 +2,7 @@ import React from "react";
 
 import FirebaseAuth from "react-firebaseui/FirebaseAuth";
 
-class SignInScreen extends React.Component {
+class SignInButton extends React.Component {
   // The component's Local state.
   state = {
     isSignedIn: false, // Local signed-in state.
@@ -79,32 +79,20 @@ class SignInScreen extends React.Component {
         );
       } else {
         return (
-          <>
-            Sign-in to post and to vote!
+          <div>
+            <p>Sign-in to post and to vote!</p>
             <FirebaseAuth
               uiConfig={this.uiConfig}
               firebaseAuth={firebase.auth()}
             />
-          </>
+          </div>
         );
       }
     }
     let { currentUser } = firebase.auth();
 
-    return (
-      <div>
-        <div style={{ display: "flex", alignItems: "center" }}>
-          <img
-            style={{ height: "35px", width: "35px", borderRadius: 50 }}
-            src={currentUser.photoURL}
-          />
-          {!currentUser.emailVerified &&
-            `Please Verify your email ${currentUser.email} to vote!`}
-          <button onClick={() => firebase.auth().signOut()}>Sign-out</button>
-        </div>
-      </div>
-    );
+    return <>{props.children}</>;
   }
 }
 
-export default SignInScreen;
+export default SignInButton;

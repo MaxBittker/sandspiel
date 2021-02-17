@@ -278,3 +278,14 @@ img {
   transform: scale(1.2);
   z-index: 5;
 }
+
+.firebaseui-container.mdl-card {
+  background-color: transparent;
+  box-shadow: none !important;
+}
+.mdl-button--primary.mdl-button--primary {
+  display: none;
+}
+.firebaseui-title {
+  /* display: none; */
+}

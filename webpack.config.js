@@ -12,13 +12,13 @@ module.exports = {
   output: {
     path: dist,
     filename: "[name].[contenthash].js",
-    publicPath: "/"
+    publicPath: "/",
   },
   devServer: {
     contentBase: dist,
     disableHostCheck: true,
     publicPath: "/",
-    historyApiFallback: true
+    historyApiFallback: true,
   },
 
   mode: "development",
@@ -29,23 +29,28 @@ module.exports = {
       "index.html",
       "js/styles.css",
       "manifest.json",
-      "assets/*"
+      "assets/*",
     ]),
     new HtmlWebpackPlugin({ template: "index.html" }),
-    new GenerateSW({ navigateFallback: "index.html" })
+    new GenerateSW({ navigateFallback: "index.html" }),
   ],
   module: {
     rules: [
       {
         test: /\.(glsl|frag|vert)$/,
         use: "raw-loader",
-        exclude: /node_modules/
+        exclude: /node_modules/,
       },
       {
         test: /\.(glsl|frag|vert)$/,
         use: "glslify-loader",
-        exclude: /node_modules/
+        exclude: /node_modules/,
       },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
+
       {
         test: /\.js$/,
         exclude: /node_modules/,
@@ -53,10 +58,10 @@ module.exports = {
           loader: "babel-loader",
           options: {
             presets: ["@babel/preset-env", "@babel/preset-react"],
-            plugins: ["@babel/plugin-syntax-dynamic-import"]
-          }
-        }
-      }
-    ]
-  }
+            plugins: ["@babel/plugin-syntax-dynamic-import"],
+          },
+        },
+      },
+    ],
+  },
 };

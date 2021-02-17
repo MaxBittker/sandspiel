@@ -7,6 +7,7 @@ import { Species } from "../../crate/pkg/sandtable";
 import { height, universe, width, reset } from "../index.js";
 import { snapshot, pallette } from "../render.js";
 import { functions, storage } from "../api.js";
+import SignInButton from "./signinButton.js";
 
 import Menu from "./menu";
 
@@ -418,19 +419,22 @@ class Index extends React.Component {
         {this.state.submissionMenuOpen && (
           <Menu close={() => this.closeMenu()}>
             <h4>Share your creation with the people!</h4>
+
             <img src={this.state.data.dataURL} className="submissionImg" />
-            <div style={{ display: "flex" }}>
-              <input
-                placeholder="title"
-                onChange={(e) => this.setState({ title: e.target.value })}
-              />
-              <button
-                disabled={this.state.submitting || this.rateLimited()}
-                onClick={() => this.submit()}
-              >
-                Submit
-              </button>
-            </div>
+            <SignInButton>
+              <div style={{ display: "flex" }}>
+                <input
+                  placeholder="title"
+                  onChange={(e) => this.setState({ title: e.target.value })}
+                />
+                <button
+                  disabled={this.state.submitting || this.rateLimited()}
+                  onClick={() => this.submit()}
+                >
+                  Submit
+                </button>
+              </div>
+            </SignInButton>
           </Menu>
         )}
       </React.Fragment>
