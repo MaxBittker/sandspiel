@@ -220,16 +220,16 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
     ]);
 
     const text =
-      "INSERT INTO creations(id, data_id, title, score, ip, timestamp) VALUES($1, $2, $3, $4, $5, to_timestamp( $6 / 1000.0) )";
+      "INSERT INTO creations(id, data_id, user_id, title, score, ip, timestamp) VALUES($1, $2, $3, $4, $5, $6, to_timestamp( $7 / 1000.0) )";
     const values = [
       publicId,
       data.id,
+      uid,
       data.title,
       data.score,
       ip,
       data.timestamp,
     ];
-
     try {
       await pgPool.query(text, values);
       res.status(201).json({ id });

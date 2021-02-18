@@ -4,11 +4,13 @@ CREATE TABLE creations (
     data_id char(32) NOT NULL,
     title varchar(220) NOT NULL,
     score integer NOT NULL,
+    user_id char(32),
     timestamp timestamp NOT NULL DEFAULT NOW()
 );
 
 -- https://blog.lateral.io/2015/05/full-text-search-in-milliseconds-with-postgresql/
 ALTER TABLE creations ADD COLUMN tsv tsvector;
+
 CREATE INDEX tsv_idx ON creations USING gin(tsv);
 UPDATE creations SET tsv = to_tsvector(coalesce(title,''));
 
@@ -35,6 +37,7 @@ CREATE INDEX ON creations (score);
 CREATE INDEX ON creations (id);
 
 CREATE INDEX ON creations (ip);
+CREATE INDEX ON creations (user_id);
 
 CREATE TABLE votes (
     id char(20),
