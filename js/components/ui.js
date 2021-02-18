@@ -196,7 +196,7 @@ class Index extends React.Component {
     this.setState({ submitting: true });
     firebase
       .auth()
-      .currentUser.getIdToken(true)
+      .currentUser.getIdToken()
       .then((token) => {
         fetch(functions._url("api/creations"), {
           method: "POST",

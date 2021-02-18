@@ -39,6 +39,7 @@ CREATE INDEX ON creations (id);
 
 CREATE INDEX ON creations (ip);
 CREATE INDEX ON creations (user_id);
+CREATE INDEX ON creations (data_id);
 
 CREATE TABLE votes (
     id char(20),
@@ -62,5 +63,7 @@ CREATE TABLE rulings (
     id char(20) REFERENCES creations(id),
     bad BOOLEAN  NOT NULL
 );
+
+
 
 CREATE UNIQUE INDEX ON rulings (id);

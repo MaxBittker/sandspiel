@@ -345,9 +345,9 @@ app.get("/creations", async (req: express.Request, res) => {
     }
 
     const filteredCreations = browse.rows.filter((row) => {
-      let reportcount = row.reportcount;
-      let score = row.score;
-      return reportcount < 2 || score > reportcount * 4;
+      const reportcount = row.reportcount;
+      const score = row.score;
+      return reportcount < 2 || score + 1 > reportcount * 3;
     });
 
     const creations = filteredCreations.map((row) => {
@@ -388,7 +388,8 @@ app.get("/reports", async (req: express.Request, res) => {
           creations AS C
           RIGHT JOIN reports AS R ON R.id = C.ID
           LEFT JOIN rulings AS J ON J.id = C.ID
-      WHERE j.id is NULL
+      WHERE j.id is NULL and
+      c.timestamp > NOW() - INTERVAL '7 days'
       GROUP BY
           C.ID
       ORDER BY

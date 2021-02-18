@@ -134,7 +134,7 @@ class AdminBrowse extends React.Component {
     // creations/:id/vote
     firebase
       .auth()
-      .currentUser.getIdToken(true)
+      .currentUser.getIdToken()
       .then((token) => {
         fetch(functions._url(`api/creations/${submission.id}/vote`), {
           method: "PUT",
@@ -178,7 +178,7 @@ class AdminBrowse extends React.Component {
     }));
     firebase
       .auth()
-      .currentUser.getIdToken(true)
+      .currentUser.getIdToken()
       .then((token) => {
         // set the __session cookie
         fetch(
