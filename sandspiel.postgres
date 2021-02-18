@@ -8,6 +8,7 @@ CREATE TABLE creations (
     timestamp timestamp NOT NULL DEFAULT NOW()
 );
 
+  
 -- https://blog.lateral.io/2015/05/full-text-search-in-milliseconds-with-postgresql/
 ALTER TABLE creations ADD COLUMN tsv tsvector;
 

@@ -423,7 +423,7 @@ class Index extends React.Component {
 
         {this.state.submissionMenuOpen && (
           <Menu close={() => this.closeMenu()}>
-            <h4>Share your creation with the people!</h4>
+            <h4>Share your creation with the people! (try using #hashtags)</h4>
 
             <img src={this.state.data.dataURL} className="submissionImg" />
             <SignInButton>

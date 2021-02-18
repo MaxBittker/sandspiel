@@ -254,6 +254,7 @@ img {
   margin: 0;
   font-size: 22px;
   font-weight: bolder;
+  transition: transform 0.1s;
 }
 .heart:active {
   color: red;
@@ -265,6 +266,10 @@ img {
   display: flex;
   flex-direction: row;
   margin: 0;
+}
+.admin .submission h3 {
+  height: 0px;
+  overflow: hidden;
 }
 .delete {
   background-color: lightpink;

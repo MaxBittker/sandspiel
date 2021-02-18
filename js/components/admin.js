@@ -10,7 +10,7 @@ import { functions, storage } from "../api.js";
 const ago = timeago();
 
 let storageUrl =
-  "https://firebasestorage.googleapis.com/v1/b/sandtable-8d0f7.appspot.com/o/creations%2F";
+  "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
 
 class Submissions extends React.Component {
   shouldComponentUpdate(nextProps) {
@@ -34,8 +34,8 @@ class Submissions extends React.Component {
     }
 
     return (
-      <div className="submissions">
-        {submissions.map(submission => {
+      <div className="submissions admin">
+        {submissions.map((submission) => {
           let displayTime = new Date(
             submission.data.timestamp
           ).toLocaleDateString();
@@ -52,12 +52,12 @@ class Submissions extends React.Component {
                 className="img-link"
                 to={{
                   pathname: "/",
-                  hash: `#${submission.id}`
+                  hash: `#${submission.id}`,
                 }}
                 onClick={() => {
                   window.UI.setState(
                     () => ({
-                      currentSubmission: null
+                      currentSubmission: null,
                     }),
                     window.UI.load
                   );
@@ -80,7 +80,9 @@ class Submissions extends React.Component {
                 </button>
 
                 <h4>{displayTime}</h4>
-                <h3>{submission.data.reports} reports</h3>
+                <h3 style={{ flexGrow: 1 }}>
+                  {submission.data.reports} reports
+                </h3>
 
                 <div className="adminButtons">
                   <button
@@ -116,7 +118,7 @@ class AdminBrowse extends React.Component {
       decidedIds: [],
       browseVotes: {},
       search: "",
-      currentUser: firebase.auth().currentUser
+      currentUser: firebase.auth().currentUser,
     };
   }
   componentWillMount() {
@@ -133,21 +135,21 @@ class AdminBrowse extends React.Component {
     firebase
       .auth()
       .currentUser.getIdToken(true)
-      .then(token => {
+      .then((token) => {
         fetch(functions._url(`api/creations/${submission.id}/vote`), {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + token
-          }
+            Authorization: "Bearer " + token,
+          },
         })
-          .then(res => res.json())
-          .then(data => {
+          .then((res) => res.json())
+          .then((data) => {
             this.setState(({ browseVotes }) => ({
-              browseVotes: { [submission.id]: data.score, ...browseVotes }
+              browseVotes: { [submission.id]: data.score, ...browseVotes },
             }));
           })
-          .catch(e => {
+          .catch((e) => {
             console.log(e);
           });
       });
@@ -157,27 +159,27 @@ class AdminBrowse extends React.Component {
     fetch(functions._url("api/reports"), {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     })
-      .then(res => res.json())
-      .then(response => {
+      .then((res) => res.json())
+      .then((response) => {
         this.setState({ submissions: response });
         // this.pause();
       })
-      .catch(error => {
+      .catch((error) => {
         this.setState({ submissions: false });
         console.error("Error:", error);
       });
   }
   judge(id, ruling) {
     this.setState(({ decidedIds }) => ({
-      decidedIds: [...decidedIds, id]
+      decidedIds: [...decidedIds, id],
     }));
     firebase
       .auth()
       .currentUser.getIdToken(true)
-      .then(token => {
+      .then((token) => {
         // set the __session cookie
         fetch(
           functions._url(`api/creations/${id}/judge`) + `?ruling=${ruling}`,
@@ -185,15 +187,15 @@ class AdminBrowse extends React.Component {
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
-              Authorization: "Bearer " + token
-            }
+              Authorization: "Bearer " + token,
+            },
           }
         )
-          .then(res => res.json())
-          .then(data => {
+          .then((res) => res.json())
+          .then((data) => {
             this.loadSubmissions();
           })
-          .catch(e => {
+          .catch((e) => {
             console.log(e);
           });
       });
@@ -207,7 +209,7 @@ class AdminBrowse extends React.Component {
 
     submissions =
       submissions &&
-      submissions.filter(submission => !decidedIds.includes(submission.id));
+      submissions.filter((submission) => !decidedIds.includes(submission.id));
     return (
       <React.Fragment>
         <SignInScreen />
@@ -219,7 +221,7 @@ class AdminBrowse extends React.Component {
         </NavLink>
         <Submissions
           submissions={submissions}
-          voteFromBrowse={submission => this.voteFromBrowse(submission)}
+          voteFromBrowse={(submission) => this.voteFromBrowse(submission)}
           browseVotes={browseVotes}
           judge={(id, ruling) => this.judge(id, ruling)}
         />

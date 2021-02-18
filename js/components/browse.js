@@ -173,6 +173,12 @@ class Browse extends React.Component {
 
   voteFromBrowse(submission) {
     // creations/:id/vote
+    this.setState(({ browseVotes }) => ({
+      browseVotes: {
+        [submission.id]: submission.data.score + 1,
+        ...browseVotes,
+      },
+    }));
     firebase
       .auth()
       .currentUser.getIdToken()

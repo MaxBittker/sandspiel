@@ -282,7 +282,7 @@ app.get("/creations", async (req: express.Request, res) => {
         from SUBSET cs
         Left JOIN reports AS RP ON RP.id = cs.ID
         group by cs.id
-        ORDER BY score DESC,  timestamp DESC
+        ORDER BY timestamp DESC
         `,
         [title.toLowerCase()]
       );
