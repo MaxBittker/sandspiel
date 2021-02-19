@@ -25,7 +25,7 @@ npm run start;
 cargo watch -s 'wasm-pack build'
 ```
 
-a successor to my previous efforts in [javascript](https://github.com/MaxBittker/dust) and [lua](https://github.com/MaxBittker/sand-toy)
+a successor to my previous efforts in [JavaScript](https://github.com/MaxBittker/dust) and [lua](https://github.com/MaxBittker/sand-toy)
 
 Fluid simulation code adopted from
 https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
