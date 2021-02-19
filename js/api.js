@@ -1,5 +1,5 @@
 // Firebase App (the core Firebase SDK) is always required and must be listed first
-import * as firebase from "firebase/app";
+import firebase from "firebase/app";
 
 // Add the Firebase products that you want to use
 import "firebase/auth";
@@ -14,10 +14,12 @@ firebase.initializeApp({
   authDomain: "sandspiel.club",
   projectId: "sandtable-8d0f7",
   appId: "1:239719651525:web:80d3674408670521",
-  messagingSenderId: "239719651525"
+  messagingSenderId: "239719651525",
 });
 
 const storage = firebase.storage();
 const functions = firebase.functions();
+
+// functions.useEmulator("localhost", 5001);
 
 export { functions, storage };

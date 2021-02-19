@@ -59,11 +59,17 @@ CREATE UNIQUE INDEX ON reports (id, ip);
 CREATE INDEX ON reports (id);
 
 
+
+CREATE TABLE bans (
+    user_id char(32),
+    timestamp timestamp NOT NULL DEFAULT NOW()
+);
+CREATE INDEX ON bans (user_id);
+
 CREATE TABLE rulings (
     id char(20) REFERENCES creations(id),
     bad BOOLEAN  NOT NULL
 );
-
 
 
 CREATE UNIQUE INDEX ON rulings (id);

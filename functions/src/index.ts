@@ -3,10 +3,8 @@ import * as c from "cors";
 import * as crypto from "crypto";
 import * as functions from "firebase-functions";
 import * as pg from "pg";
-import * as ipRangeCheck from "ip-range-check";
 import * as Twit from "twit";
 import * as wordfilter from "wordfilter";
-import { banned } from "./ranges";
 
 import admins from "./admin";
 
@@ -150,12 +148,6 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
     res.sendStatus(301);
   }
 
-  if (banned.some((r) => ipRangeCheck(ip, r))) {
-    res.sendStatus(303);
-    console.log("reject google IP");
-    return;
-  }
-
   if (wordfilter.blacklisted(title)) {
     res.sendStatus(418);
     return;
@@ -173,8 +165,23 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
       "SELECT exists( SELECT 1 FROM creations WHERE id = $1 )",
       [publicId]
     );
+
     if (exists.rows[0].exists) {
       res.sendStatus(202).json({ id: "already exists" });
+      return;
+    }
+    const banned = await pgPool.query(
+      `
+      SELECT exists(
+      SELECT 1 FROM bans 
+      WHERE user_id = $1 and 
+      timestamp > NOW() - INTERVAL '30 days'
+      )`,
+      [uid]
+    );
+
+    if (banned.rows[0].exists) {
+      res.sendStatus(401).json({ id: "you're banned for one month" });
       return;
     }
     const countRows = await pgPool.query(
@@ -254,11 +261,22 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
 // GET /api/creations?q={q}
 // Get all creations, optionally specifying a string to filter on
 app.get("/creations", async (req: express.Request, res) => {
-  const { q, d, title } = req.query;
+  const { q, d, title, user } = req.query;
 
   try {
     let browse: pg.QueryResult;
-    if (title) {
+    if (user) {
+      console.log("making user query! " + user);
+      browse = await pgPool.query(
+        `
+        SELECT * from creations 
+        WHERE user_id = $1
+        ORDER BY score DESC,  timestamp DESC
+        LIMIT 150
+        `,
+        [user.toString().trim()]
+      );
+    } else if (title) {
       browse = await pgPool.query(
         `
         WITH subset AS(
@@ -284,14 +302,14 @@ app.get("/creations", async (req: express.Request, res) => {
         group by cs.id
         ORDER BY timestamp DESC
         `,
-        [title.toLowerCase()]
+        [title.toString().toLowerCase()]
       );
     } else if (d) {
       browse = await pgPool.query(`
     WITH subset AS(
       SELECT *
       FROM creations c
-      WHERE timestamp > NOW() - INTERVAL '${parseInt(d, 10)} days'
+      WHERE timestamp > NOW() - INTERVAL '${parseInt(d.toString(), 10)} days'
       AND NOT EXISTS(
         SELECT
         FROM rulings as r
@@ -345,7 +363,7 @@ app.get("/creations", async (req: express.Request, res) => {
     }
 
     const filteredCreations = browse.rows.filter((row) => {
-      const reportcount = row.reportcount;
+      const reportcount = row.reportcount || 0;
       const score = row.score;
       return reportcount < 2 || score + 1 > reportcount * 3;
     });
@@ -380,6 +398,7 @@ app.get("/reports", async (req: express.Request, res) => {
       SELECT
           C.ID,
           c.data_id,
+          c.user_id,
           c.title,
           c.timestamp,
           c.score,
@@ -388,8 +407,9 @@ app.get("/reports", async (req: express.Request, res) => {
           creations AS C
           RIGHT JOIN reports AS R ON R.id = C.ID
           LEFT JOIN rulings AS J ON J.id = C.ID
-      WHERE j.id is NULL and
-      c.timestamp > NOW() - INTERVAL '7 days'
+      WHERE j.id is NULL 
+      and
+      c.timestamp > NOW() - INTERVAL '60 days'
       GROUP BY
           C.ID
       ORDER BY
@@ -400,6 +420,7 @@ app.get("/reports", async (req: express.Request, res) => {
         id: row.id,
         data: {
           id: row.data_id,
+          user_id: row.user_id,
           title: row.title,
           score: row.score,
           timestamp: row.timestamp,
@@ -539,26 +560,52 @@ app.put("/creations/:id/report", async (req, res) => {
 app.put("/creations/:id/judge", validateFirebaseIdToken, async (req, res) => {
   const id = req.params.id;
   // const ip = req.header("x-appengine-user-ip");
-  const { ruling } = req.query;
+  let { ruling } = req.query;
   const { email } = req["user"];
   if (!admins.includes(email)) {
     res.status(403).send("Not Admin");
     return;
   }
-  // res.status(200).json({ result: "success", ruling, user: req["user"].email
-  // });
+
   try {
+    if (ruling.toString() === "2") {
+      ruling = "true";
+      const get = await pgPool.query("SELECT *  FROM creations WHERE id = $1", [
+        id,
+      ]);
+
+      if (get.rowCount > 0) {
+        const { user_id } = get.rows[0];
+        if (user_id) {
+          await pgPool.query("INSERT INTO bans(user_id) VALUES($1)", [user_id]);
+
+          const others = await pgPool.query(
+            "SELECT *  FROM creations WHERE user_id = $1",
+            [user_id]
+          );
+          console.log("ban", others.rows);
+          others.rows.forEach(async (row) => {
+            await pgPool.query(
+              `INSERT INTO rulings(id, bad) VALUES($1, $2) 
+               ON CONFLICT (id)
+               DO NOTHING;`,
+              [row.id, true]
+            );
+          });
+        }
+      } else {
+        console.log("banned user not found");
+      }
+    }
     const values = [id, ruling];
 
-    const insert = "INSERT INTO rulings(id, bad) VALUES($1, $2)";
-    try {
-      await pgPool.query(insert, values);
-    } catch (err) {
-      console.error(err.stack);
-    }
+    const insert =
+      "INSERT INTO rulings(id, bad) VALUES($1, $2)   ON CONFLICT (id)    DO NOTHING;";
+    await pgPool.query(insert, values);
     res.status(200).json({ result: "success" });
   } catch (error) {
     console.error("Error making ruling post", id, error.message);
+    console.error(error.stack);
   }
 });
 
@@ -595,7 +642,9 @@ wordfilter.removeWord("homo");
 wordfilter.removeWord("crazy");
 wordfilter.removeWord("crip");
 wordfilter.removeWord("kraut");
+wordfilter.removeWord("spook");
 wordfilter.addWords(["rape"]);
+wordfilter.addWords(["n i g g"]);
 
 // Expose the API as a function
 exports.api = functions.https.onRequest(app);

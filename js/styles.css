@@ -267,14 +267,18 @@ img {
   flex-direction: row;
   margin: 0;
 }
+.admin * {
+  font-size: 12px !important;
+}
 .admin .submission h3 {
-  height: 0px;
   overflow: hidden;
 }
 .delete {
   background-color: lightpink;
 }
-
+.ban {
+  background-color: rgb(233, 23, 55);
+}
 .pardon {
   background-color: aliceblue;
 }

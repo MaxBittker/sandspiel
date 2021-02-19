@@ -151,6 +151,9 @@ class Browse extends React.Component {
     }
     if (location.pathname.startsWith("/browse/search/")) {
       param = location.search;
+      if (location.user) {
+        param = location.user;
+      }
     }
 
     this.setState({ submissions: null });

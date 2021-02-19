@@ -79,12 +79,27 @@ class Submissions extends React.Component {
                   </h3>
                 </button>
 
+                <NavLink
+                  to={{
+                    pathname: "/browse/search/",
+                    search: `?user=${submission.data.user_id}`,
+                  }}
+                >
+                  웃
+                </NavLink>
+
                 <h4>{displayTime}</h4>
                 <h3 style={{ flexGrow: 1 }}>
                   {submission.data.reports} reports
                 </h3>
-
                 <div className="adminButtons">
+                  <button
+                    className="BAN"
+                    title="ban"
+                    onClick={() => judge(submission.id, 2)}
+                  >
+                    ban 🤾🏽‍♂️
+                  </button>
                   <button
                     className="delete"
                     title="delete"
