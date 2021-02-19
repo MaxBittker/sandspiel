@@ -29,3 +29,4 @@ a successor to my previous efforts in [javascript](https://github.com/MaxBittker
 
 Fluid simulation code adopted from
 https://github.com/PavelDoGreat/WebGL-Fluid-Simulation
+### Sandspiel is currently being revised. Come back later if you experience problems.
