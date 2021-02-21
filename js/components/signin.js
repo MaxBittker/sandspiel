@@ -1,4 +1,5 @@
 import React from "react";
+import { NavLink } from "react-router-dom";
 
 import FirebaseAuth from "react-firebaseui/FirebaseAuth";
 
@@ -94,9 +95,27 @@ class SignInScreen extends React.Component {
     return (
       <div>
         <div style={{ display: "flex", alignItems: "center" }}>
+          <NavLink
+            style={{ flexGrow: 0, margin: "0 4px", fontSize: "19px" }}
+            to={{
+              pathname: "/browse/search/",
+              search: `?user=${currentUser.uid}`,
+            }}
+          >
+            [Post History]
+          </NavLink>
           {!currentUser.emailVerified &&
             `Please Verify your email ${currentUser.email} to vote!`}
-          <button onClick={() => firebase.auth().signOut()}>Sign-out</button>
+          <button
+            style={{ flexGrow: 0, margin: "0 10px" }}
+            onClick={() => {
+              if (window.confirm("sign out?")) {
+                firebase.auth().signOut();
+              }
+            }}
+          >
+            Sign-out
+          </button>
         </div>
       </div>
     );

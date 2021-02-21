@@ -51,7 +51,7 @@
     <script>
       (adsbygoogle = window.adsbygoogle || []).push({
         google_ad_client: "ca-pub-9933377295988485",
-        enable_page_level_ads: true
+        enable_page_level_ads: true,
       });
     </script>
   </head>
@@ -64,7 +64,11 @@
         position: absolute;
         /* width: 320px; */
         height: 100%;
+        pointer-events: none;
         /* background-color: rebeccapurple; */
+      }
+      .adslot_1 * {
+        pointer-events: all;
       }
       /*   @media screen and (max-width: 1000px) {
         .adslot_1 {
@@ -75,7 +79,7 @@
     <!-- left-sidebar -->
     <ins
       class="adsbygoogle adslot_1"
-      style="display:block"
+      style="display: block"
       data-ad-client="ca-pub-9933377295988485"
       data-ad-slot="2593942396"
       data-ad-format="vertical"
@@ -99,9 +103,9 @@
   <script>
     Sentry.init({
       dsn: "https://4bf8c3ab764f40569d573fc4021efe40@sentry.io/1331284",
-      release: "1.1.0"
+      release: "1.1.0",
     });
   </script>
   <script async defer src="https://a.sandspiel.club/app.js"></script>
-  <noscript><img src="https://a.sandspiel.club/image.gif" alt=""/></noscript>
+  <noscript><img src="https://a.sandspiel.club/image.gif" alt="" /></noscript>
 </html>

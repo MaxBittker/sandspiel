@@ -11,10 +11,24 @@ const HyperText = ({ text }) => {
           <Link
             to={{
               pathname: "/browse/search/",
-              search: `?title=${t.slice(1)}`
+              search: `?title=${t.slice(1)}`,
             }}
           >
             {t}
+          </Link>{" "}
+        </React.Fragment>
+      );
+    }
+    if (t.startsWith("https://sandspiel.club/browse/search/?user=")) {
+      return (
+        <React.Fragment key={i}>
+          <Link
+            to={{
+              pathname: "/browse/search/",
+              search: t.slice("https://sandspiel.club/browse/search/".length),
+            }}
+          >
+            [profile]
           </Link>{" "}
         </React.Fragment>
       );

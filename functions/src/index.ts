@@ -409,7 +409,7 @@ app.get("/reports", async (req: express.Request, res) => {
           LEFT JOIN rulings AS J ON J.id = C.ID
       WHERE j.id is NULL 
       and
-      c.timestamp > NOW() - INTERVAL '60 days'
+      c.timestamp > NOW() - INTERVAL '20 days'
       GROUP BY
           C.ID
       ORDER BY

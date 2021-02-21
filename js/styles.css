@@ -270,7 +270,7 @@ img {
 .admin * {
   font-size: 12px !important;
 }
-.admin .submission h3 {
+.admin .submission h3.title {
   overflow: hidden;
 }
 .delete {

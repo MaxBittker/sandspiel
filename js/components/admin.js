@@ -7,6 +7,7 @@ import HyperText from "./hypertext.js";
 import SignInScreen from "./signin";
 import { functions, storage } from "../api.js";
 
+let n = 0;
 const ago = timeago();
 
 let storageUrl =
@@ -66,7 +67,10 @@ class Submissions extends React.Component {
                 <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
               </Link>
               <div style={{ width: "50%" }}>
-                <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
+                <h3
+                  className="title"
+                  style={{ flexGrow: 1, wordWrap: "break-word" }}
+                >
                   <HyperText text={submission.data.title} />
                 </h3>
                 <button
@@ -208,7 +212,11 @@ class AdminBrowse extends React.Component {
         )
           .then((res) => res.json())
           .then((data) => {
-            this.loadSubmissions();
+            n++;
+            if (n > 20) {
+              this.loadSubmissions();
+              n = 0;
+            }
           })
           .catch((e) => {
             console.log(e);
