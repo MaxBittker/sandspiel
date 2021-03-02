@@ -3,3 +3,4 @@ js/fluidShaders.js linguist-vendored
 js/render.js linguist-vendored
 js/components/signin.js linguist-vendored
 js/components/ui.js linguist-vendored
+js/components linguist-vendored
