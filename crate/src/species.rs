@@ -22,7 +22,7 @@ pub enum Species {
     Ice = 9,
     Gas = 4,
     Cloner = 5,
-    // Sink = 10,
+    Sink = 10,
     Mite = 15,
     Wood = 7,
     Plant = 11,
@@ -54,7 +54,7 @@ impl Species {
             Species::Ice => update_ice(cell, api),
             // Species::Snow => update_ice(cell, api),
             //lightning
-            // Species::Sink => update_sink(cell, api),
+            Species::Sink => update_Sink(cell, api),
             Species::Plant => update_plant(cell, api),
             Species::Acid => update_acid(cell, api),
             Species::Mite => update_mite(cell, api),
@@ -374,6 +374,8 @@ pub fn update_cloner(cell: Cell, mut api: SandApi) {
     }
 }
 
+
+
 pub fn update_rocket(cell: Cell, mut api: SandApi) {
     // rocket has complicated behavior that is staged piecewise in ra.
     // it would be awesome to diagram the ranges of values and their meaning
@@ -578,6 +580,56 @@ pub fn update_lava(cell: Cell, mut api: SandApi) {
         api.set(dx, 0, cell);
     } else {
         api.set(0, 0, cell);
+    }
+}
+
+
+pub fn update_Sink(cell: Cell, mut api: SandApi) {
+    let dx = rand_dir();
+
+    let rb = cell.rb;
+        if rb > 1 {
+        api.set(
+            0,
+            0,
+            Cell {
+                species: Species::Sink,
+                ra: cell.ra,
+                rb: rb - 1,
+                clock: 0,
+            },
+        );
+
+    let mut degraded = cell.clone();
+    degraded.ra = ra - 60;
+    // i = rand_int(100);
+    if degraded.ra < 80 {
+        degraded = EMPTY_CELL;
+    }
+    if api.get(0, 1).species == Species::Empty {
+        api.set(0, 1, cell);
+    } else if api.get(dx, 0).species == Species::Empty {
+        api.set(dx, 0, cell);
+    } else if api.get(-dx, 0).species == Species::Empty {
+        api.set(-dx, 0, cell);
+    } else {
+        if api.get(0, 1).species != Species::Wall && api.get(0, 1).species != Species::Sink {
+            api.set(0, 1, degraded);
+        } else if api.get(dx, 0).species != Species::Wall && api.get(dx, 0).species != Species::Sink
+        {
+            api.set(dx, 0, degraded);
+        } else if api.get(-dx, 0).species != Species::Wall
+            && api.get(-dx, 0).species != Species::Sink
+        {
+            api.set(-dx, 0, degraded);
+        } else if api.get(0, -1).species != Species::Wall
+            && api.get(0, -1).species != Species::Sink
+            && api.get(0, -1).species != Species::Empty
+        {
+            api.set(0, -1, degraded);
+        } else {
+            api.set(0, 0, cell);
+        }
     }
 }
 
