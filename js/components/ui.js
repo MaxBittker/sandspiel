@@ -185,37 +185,41 @@ class Index extends React.Component {
   }
   submit() {
     let { title, data } = this.state;
+
     let { dataURL, cells } = data;
+    let { currentUser } = firebase.auth();
+    title = title.replace(
+      "[profile]",
+      `https://sandspiel.club/browse/search/?user=${currentUser.uid}`
+    );
     let payload = { title, image: dataURL, cells };
 
     var postList = JSON.parse(localStorage.getItem("postList") || "[]");
+
     postList = postList.filter((post) => Date.now() - 1000 * 60 * 3 < post);
     postList.push(Date.now());
     localStorage.setItem("postList", JSON.stringify(postList));
 
     this.setState({ submitting: true });
-    firebase
-      .auth()
-      .currentUser.getIdToken()
-      .then((token) => {
-        fetch(functions._url("api/creations"), {
-          method: "POST",
-          body: JSON.stringify(payload), // data can be `string` or {object}!
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
-          },
+    currentUser.getIdToken().then((token) => {
+      fetch(functions._url("api/creations"), {
+        method: "POST",
+        body: JSON.stringify(payload), // data can be `string` or {object}!
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token,
+        },
+      })
+        .then((res) => res.json())
+        .then((response) => {
+          console.log("Success:", JSON.stringify(response));
+          this.play();
         })
-          .then((res) => res.json())
-          .then((response) => {
-            console.log("Success:", JSON.stringify(response));
-            this.play();
-          })
-          .catch((error) => console.error("Error:", error))
-          .then(() => {
-            this.setState({ submissionMenuOpen: false, submitting: false });
-          });
-      });
+        .catch((error) => console.error("Error:", error))
+        .then(() => {
+          this.setState({ submissionMenuOpen: false, submitting: false });
+        });
+    });
   }
 
   load() {
