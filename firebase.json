@@ -13,11 +13,11 @@
     "public": "dist",
     "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
+      { "source": "/ads.txt", "destination": "/assets/ads.txt" },
       {
         "source": "**",
         "destination": "/index.html"
-      },
-      { "source": "/ads.txt", "destination": "/ads.txt" }
+      }
     ]
   },
   "storage": {
