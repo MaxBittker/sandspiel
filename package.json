@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "classnames": "^2.2.6",
     "css-loader": "^5.0.2",
     "dat.gui": "^0.7.5",
     "firebase": "^8.2.8",

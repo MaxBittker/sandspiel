@@ -1,15 +1,15 @@
 import React from "react";
-import { NavLink, Link, withRouter } from "react-router-dom";
+import { NavLink, withRouter } from "react-router-dom";
 
 import timeago from "timeago.js";
 
-import HyperText from "./hypertext.js";
-import { functions, storage } from "../api.js";
+import { functions } from "../api.js";
 import SignInScreen from "./signin.js";
+import { Post } from "./Post";
 
-const ago = timeago();
+export const ago = timeago();
 
-let storageUrl =
+export let storageUrl =
   "https://firebasestorage.googleapis.com/v0/b/sandtable-8d0f7.appspot.com/o/creations%2F";
 
 class Submissions extends React.Component {
@@ -34,58 +34,13 @@ class Submissions extends React.Component {
     return (
       <div className="submissions">
         {submissions.map((submission) => {
-          let displayTime = new Date(
-            submission.data.timestamp
-          ).toLocaleDateString();
-          let msAgo =
-            new Date().getTime() -
-            new Date(submission.data.timestamp).getTime();
-
-          if (msAgo < 24 * 60 * 60 * 1000) {
-            displayTime = ago.format(submission.data.timestamp);
-          }
           return (
-            <div key={submission.id} className="submission">
-              <Link
-                className="img-link"
-                to={{
-                  pathname: "/",
-                  hash: `#${submission.id}`,
-                }}
-                onClick={() => {
-                  window.UI.setState(
-                    () => ({
-                      currentSubmission: null,
-                    }),
-                    window.UI.load
-                  );
-                }}
-              >
-                <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
-              </Link>
-              <div style={{ width: "50%" }}>
-                <h3 style={{ flexGrow: 1, wordWrap: "break-word" }}>
-                  <HyperText text={submission.data.title} />
-                </h3>
-                <button
-                  className="heart"
-                  onClick={() => voteFromBrowse(submission)}
-                >
-                  {browseVotes[submission.id] ? "🖤" : "♡"}
-                  {browseVotes[submission.id] || submission.data.score}
-                </button>
-
-                <h4>{displayTime}</h4>
-
-                <button
-                  className="report"
-                  title="report"
-                  onClick={() => report(submission.id)}
-                >
-                  !
-                </button>
-              </div>
-            </div>
+            <Post
+              submission={submission}
+              voteFromBrowse={voteFromBrowse}
+              browseVotes={browseVotes}
+              report={report}
+            />
           );
         })}
       </div>

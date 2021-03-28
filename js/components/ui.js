@@ -184,7 +184,7 @@ class Index extends React.Component {
     return false;
   }
   submit() {
-    let { title, data } = this.state;
+    let { title, data, currentSubmission } = this.state;
 
     let { dataURL, cells } = data;
     let { currentUser } = firebase.auth();
@@ -192,7 +192,13 @@ class Index extends React.Component {
       "[profile]",
       `https://sandspiel.club/browse/search/?user=${currentUser.uid}`
     );
-    let payload = { title, image: dataURL, cells };
+
+    let payload = {
+      title,
+      image: dataURL,
+      parent_id: currentSubmission?.data?.id,
+      cells,
+    };
 
     var postList = JSON.parse(localStorage.getItem("postList") || "[]");
 
@@ -405,11 +411,13 @@ class Index extends React.Component {
         >
           Wind
         </button>
-        {Object.keys(Species).filter(x => !Number.isInteger(Number.parseInt(x))).map((n) =>
-          ElementButton(n, selectedElement, (id) =>
-            this.setState({ selectedElement: id })
-          )
-        )}
+        {Object.keys(Species)
+          .filter((x) => !Number.isInteger(Number.parseInt(x)))
+          .map((n) =>
+            ElementButton(n, selectedElement, (id) =>
+              this.setState({ selectedElement: id })
+            )
+          )}
         <span className="promo">
           *new*{" "}
           <a href="https://orb.farm" target="_blank">

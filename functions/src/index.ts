@@ -139,7 +139,7 @@ const validateFirebaseIdToken = async (req, res, next) => {
 // POST /api/creations
 // Create a new creation, and upload two image
 app.post("/creations", validateFirebaseIdToken, async (req, res) => {
-  const { title, image, cells } = req.body;
+  const { title, image, cells, parent_id } = req.body;
   const ip = req.header("x-appengine-user-ip");
 
   const { uid } = req["user"];
@@ -175,13 +175,13 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
       SELECT exists(
       SELECT 1 FROM bans 
       WHERE user_id = $1 and 
-      timestamp > NOW() - INTERVAL '30 days'
+      timestamp > NOW() - INTERVAL '60 days'
       )`,
       [uid]
     );
 
     if (banned.rows[0].exists) {
-      res.sendStatus(401).json({ id: "you're banned for one month" });
+      res.sendStatus(401).json({ id: "you're banned for two months" });
       return;
     }
     const countRows = await pgPool.query(
@@ -226,12 +226,15 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
       uploadPNG(image, ".png"),
     ]);
 
-    const text =
-      "INSERT INTO creations(id, data_id, user_id, title, score, ip, timestamp) VALUES($1, $2, $3, $4, $5, $6, to_timestamp( $7 / 1000.0) )";
+    const text = `INSERT INTO 
+       creations(id, data_id, user_id, parent_id, title, score, ip, timestamp)
+       VALUES($1, $2, $3, $4, $5, $6, $7, to_timestamp( $8 / 1000.0) )`;
+
     const values = [
       publicId,
       data.id,
       uid,
+      parent_id,
       data.title,
       data.score,
       ip,
@@ -266,7 +269,6 @@ app.get("/creations", async (req: express.Request, res) => {
   try {
     let browse: pg.QueryResult;
     if (user) {
-      console.log("making user query! " + user);
       browse = await pgPool.query(
         `
         SELECT * from creations 
@@ -296,7 +298,8 @@ app.get("/creations", async (req: express.Request, res) => {
           MAX(cs.title) as title,
           MAX(cs.timestamp) as timestamp,
           MAX(cs.score) as score,
-        COUNT(RP.id) AS reportcount
+          MAX(cs.parent_id) as parent_id,
+          COUNT(RP.id) AS reportcount
         from SUBSET cs
         Left JOIN reports AS RP ON RP.id = cs.ID
         group by cs.id
@@ -324,6 +327,7 @@ app.get("/creations", async (req: express.Request, res) => {
         MAX(cs.title) as title ,
         MAX(cs.timestamp) as timestamp ,
         MAX(cs.score) as score ,
+        MAX(cs.parent_id) as parent_id,
     COUNT(RP.id) AS reportcount
     from SUBSET cs
     Left JOIN reports AS RP ON RP.id = cs.ID
@@ -338,7 +342,8 @@ app.get("/creations", async (req: express.Request, res) => {
           C.data_id,
           C.title,
           C.timestamp,
-          C.score
+          C.score,
+          C.parent_id          
         FROM creations c 
         WHERE NOT EXISTS(
           SELECT
@@ -354,6 +359,7 @@ app.get("/creations", async (req: express.Request, res) => {
         MAX(cs.title) as title ,
         MAX(cs.timestamp) as timestamp ,
         MAX(cs.score) as score ,
+        MAX(cs.parent_id) as parent_id,
         COUNT(RP.id) AS reportcount
       from SUBSET cs
       Left JOIN reports AS RP ON RP.id = cs.ID
@@ -376,6 +382,7 @@ app.get("/creations", async (req: express.Request, res) => {
           title: row.title,
           score: row.score,
           timestamp: row.timestamp,
+          parent_id: row.parent_id,
         },
       };
     });
@@ -446,8 +453,11 @@ app.get("/creations/:id", async (req, res) => {
     ]);
 
     if (get.rowCount > 0) {
-      const { data_id, score, timestamp, title } = get.rows[0];
-      res.status(200).json({ id: data_id, score, timestamp, title, data_id });
+      const { ip, tsv, ...data } = get.rows[0];
+      res.status(200).json({
+        ...data,
+        id: data.data_id,
+      });
     } else {
       res
         .status(404)
@@ -498,7 +508,8 @@ app.put("/creations/:id/vote", validateFirebaseIdToken, async (req, res) => {
       "UPDATE creations SET score=score+1 WHERE id = $1 RETURNING *";
     try {
       const result: pg.QueryResult = await pgPool.query(update, [id]);
-      res.status(200).json({ ...result.rows[0] });
+      let { ip, tsv, ...data } = result.rows[0];
+      res.status(200).json({ ...data, id: data.data_id });
     } catch (err) {
       console.error("error updating score" + err.message + err.stack);
       res.sendStatus(500);
@@ -643,6 +654,9 @@ wordfilter.removeWord("crazy");
 wordfilter.removeWord("crip");
 wordfilter.removeWord("kraut");
 wordfilter.removeWord("spook");
+wordfilter.addWords(["porn"]);
+wordfilter.addWords(["fuck"]);
+
 wordfilter.addWords(["rape"]);
 wordfilter.addWords(["n i g g"]);
 

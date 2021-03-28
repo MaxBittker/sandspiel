@@ -5,9 +5,11 @@ CREATE TABLE creations (
     title varchar(220) NOT NULL,
     score integer NOT NULL,
     user_id char(32),
+    parent_id char(32),
     timestamp timestamp NOT NULL DEFAULT NOW()
 );
 
+ALTER TABLE creations ADD COLUMN parent_id char(32);
   
 -- https://blog.lateral.io/2015/05/full-text-search-in-milliseconds-with-postgresql/
 ALTER TABLE creations ADD COLUMN tsv tsvector;
@@ -40,6 +42,7 @@ CREATE INDEX ON creations (id);
 CREATE INDEX ON creations (ip);
 CREATE INDEX ON creations (user_id);
 CREATE INDEX ON creations (data_id);
+CREATE INDEX ON creations (parent_id);
 
 CREATE TABLE votes (
     id char(20),
@@ -73,3 +76,13 @@ CREATE TABLE rulings (
 
 
 CREATE UNIQUE INDEX ON rulings (id);
+
+
+
+-- SELECT d.date, count(se.id)
+-- FROM (SELECT to_char(date_trunc('day', (current_date - offs)), 'YYYY-MM-DD') AS date 
+--       FROM generate_series(0, 365, 1) AS offs
+--      ) d LEFT OUTER JOIN
+--      creations se 
+--      ON d.date = to_char(date_trunc('day', se.timestamp), 'YYYY-MM-DD')  
+-- GROUP BY d.date;

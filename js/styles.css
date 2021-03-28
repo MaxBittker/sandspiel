@@ -80,9 +80,11 @@ button {
   line-height: 0px;
   cursor: pointer;
 }
-.active button {
+.active button,
+button.active {
   background-color: gainsboro;
 }
+
 button:disabled {
   background-color: gainsboro;
   color: gray;
@@ -207,15 +209,31 @@ img {
   background-color: gainsboro;
   display: flex;
 }
+.submission.expanded {
+  border-top: 2px dashed #a0a0a0;
+  margin-top: -5px;
+}
 .submission img {
   width: 100%;
 }
 .img-link {
   width: 50%;
+  line-height: 0;
   /* height: 50%; */
   /* display: inline-block; */
 }
-
+.submission button.parent {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  height: 30px;
+  width: 30px;
+}
+.thread {
+  /* margin: 1px; */
+  /* border: 1px dotted #a0a0a0; */
+  /* background-color: rgb(212, 204, 204); */
+}
 .submission div {
   margin: 8px 8px 8px 16px;
   display: flex;
@@ -223,7 +241,7 @@ img {
   align-items: flex-start;
 }
 .submission div h3 {
-  width: 100%;
+  /* width: 100%; */
 }
 .submission div h2 {
   display: inline-block;

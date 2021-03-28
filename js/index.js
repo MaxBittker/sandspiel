@@ -145,5 +145,12 @@ function reset() {
 }
 window.u = universe;
 
+document.addEventListener("keydown", function (event) {
+  if (event.ctrlKey && event.key === "z") {
+    reset();
+    universe.pop_undo();
+  }
+});
+
 (adsbygoogle = window.adsbygoogle || []).push({});
 export { canvas, width, height, universe, reset };
