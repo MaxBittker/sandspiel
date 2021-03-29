@@ -103,13 +103,24 @@ export function Post({
             style={{
               flexGrow: 1,
               wordWrap: "break-word",
-              marginRight: hasParent ? 35 : 0,
+              fontSize: submission.data.title.length > 100 ? " 0.9em" : "1.1em",
+              //   marginTop: hasParent ? 35 : 0,
             }}
           >
+            {hasParent && <span className="blocker" />}
             <HyperText text={submission.data.title} />
           </h3>
+          <span className="bottom-row">
+            <span>{displayTime} </span>
 
-          <h4>{displayTime}</h4>
+            <button
+              className="heart"
+              onClick={() => voteFromBrowse(submission)}
+            >
+              {browseVotes[submission.id] || submission.data.score}
+              {browseVotes[submission.id] ? "🖤" : "♡"}
+            </button>
+          </span>
 
           <button
             className="report"
@@ -118,11 +129,6 @@ export function Post({
           >
             !
           </button>
-          <button className="heart" onClick={() => voteFromBrowse(submission)}>
-            {browseVotes[submission.id] ? "🖤" : "♡"}
-            {browseVotes[submission.id] || submission.data.score}
-          </button>
-
           {submission.data.children > (redundent_child_id ? 1 : 0) && (
             <button
               className={classnames("children", { active: childrenPosts })}

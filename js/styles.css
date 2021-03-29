@@ -8,7 +8,7 @@ html,
 body {
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
 }
 
 body,
@@ -161,7 +161,7 @@ button.selected {
   max-width: 80vh;
   background-color: #f0e4e3;
   width: calc(100% - 10px);
-  margin: 5px;
+  margin: 3px;
   box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.2);
   /* margin: auto; */
 }
@@ -229,32 +229,47 @@ img {
 }
 .submission button.parent {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 0px;
+  right: 0px;
   height: 30px;
   width: 30px;
 }
 .thread {
 }
 .submission div {
-  margin: 8px 8px 8px 16px;
+  margin: 8px 8px 8px 10px;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
 }
 .submission div h3 {
-  /* width: 100%; */
+  width: 100%;
 }
 .submission div h2 {
   display: inline-block;
   max-width: 50vw;
 }
-
 .report {
-  position: absolute;
-  right: 5px;
-  bottom: 5px;
+  height: 30px;
+  width: 30px;
+  display: block;
   color: grey;
+  flex-grow: 0;
+  margin-left: -4px;
+  margin-bottom: -8px;
+  /* position: absolute; */
+  /* right: 35px; */
+  /* bottom: 0px; */
+}
+.blocker {
+  height: 23px;
+  width: 24px;
+  float: right;
+}
+.children {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
   /* filter: graysca
   /* line-height: 29px; */
 }
@@ -263,18 +278,35 @@ img {
   filter: none;
   transform: scale(1.5);
 }
+.bottom-row {
+  width: 100%;
+  line-height: 19px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.bottom-row > * {
+  line-height: 30px;
+  display: inline-block;
+}
 .heart {
-  display: block;
+  /* display: block; */
   background-color: transparent;
   border-color: transparent;
+  border-width: 0;
   flex-grow: 0;
   line-break: auto;
   text-align: left;
   padding: 0;
   margin: 0;
-  font-size: 22px;
-  font-weight: bolder;
+  /* height: 0 */
+  /* font-size: 22px; */
+  /* font-weight: bolder; */
   transition: transform 0.1s;
+  flex-grow: 0;
+  /* margin-left: auto; */
+  margin-right: -10px;
+  /* margin-bottom: 15px; */
 }
 .heart:active {
   color: red;
