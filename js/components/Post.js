@@ -3,10 +3,18 @@ import { Link } from "react-router-dom";
 import HyperText from "./hypertext.js";
 import classnames from "classnames";
 import { ago, storageUrl } from "./browse";
-import { functions, storage } from "../api.js";
+import { functions } from "../api.js";
 
-export function Post({ submission, voteFromBrowse, browseVotes, report }) {
+export function Post({
+  submission,
+  voteFromBrowse,
+  browseVotes,
+  report,
+  redundent_parent_id,
+  redundent_child_id,
+}) {
   let [nextPost, setNextPost] = useState(null);
+  let [childrenPosts, setChildrenPosts] = useState(null);
   let displayTime = new Date(submission.data.timestamp).toLocaleDateString();
   let msAgo =
     new Date().getTime() - new Date(submission.data.timestamp).getTime();
@@ -30,6 +38,20 @@ export function Post({ submission, voteFromBrowse, browseVotes, report }) {
         setNextPost({ id: data.id, data });
       });
   }
+
+  function fetchChildren() {
+    fetch(functions._url(`api/creations?parent=${submission.data.id}`), {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setChildrenPosts(data.filter(({ id }) => id !== redundent_child_id));
+      });
+  }
+
   const hasParent = submission.data?.parent_id;
   return (
     <div className="thread">
@@ -39,11 +61,15 @@ export function Post({ submission, voteFromBrowse, browseVotes, report }) {
           voteFromBrowse={voteFromBrowse}
           browseVotes={browseVotes}
           report={report}
+          redundent_child_id={submission.id}
         />
       )}
       <div
         key={submission.id}
-        className={classnames("submission", { expanded: nextPost })}
+        className={classnames("submission", {
+          expandedTop: nextPost,
+          expandedBottom: childrenPosts,
+        })}
       >
         <Link
           className="img-link"
@@ -63,8 +89,9 @@ export function Post({ submission, voteFromBrowse, browseVotes, report }) {
           <img src={`${storageUrl}${submission.data.id}.png?alt=media`} />
         </Link>
         <div style={{ width: "50%" }}>
-          {hasParent && (
+          {hasParent && !redundent_parent_id && (
             <button
+              title="parent post"
               className={classnames("parent", { active: nextPost })}
               onClick={fetchParent}
             >
@@ -81,10 +108,6 @@ export function Post({ submission, voteFromBrowse, browseVotes, report }) {
           >
             <HyperText text={submission.data.title} />
           </h3>
-          <button className="heart" onClick={() => voteFromBrowse(submission)}>
-            {browseVotes[submission.id] ? "🖤" : "♡"}
-            {browseVotes[submission.id] || submission.data.score}
-          </button>
 
           <h4>{displayTime}</h4>
 
@@ -95,8 +118,34 @@ export function Post({ submission, voteFromBrowse, browseVotes, report }) {
           >
             !
           </button>
+          <button className="heart" onClick={() => voteFromBrowse(submission)}>
+            {browseVotes[submission.id] ? "🖤" : "♡"}
+            {browseVotes[submission.id] || submission.data.score}
+          </button>
+
+          {submission.data.children > (redundent_child_id ? 1 : 0) && (
+            <button
+              className={classnames("children", { active: childrenPosts })}
+              title="show children"
+              onClick={fetchChildren}
+            >
+              {submission.data.children}↓
+            </button>
+          )}
         </div>
       </div>
+
+      {childrenPosts &&
+        childrenPosts.map((childData) => (
+          <Post
+            key={childData.id}
+            submission={childData}
+            voteFromBrowse={voteFromBrowse}
+            browseVotes={browseVotes}
+            report={report}
+            redundent_parent_id={submission.id}
+          />
+        ))}
     </div>
   );
 }

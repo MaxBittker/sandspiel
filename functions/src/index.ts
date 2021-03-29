@@ -243,6 +243,13 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
     try {
       await pgPool.query(text, values);
       res.status(201).json({ id });
+
+      if (parent_id) {
+        const update =
+          "UPDATE creations SET children=COALESCE(children, 0)+1 WHERE id = $1";
+
+        await pgPool.query(update, [parent_id.slice(0, 20)]);
+      }
     } catch (err) {
       console.error(
         "error writing creation" + err.message + err.name + err.stack
@@ -264,7 +271,7 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
 // GET /api/creations?q={q}
 // Get all creations, optionally specifying a string to filter on
 app.get("/creations", async (req: express.Request, res) => {
-  const { q, d, title, user } = req.query;
+  const { q, d, title, user, parent } = req.query;
 
   try {
     let browse: pg.QueryResult;
@@ -277,6 +284,16 @@ app.get("/creations", async (req: express.Request, res) => {
         LIMIT 150
         `,
         [user.toString().trim()]
+      );
+    } else if (parent) {
+      browse = await pgPool.query(
+        `
+          SELECT * from creations 
+          WHERE parent_id = $1
+          ORDER BY timestamp DESC
+          LIMIT 150
+          `,
+        [parent]
       );
     } else if (title) {
       browse = await pgPool.query(
@@ -298,6 +315,7 @@ app.get("/creations", async (req: express.Request, res) => {
           MAX(cs.title) as title,
           MAX(cs.timestamp) as timestamp,
           MAX(cs.score) as score,
+          MAX(cs.children) as children,
           MAX(cs.parent_id) as parent_id,
           COUNT(RP.id) AS reportcount
         from SUBSET cs
@@ -327,6 +345,7 @@ app.get("/creations", async (req: express.Request, res) => {
         MAX(cs.title) as title ,
         MAX(cs.timestamp) as timestamp ,
         MAX(cs.score) as score ,
+        MAX(cs.children) as children,
         MAX(cs.parent_id) as parent_id,
     COUNT(RP.id) AS reportcount
     from SUBSET cs
@@ -343,6 +362,7 @@ app.get("/creations", async (req: express.Request, res) => {
           C.title,
           C.timestamp,
           C.score,
+          C.children,
           C.parent_id          
         FROM creations c 
         WHERE NOT EXISTS(
@@ -359,6 +379,7 @@ app.get("/creations", async (req: express.Request, res) => {
         MAX(cs.title) as title ,
         MAX(cs.timestamp) as timestamp ,
         MAX(cs.score) as score ,
+        MAX(cs.children) as children,
         MAX(cs.parent_id) as parent_id,
         COUNT(RP.id) AS reportcount
       from SUBSET cs
@@ -381,6 +402,7 @@ app.get("/creations", async (req: express.Request, res) => {
           id: row.data_id,
           title: row.title,
           score: row.score,
+          children: row.children,
           timestamp: row.timestamp,
           parent_id: row.parent_id,
         },

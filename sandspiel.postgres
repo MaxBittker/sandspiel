@@ -4,6 +4,7 @@ CREATE TABLE creations (
     data_id char(32) NOT NULL,
     title varchar(220) NOT NULL,
     score integer NOT NULL,
+    children integer,
     user_id char(32),
     parent_id char(32),
     timestamp timestamp NOT NULL DEFAULT NOW()

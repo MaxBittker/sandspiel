@@ -8,6 +8,7 @@ html,
 body {
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
+  overflow-x: hidden;
 }
 
 body,
@@ -209,9 +210,13 @@ img {
   background-color: gainsboro;
   display: flex;
 }
-.submission.expanded {
+.submission.expandedTop {
   border-top: 2px dashed #a0a0a0;
   margin-top: -5px;
+}
+.submission.expandedBottom {
+  border-bottom: 2px dashed #a0a0a0;
+  margin-bottom: -5px;
 }
 .submission img {
   width: 100%;
@@ -230,9 +235,6 @@ img {
   width: 30px;
 }
 .thread {
-  /* margin: 1px; */
-  /* border: 1px dotted #a0a0a0; */
-  /* background-color: rgb(212, 204, 204); */
 }
 .submission div {
   margin: 8px 8px 8px 16px;

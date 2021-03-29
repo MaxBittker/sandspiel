@@ -36,6 +36,7 @@ class Submissions extends React.Component {
         {submissions.map((submission) => {
           return (
             <Post
+              key={submission.id}
               submission={submission}
               voteFromBrowse={voteFromBrowse}
               browseVotes={browseVotes}

@@ -258,7 +258,6 @@ class Index extends React.Component {
             })
               .then((res) => res.blob())
               .then((blob) => {
-                // console.log(response);
                 this.setState({ currentSubmission: { id, data } });
 
                 var url = URL.createObjectURL(blob);
@@ -318,7 +317,6 @@ class Index extends React.Component {
           .then((res) => res.json())
           .then((data) => {
             if (currentSubmission != null) {
-              console.log(data);
               this.setState({
                 currentSubmission: { ...currentSubmission, data },
               });
