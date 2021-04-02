@@ -43,7 +43,7 @@ const Info = () => {
         on it, your opinion is important to me and I want to do my best to
         ensure sandspiel is a friendly and kind place to play, without bullying,
         racism, or homophobia. If something is wrong or there's some way I can
-        help, feel free to contact me at [FirstnameLastname]@gmail.com
+        help, feel free to contact me at MaxBittker@gmail.com
       </p>
       <br />
       <hr />
