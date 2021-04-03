@@ -62,7 +62,6 @@ class Browse extends React.Component {
     };
   }
   componentWillMount() {
-    console.log("mounted");
     this.loadSubmissions();
   }
   componentDidUpdate(prevProps) {
@@ -156,25 +155,31 @@ class Browse extends React.Component {
             }));
           })
           .catch((e) => {
-            console.log(e);
+            console.error(e);
           });
       });
   }
   report(id) {
-    fetch(functions._url(`api/creations/${id}/report`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        // this.setState(({ browseVotes }) => ({
-        //   browseVotes: { [submission.id]: data.score, ...browseVotes }
-        // }));
-      })
-      .catch((e) => {
-        console.log(e);
+    firebase
+      .auth()
+      .currentUser.getIdToken()
+      .then((token) => {
+        fetch(functions._url(`api/creations/${id}/report`), {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            // this.setState(({ browseVotes }) => ({
+            //   browseVotes: { [submission.id]: data.score, ...browseVotes }
+            // }));
+          })
+          .catch((e) => {
+            console.error(e);
+          });
       });
   }
   render() {
@@ -182,11 +187,20 @@ class Browse extends React.Component {
     return (
       <React.Fragment>
         <SignInScreen />
-        <p style={{ gridColumn: "auto / span 2" }}>
-          Developer update: I'm working on implementing a new user system for
-          sandspiel! If you have trouble posting, please try signing in via
-          email or "hard refreshing" your browser tab. Please bear with me as I
-          work out the issues. - Max
+        <p style={{ gridColumn: "auto / span 2", margin: "8px", fontSize: 16 }}>
+          Check out ☞ <br></br>
+          <a href="https://www.youtube.com/watch?v=BDyvjkAs5-Y" target="_blank">
+            {" "}
+            "Top 9 ways to make Sand" [Luke Wilson]
+          </a>
+          <br></br>
+          <a
+            href="https://www.youtube.com/watch?v=ui1Rvfi25Wc&feature=youtu.be"
+            target="_blank"
+          >
+            {" "}
+            "Lucky Frog - Silence" [Music Video]
+          </a>
         </p>
         <NavLink exact to="/browse/">
           <button>New</button>

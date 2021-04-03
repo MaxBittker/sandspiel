@@ -75,14 +75,14 @@ export function Post({
           className="img-link"
           to={{
             pathname: "/",
-            hash: `#${submission.id}`,
+            hash: `#${submission.id.slice(0, 20)}`,
           }}
           onClick={() => {
             window.UI.setState(
               () => ({
                 currentSubmission: null,
-              })
-              // window.UI.load
+              }),
+              window.UI.load
             );
           }}
         >

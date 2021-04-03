@@ -40,6 +40,9 @@
   },
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.7.4",
+    "@sentry/browser": "^6.2.5",
+    "@sentry/tracing": "^6.2.5",
+    "@sentry/wasm": "^6.2.5",
     "classnames": "^2.2.6",
     "css-loader": "^5.0.2",
     "dat.gui": "^0.7.5",

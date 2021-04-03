@@ -680,7 +680,7 @@ wordfilter.addWords(["porn"]);
 wordfilter.addWords(["fuck"]);
 
 wordfilter.addWords(["rape"]);
-wordfilter.addWords(["n i g g"]);
+wordfilter.addWords(["n i g"]);
 
 // Expose the API as a function
 exports.api = functions.https.onRequest(app);

@@ -302,10 +302,11 @@ img {
   /* height: 0 */
   /* font-size: 22px; */
   /* font-weight: bolder; */
+  min-width: 0 !important;
   transition: transform 0.1s;
   flex-grow: 0;
   /* margin-left: auto; */
-  margin-right: -10px;
+  margin-right: -2px;
   /* margin-bottom: 15px; */
 }
 .heart:active {

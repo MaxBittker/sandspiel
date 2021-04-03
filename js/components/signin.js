@@ -91,7 +91,7 @@ class SignInScreen extends React.Component {
       }
     }
     let { currentUser } = firebase.auth();
-    console.log(currentUser);
+    // console.log(currentUser);
     return (
       <div>
         <div style={{ display: "flex", alignItems: "center" }}>
