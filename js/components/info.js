@@ -27,11 +27,6 @@ const Info = () => {
       </p>
       <br />
       <p>
-        You can follow sandspiel on twitter for updates and new uploads:
-        <a href="https://twitter.com/sandspiel_feed">@sandspiel_feed</a>
-      </p>
-      <br />
-      <p>
         If you'd like, you can view the{" "}
         <a href="https://github.com/maxbittker/sandspiel">source code</a> or{" "}
         <a href="https://github.com/maxbittker/sandspiel/issues">report bugs</a>{" "}
@@ -43,7 +38,7 @@ const Info = () => {
         on it, your opinion is important to me and I want to do my best to
         ensure sandspiel is a friendly and kind place to play, without bullying,
         racism, or homophobia. If something is wrong or there's some way I can
-        help, feel free to contact me at [FirstnameLastname]@gmail.com
+        help, feel free to contact me at <a href="mailto:maxbittker@gmail.com">maxbittker@gmail.com</a> or <a href="https://twitter.com/maxbittker">@maxbittker on twitter.</a>
       </p>
       <br />
       <hr />
