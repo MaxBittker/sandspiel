@@ -1,53 +1,5 @@
 use cfg_if::cfg_if;
 
-pub fn rand_int(n: i32) -> i32 {
-    (js_sys::Math::random() * n as f64) as i32
-}
-
-pub fn once_in(n: i32) -> bool {
-    rand_int(n) == 0
-}
-pub fn rand_dir() -> i32 {
-    let i = rand_int(1000);
-    (i % 3) - 1
-}
-pub fn rand_dir_2() -> i32 {
-    let i = rand_int(1000);
-    if (i % 2) == 0 {
-        -1
-    } else {
-        1
-    }
-}
-
-pub fn rand_vec() -> (i32, i32) {
-    let i = rand_int(2000);
-    match i % 9 {
-        0 => (1, 1),
-        1 => (1, 0),
-        2 => (1, -1),
-        3 => (0, -1),
-        4 => (-1, -1),
-        5 => (-1, 0),
-        6 => (-1, 1),
-        7 => (0, 1),
-        _ => (0, 0),
-    }
-}
-
-pub fn rand_vec_8() -> (i32, i32) {
-    let i = rand_int(2000);
-    match i % 8 {
-        0 => (1, 1),
-        1 => (1, 0),
-        2 => (1, -1),
-        3 => (0, -1),
-        4 => (-1, -1),
-        5 => (-1, 0),
-        6 => (-1, 1),
-        _ => (0, 1),
-    }
-}
 pub fn adjacency_right(dir: (i32, i32)) -> (i32, i32) {
     match dir {
         (0, 1) => (1, 1),

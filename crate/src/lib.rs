@@ -1,11 +1,15 @@
 extern crate cfg_if;
 extern crate js_sys;
+extern crate rand;
+extern crate rand_isaac;
 extern crate wasm_bindgen;
 extern crate web_sys;
 
 mod species;
 mod utils;
 
+use rand::{Rng, SeedableRng};
+use rand_isaac::Isaac64Rng;
 use species::Species;
 use std::collections::VecDeque;
 use wasm_bindgen::prelude::*;
@@ -61,6 +65,7 @@ pub struct Universe {
     winds: Vec<Wind>,
     burns: Vec<Wind>,
     generation: u8,
+    rng: Isaac64Rng,
 }
 
 pub struct SandApi<'a> {
@@ -102,18 +107,63 @@ impl<'a> SandApi<'a> {
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
     }
     pub fn get_fluid(&mut self) -> Wind {
-        let idx = self
-            .universe
-            .get_index(self.x, self.y);
+        let idx = self.universe.get_index(self.x, self.y);
 
         self.universe.winds[idx]
     }
     pub fn set_fluid(&mut self, v: Wind) {
-        let idx = self
-            .universe
-            .get_index(self.x, self.y);
+        let idx = self.universe.get_index(self.x, self.y);
 
         self.universe.burns[idx] = v;
+    }
+
+    pub fn rand_int(&mut self, n: i32) -> i32 {
+        self.universe.rng.gen_range(0..n)
+    }
+
+    pub fn once_in(&mut self, n: i32) -> bool {
+        self.rand_int(n) == 0
+    }
+    pub fn rand_dir(&mut self) -> i32 {
+        let i = self.rand_int(1000);
+        (i % 3) - 1
+    }
+    pub fn rand_dir_2(&mut self) -> i32 {
+        let i = self.rand_int(1000);
+        if (i % 2) == 0 {
+            -1
+        } else {
+            1
+        }
+    }
+
+    pub fn rand_vec(&mut self) -> (i32, i32) {
+        let i = self.rand_int(2000);
+        match i % 9 {
+            0 => (1, 1),
+            1 => (1, 0),
+            2 => (1, -1),
+            3 => (0, -1),
+            4 => (-1, -1),
+            5 => (-1, 0),
+            6 => (-1, 1),
+            7 => (0, 1),
+            _ => (0, 0),
+        }
+    }
+
+    pub fn rand_vec_8(&mut self) -> (i32, i32) {
+        let i = self.rand_int(8);
+        match i {
+            0 => (1, 1),
+            1 => (1, 0),
+            2 => (1, -1),
+            3 => (0, -1),
+            4 => (-1, -1),
+            5 => (-1, 0),
+            6 => (-1, 1),
+            _ => (0, 1),
+        }
     }
 }
 
@@ -225,7 +275,7 @@ impl Universe {
                         species: species,
                         ra: 60
                             + (size as u8)
-                            + (js_sys::Math::random() * 30.) as u8
+                            + (self.rng.gen::<f32>() * 30.) as u8
                             + ((self.generation % 127) as i8 - 60).abs() as u8,
                         rb: 0,
                         clock: self.generation,
@@ -253,11 +303,7 @@ impl Universe {
     }
 
     pub fn new(width: i32, height: i32) -> Universe {
-        let cells = (0..width * height)
-            .map(|i| {
-                    EMPTY_CELL
-            })
-            .collect();
+        let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
         let winds: Vec<Wind> = (0..width * height)
             .map(|_i| Wind {
                 dx: 0,
@@ -275,7 +321,7 @@ impl Universe {
                 density: 0,
             })
             .collect();
-
+        let rng: Isaac64Rng = SeedableRng::seed_from_u64(0x734f6b89de5f83cc);
         Universe {
             width,
             height,
@@ -284,6 +330,7 @@ impl Universe {
             burns,
             winds,
             generation: 0,
+            rng,
         }
     }
 }
