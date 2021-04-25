@@ -22,7 +22,7 @@ void main() {
   //   if (length(uv) < r && length(uv) > r - 0.1) {
   // color = hsv2rgb(vec3(sin(t * 0.01), 0.5, 0.5));
 
-  vec2 textCoord = (uv * vec2(0.5, -0.5)) + vec2(0.5);
+  vec2 textCoord = ((uv * vec2(0.5, -0.5)) + vec2(0.5)).yx;
   // vec3 bb = texture2D(backBuffer, (uv * 0.5) + vec2(0.5)).rgb;
 
   vec4 data = texture2D(data, textCoord);

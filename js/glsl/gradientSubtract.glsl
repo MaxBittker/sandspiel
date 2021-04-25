@@ -21,9 +21,9 @@ void main() {
   float B = texture2D(uPressure, boundary(vB)).x;
   vec2 velocity = texture2D(uVelocity, vUv).xy;
   vec2 wind = texture2D(uWind, vUv).xy;
-  vec2 cell = texture2D(uCells, vec2(vUv.x, 1.0 - (vUv.y + (1.0 / 300.)))).xy;
+  vec2 cell = texture2D(uCells, vUv).xy;
   velocity.xy -= vec2(R - L, T - B);
-  velocity.xy += wind * 25.;
+  velocity.yx += wind * -25.; // hack, probably wrong for X
 
   int type = int((cell.r * 255.) + 0.1);
 

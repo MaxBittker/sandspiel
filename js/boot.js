@@ -36,6 +36,7 @@ async function boot(width, height) {
       Math.random() * 6 + 10,
       Species.Sand
     );
+    if (window.stopboot) return;
     await sleep(8);
   }
   for (let x = 40; x <= width - 40; x += 50 + Math.random() * 10) {
@@ -45,7 +46,9 @@ async function boot(width, height) {
       6,
       Species.Seed
     );
-    await sleep(100);
+    if (window.stopboot) return;
+
+    await sleep(80);
   }
 
   //   for (let a = 0; a <= 180; a += 4) {

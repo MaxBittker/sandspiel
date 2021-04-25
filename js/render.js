@@ -73,11 +73,11 @@ let snapshot = (universe) => {
 let pallette = () => {
   let canvas = document.createElement("canvas");
 
-  let species = Object.values(Species).filter(x => Number.isInteger(x));;
+  let species = Object.values(Species).filter((x) => Number.isInteger(x));
   let range = Math.max(...species) + 1;
   let universe = Universe.new(range, 1);
-  canvas.width = range;
-  canvas.height = 3;
+  canvas.width = 3;
+  canvas.height = range;
   universe.reset();
 
   species.forEach((id) => universe.paint(id, 0, 1, id));
@@ -86,10 +86,10 @@ let pallette = () => {
   render();
   let ctx = canvas.getContext("webgl");
   let data = new Uint8Array(range * 4);
-  ctx.readPixels(0, 0, range, 1, ctx.RGBA, ctx.UNSIGNED_BYTE, data);
+  ctx.readPixels(0, 0, 1, range, ctx.RGBA, ctx.UNSIGNED_BYTE, data);
   let colors = {};
   species.forEach((id) => {
-    let index = id * 4;
+    let index = (range - 1 - id) * 4;
     let color = `rgba(${data[index]},${data[index + 1]}, ${
       data[index + 2]
     }, 0.25)`;

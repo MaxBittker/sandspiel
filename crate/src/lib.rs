@@ -104,14 +104,14 @@ impl<'a> SandApi<'a> {
     pub fn get_fluid(&mut self) -> Wind {
         let idx = self
             .universe
-            .get_index(self.x, self.universe.height - (1 + self.y));
+            .get_index(self.x, self.y);
 
         self.universe.winds[idx]
     }
     pub fn set_fluid(&mut self, v: Wind) {
         let idx = self
             .universe
-            .get_index(self.x, self.universe.height - (1 + self.y));
+            .get_index(self.x, self.y);
 
         self.universe.burns[idx] = v;
     }
@@ -157,7 +157,7 @@ impl Universe {
             };
 
             for y in 0..self.height {
-                let idx = self.get_index(scanx, self.height - (1 + y));
+                let idx = self.get_index(scanx, y);
                 let cell = self.get_cell(scanx, y);
 
                 self.burns[idx] = Wind {
@@ -291,7 +291,7 @@ impl Universe {
 //private methods
 impl Universe {
     fn get_index(&self, x: i32, y: i32) -> usize {
-        (x + (y * self.width)) as usize
+        (x * self.height + y) as usize
     }
 
     fn get_cell(&self, x: i32, y: i32) -> Cell {
@@ -300,7 +300,7 @@ impl Universe {
     }
 
     fn get_wind(&self, x: i32, y: i32) -> Wind {
-        let i = self.get_index(x, (self.height - y) - 1);
+        let i = self.get_index(x, y);
         return self.winds[i];
     }
 
@@ -351,20 +351,20 @@ impl Universe {
             _ => 40,
         };
 
-        let wx = (wind.dx as i32) - 126;
-        let wy = (wind.dy as i32) - 126;
+        let wx = (wind.dy as i32) - 126;
+        let wy = (wind.dx as i32) - 126;
 
         if wx > threshold {
             dx = 1;
         }
         if wy > threshold {
-            dy = -1;
+            dy = 1;
         }
         if wx < -threshold {
             dx = -1;
         }
         if wy < -threshold {
-            dy = 1;
+            dy = -1;
         }
         if (dx != 0 || dy != 0) && api.get(dx, dy).species == Species::Empty {
             api.set(0, 0, EMPTY_CELL);

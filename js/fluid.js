@@ -839,10 +839,10 @@ function startFluid({ universe }) {
     );
     gl.uniform2f(
       splatProgram.uniforms.point,
-      x / canvas.width,
-      1.0 - y / canvas.height
+      y / canvas.height,
+      x / canvas.width
     );
-    gl.uniform3f(splatProgram.uniforms.color, dx, -dy, 1.0);
+    gl.uniform3f(splatProgram.uniforms.color, dy, dx, 1.0);
     gl.uniform1f(
       splatProgram.uniforms.radius,
       (window.UI.state.size + 1) / 600

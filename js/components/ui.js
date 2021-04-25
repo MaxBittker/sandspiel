@@ -155,6 +155,7 @@ class Index extends React.Component {
     canvas.width = width;
 
     // fill imgData with data from cells
+    // todo, transpose
     for (var i = 0; i < width * height * 4; i++) {
       if (i % 4 == 3) {
         imgData.data[i] = 255;
@@ -268,6 +269,11 @@ class Index extends React.Component {
                   canvas.width = width;
                   canvas.height = height;
                   var ctx = canvas.getContext("2d");
+
+                  ctx.translate(canvas.width / 2, canvas.height / 2);
+                  ctx.rotate((-90 * Math.PI) / 180);
+                  ctx.translate(-canvas.width / 2, -canvas.height / 2);
+
                   ctx.drawImage(img, 0, 0);
                   var imgData = ctx.getImageData(
                     0,
@@ -283,6 +289,7 @@ class Index extends React.Component {
                   );
 
                   reset();
+                  window.stopboot = true;
 
                   for (var i = 0; i < width * height * 4; i++) {
                     cellsData[i] = imgData.data[i];
