@@ -255,13 +255,7 @@ impl Universe {
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height)
             .map(|i| {
-                if js_sys::Math::random() > 0.9995 && i < width * height / 4 {
-                    Cell::new(Species::Seed)
-                } else if js_sys::Math::random() < 0.9 || i < width * height / 3 {
                     EMPTY_CELL
-                } else {
-                    Cell::new(Species::Sand)
-                }
             })
             .collect();
         let winds: Vec<Wind> = (0..width * height)

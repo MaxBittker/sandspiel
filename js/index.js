@@ -1,6 +1,7 @@
 import * as Sentry from "@sentry/browser";
 import { Integrations } from "@sentry/tracing";
 import { Wasm as WasmIntegration } from "@sentry/wasm";
+import { boot } from "./boot";
 
 Sentry.init({
   dsn:
@@ -151,7 +152,9 @@ const renderLoop = () => {
 };
 
 renderLoop();
+window.u = universe;
 
+boot(width, height);
 function reset() {
   fluid.reset();
   fluid.update();
@@ -160,7 +163,6 @@ function reset() {
 
   universe.reset();
 }
-window.u = universe;
 
 document.addEventListener("keydown", function (event) {
   if (event.ctrlKey && event.key === "z") {
