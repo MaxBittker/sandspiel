@@ -155,12 +155,18 @@ class Index extends React.Component {
     canvas.width = width;
 
     // fill imgData with data from cells
-    // todo, transpose
-    for (var i = 0; i < width * height * 4; i++) {
-      if (i % 4 == 3) {
-        imgData.data[i] = 255;
-      } else {
-        imgData.data[i] = cells[i];
+    // transpose for historical compatability
+    for (let x = 0; x < width; x++) {
+      for (let y = 0; y < height; y++) {
+        let cell_index = (y + x * height) * 4;
+        let img_index = (x + y * width) * 4;
+        for (var i = 0; i < 4; i++) {
+          if (i % 4 == 3) {
+            imgData.data[img_index + i] = 255;
+          } else {
+            imgData.data[img_index + i] = cells[cell_index + i];
+          }
+        }
       }
     }
     // put data to context at (0, 0)
@@ -272,6 +278,7 @@ class Index extends React.Component {
 
                   ctx.translate(canvas.width / 2, canvas.height / 2);
                   ctx.rotate((-90 * Math.PI) / 180);
+                  ctx.scale(-1, 1.0);
                   ctx.translate(-canvas.width / 2, -canvas.height / 2);
 
                   ctx.drawImage(img, 0, 0);

@@ -50,6 +50,6 @@ avg: ${(avg / m).toPrecision(3)}ms ± ${(dev / m).toPrecision(2)}ms
   `);
 }
 function runBenchmark() {
-  runTest(5, 5);
+  runTest(10, 10);
 }
 export { runBenchmark };
