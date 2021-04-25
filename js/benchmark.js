@@ -42,13 +42,14 @@ function runTest(n, m) {
     console.log(`${i}/${n}`);
   }
   let avg = sum / n;
+  let dev = max - min;
+  // ${min.toPrecision(3)}ms - ${max.toPrecision(3)}ms
   console.log(`Ran ${n} trials
 Range per ${m}: 
-${min.toPrecision(3)}ms - ${max.toPrecision(3)}ms
-avg: ${(avg / m).toPrecision(3)}ms
+avg: ${(avg / m).toPrecision(3)}ms ± ${(dev / m).toPrecision(2)}ms
   `);
 }
 function runBenchmark() {
-  runTest(20, 20);
+  runTest(5, 5);
 }
 export { runBenchmark };
