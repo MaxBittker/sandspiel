@@ -37,8 +37,8 @@ function startFluid({ universe }) {
     VELOCITY_DISSIPATION: 0.99,
     PRESSURE_DISSIPATION: 0.8,
     PRESSURE_ITERATIONS: 25,
-    CURL: 30,
-    SPLAT_RADIUS: 0.005
+    CURL: 15,
+    SPLAT_RADIUS: 0.005,
   };
 
   let pointers = [];
@@ -57,7 +57,7 @@ function startFluid({ universe }) {
     vorticityShader,
     pressureShader,
     gradientSubtractShader,
-    velocityOutShader
+    velocityOutShader,
   } = compileShaders(gl);
   startGUI();
 
@@ -67,7 +67,7 @@ function startFluid({ universe }) {
       depth: false,
       stencil: false,
       antialias: false,
-      preserveDrawingBuffer: false
+      preserveDrawingBuffer: false,
     };
 
     let gl = canvas.getContext("webgl2", params);
@@ -118,8 +118,8 @@ function startFluid({ universe }) {
         formatRG,
         formatR,
         halfFloatTexType,
-        supportLinearFiltering
-      }
+        supportLinearFiltering,
+      },
     };
   }
 
@@ -137,7 +137,7 @@ function startFluid({ universe }) {
 
     return {
       internalFormat,
-      format
+      format,
     };
   }
 
@@ -189,10 +189,7 @@ function startFluid({ universe }) {
       .add(config, "PRESSURE_DISSIPATION", 0.0, 1.0)
       .name("pressure diffusion");
     gui.add(config, "PRESSURE_ITERATIONS", 1, 60).name("iterations");
-    gui
-      .add(config, "CURL", 0, 50)
-      .name("vorticity")
-      .step(1);
+    gui.add(config, "CURL", 0, 50).name("vorticity").step(1);
     gui.add(config, "SPLAT_RADIUS", 0.0001, 0.01).name("splat radius");
 
     gui
@@ -200,7 +197,7 @@ function startFluid({ universe }) {
         {
           fun: () => {
             splatStack.push(parseInt(Math.random() * 20) + 5);
-          }
+          },
         },
         "fun"
       )
@@ -417,7 +414,7 @@ function startFluid({ universe }) {
         let temp = fbo1;
         fbo1 = fbo2;
         fbo2 = temp;
-      }
+      },
     };
   }
 
@@ -437,7 +434,7 @@ function startFluid({ universe }) {
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(0);
 
-    return destination => {
+    return (destination) => {
       gl.bindFramebuffer(gl.FRAMEBUFFER, destination);
       gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
     };
@@ -893,7 +890,7 @@ function startFluid({ universe }) {
   window.addEventListener("resize", resize);
   window.addEventListener("deviceorientation", resize, true);
 
-  sandCanvas.addEventListener("mousemove", e => {
+  sandCanvas.addEventListener("mousemove", (e) => {
     const canvasLeft = (e.clientX - boundingRect.left) * scaleX;
     const canvasTop = (e.clientY - boundingRect.top) * scaleY;
     pointers[0].moved = pointers[0].down;
@@ -905,7 +902,7 @@ function startFluid({ universe }) {
 
   sandCanvas.addEventListener(
     "touchmove",
-    e => {
+    (e) => {
       if (!window.paused) {
         if (e.cancelable) {
           e.preventDefault();
@@ -933,7 +930,7 @@ function startFluid({ universe }) {
     pointers[0].color = fluidColor;
   });
 
-  sandCanvas.addEventListener("touchstart", e => {
+  sandCanvas.addEventListener("touchstart", (e) => {
     if (e.cancelable) {
       e.preventDefault();
     }
@@ -956,7 +953,7 @@ function startFluid({ universe }) {
     pointers[0].down = false;
   });
 
-  window.addEventListener("touchend", e => {
+  window.addEventListener("touchend", (e) => {
     const touches = e.changedTouches;
     for (let i = 0; i < touches.length; i++)
       for (let j = 0; j < pointers.length; j++)
