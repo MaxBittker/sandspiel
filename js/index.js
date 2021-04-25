@@ -24,9 +24,9 @@ import { fps } from "./fps";
 import {} from "./paint";
 import {} from "./app";
 import { startFluid } from "./fluid";
-import { runBenchmark } from "./benchmark";
+// import { runBenchmark } from "./benchmark";
 
-runBenchmark();
+// runBenchmark();
 if (window.safari) {
   history.pushState(null, null, location.href);
   window.onpopstate = function (event) {
