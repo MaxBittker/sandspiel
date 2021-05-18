@@ -12,7 +12,7 @@
   "main": "lib/index.js",
   "dependencies": {
     "@firebase/app-types": "^0.3.9",
-    "@firebase/util": "^0.2.50",
+    "@firebase/util": "^0.3.4",
     "@google-cloud/language": "^2.0.0",
     "@google-cloud/storage": "^2.5.0",
     "@types/pg": "^7.14.10",
