@@ -305,7 +305,7 @@ impl Universe {
     }
 
     fn blow_wind(cell: Cell, wind: Wind, mut api: SandApi) {
-        if cell.clock - api.universe.generation == 1 {
+        if cell.clock.wrapping_sub(api.universe.generation) == 1 {
             return;
         }
         if cell.species == Species::Empty {
@@ -386,7 +386,7 @@ impl Universe {
         }
     }
     fn update_cell(cell: Cell, api: SandApi) {
-        if cell.clock - api.universe.generation == 1 {
+        if cell.clock.wrapping_sub(api.universe.generation) == 1 {
             return;
         }
 
