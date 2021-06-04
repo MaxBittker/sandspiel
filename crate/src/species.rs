@@ -165,26 +165,48 @@ pub fn update_stone(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_water(cell: Cell, mut api: SandApi) {
-    let dx = api.rand_dir();
+    let mut dx = api.rand_dir();
     let below = api.get(0, 1);
     let dx1 = api.get(dx, 1);
-    let dx0 = api.get(dx, 0);
+    let mut dx0 = api.get(dx, 0);
     if below.species == Species::Empty || below.species == Species::Oil {
         api.set(0, 0, below);
         api.set(0, 1, cell);
+        return;
     } else if dx1.species == Species::Empty || dx1.species == Species::Oil {
         api.set(0, 0, dx1);
         api.set(dx, 1, cell);
+        return;
     } else if api.get(-dx, 1).species == Species::Empty {
         api.set(0, 0, EMPTY_CELL);
         api.set(-dx, 1, cell);
+        return;
+    }
+    let left = cell.ra % 2 == 0;
+    dx = if left { 1 } else { -1 };
+    dx0 = api.get(dx, 0);
+    let dxd = api.get(dx * 2, 0);
+    if dx0.species == Species::Empty && dxd.species == Species::Empty {
+        api.set(0, 0, dxd);
+        api.set(2 * dx, 0, cell);
     } else if dx0.species == Species::Empty || dx0.species == Species::Oil {
         api.set(0, 0, dx0);
         api.set(dx, 0, cell);
-    } else if api.get(-dx, 0).species == Species::Empty {
-        api.set(0, 0, EMPTY_CELL);
-        api.set(-dx, 0, cell);
+    } else if api.once_in(4) {
+        api.set(
+            0,
+            0,
+            Cell {
+                ra: ((cell.ra as i32) + dx) as u8,
+                ..cell
+            },
+        )
     }
+
+    // if api.get(-dx, 0).species == Species::Empty {
+    //     api.set(0, 0, EMPTY_CELL);
+    //     api.set(-dx, 0, cell);
+    // }
 }
 
 pub fn update_oil(cell: Cell, mut api: SandApi) {

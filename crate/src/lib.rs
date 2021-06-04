@@ -76,7 +76,7 @@ pub struct SandApi<'a> {
 
 impl<'a> SandApi<'a> {
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
-        if dx > 1 || dx < -1 || dy > 2 || dy < -2 {
+        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
             panic!("oob set");
         }
         let nx = self.x + dx;
@@ -92,7 +92,7 @@ impl<'a> SandApi<'a> {
         self.universe.get_cell(nx, ny)
     }
     pub fn set(&mut self, dx: i32, dy: i32, v: Cell) {
-        if dx > 1 || dx < -1 || dy > 2 || dy < -2 {
+        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
             panic!("oob set");
         }
         let nx = self.x + dx;
