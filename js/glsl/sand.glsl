@@ -54,6 +54,11 @@ void main() {
   } else if (type == 3) { // water
     hue = 0.6;
     lightness = 0.7 + data.g * 0.25 + noise * 0.1;
+    int polarity = int( mod(data.g * 255. ,2.) + 0.1);
+    if(polarity == 0){
+      lightness += 0.01;
+    }
+
   } else if (type == 4) { // gas
     hue = 0.0;
     lightness += 0.4;
@@ -62,10 +67,14 @@ void main() {
     hue = 0.9;
     saturation = 0.3;
   } else if (type == 6) { // fire
+  
     hue = (data.g * 0.1);
     saturation = 0.7;
 
     lightness = 0.7 + (data.g * 0.3) + ((noise + 0.8) * 0.5);
+    if(isSnapshot){
+      lightness -=0.2;
+    }
   } else if (type == 7) { // wood
     hue = (data.g * 0.1);
     saturation = 0.3;

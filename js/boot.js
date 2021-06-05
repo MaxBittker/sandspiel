@@ -37,7 +37,7 @@ async function boot(width, height) {
       Species.Sand
     );
     if (window.stopboot) return;
-    await sleep(8);
+    await sleep(16);
   }
   for (let x = 40; x <= width - 40; x += 50 + Math.random() * 10) {
     window.u.paint(

@@ -168,12 +168,20 @@ pub fn update_water(cell: Cell, mut api: SandApi) {
     let mut dx = api.rand_dir();
     let below = api.get(0, 1);
     let dx1 = api.get(dx, 1);
-    let mut dx0 = api.get(dx, 0);
+    // let mut dx0 = api.get(dx, 0);
+    //fall down
     if below.species == Species::Empty || below.species == Species::Oil {
         api.set(0, 0, below);
-        api.set(0, 1, cell);
+        let mut ra = cell.ra;
+        if api.once_in(20) {
+            //randomize direction when falling sometimes
+            ra = 100 + api.rand_int(50) as u8;
+        }
+        api.set(0, 1, Cell { ra, ..cell });
+
         return;
     } else if dx1.species == Species::Empty || dx1.species == Species::Oil {
+        //fall diagonally
         api.set(0, 0, dx1);
         api.set(dx, 1, cell);
         return;
@@ -184,24 +192,88 @@ pub fn update_water(cell: Cell, mut api: SandApi) {
     }
     let left = cell.ra % 2 == 0;
     dx = if left { 1 } else { -1 };
-    dx0 = api.get(dx, 0);
+    let dx0 = api.get(dx, 0);
     let dxd = api.get(dx * 2, 0);
+
     if dx0.species == Species::Empty && dxd.species == Species::Empty {
+        // scoot double
         api.set(0, 0, dxd);
-        api.set(2 * dx, 0, cell);
+        api.set(2 * dx, 0, Cell { rb: 6, ..cell });
+        let (dx, dy) = api.rand_vec_8();
+        let nbr = api.get(dx, dy);
+
+        // spread opinion
+        if nbr.species == Species::Water {
+            if nbr.ra % 2 != cell.ra % 2 {
+                api.set(
+                    dx,
+                    dy,
+                    Cell {
+                        ra: cell.ra,
+                        ..cell
+                    },
+                )
+            }
+        }
     } else if dx0.species == Species::Empty || dx0.species == Species::Oil {
         api.set(0, 0, dx0);
-        api.set(dx, 0, cell);
-    } else if api.once_in(4) {
+        api.set(dx, 0, Cell { rb: 3, ..cell });
+        let (dx, dy) = api.rand_vec_8();
+        let nbr = api.get(dx, dy);
+        if nbr.species == Species::Water {
+            if nbr.ra % 2 != cell.ra % 2 {
+                api.set(
+                    dx,
+                    dy,
+                    Cell {
+                        ra: cell.ra,
+                        ..cell
+                    },
+                )
+            }
+        }
+    } else if cell.rb == 0 {
+        if api.get(-dx, 0).species == Species::Empty {
+            // bump
+            api.set(
+                0,
+                0,
+                Cell {
+                    ra: ((cell.ra as i32) + dx) as u8,
+                    ..cell
+                },
+            );
+        }
+    } else {
+        // become less certain (more bumpable)
         api.set(
             0,
             0,
             Cell {
-                ra: ((cell.ra as i32) + dx) as u8,
+                rb: cell.rb - 1,
                 ..cell
             },
-        )
+        );
     }
+    // if api.once_in(8) {
+    //     let (dx, dy) = api.rand_vec_8();
+    //     let nbr = api.get(dx, dy);
+    //     if nbr.species == Species::Water {
+    //         if nbr.ra % 2 != cell.ra % 2 {
+    //             api.set(0, 0, Cell { ra: nbr.ra, ..cell })
+    //         }
+    //     }
+    // }
+
+    // let (dx, dy) = api.rand_vec_8();
+    // let nbr = api.get(dx, dy);
+    // if nbr.species == Species::Water {
+    //     if nbr.ra % 2 != cell.ra % 2 && api.once_in(2) {
+    //         api.set(0, 0, Cell { ra: nbr.ra, ..cell })
+    //     }
+    // }
+
+    // {
 
     // if api.get(-dx, 0).species == Species::Empty {
     //     api.set(0, 0, EMPTY_CELL);
