@@ -189,17 +189,17 @@ class Browse extends React.Component {
         <SignInScreen />
         <p style={{ gridColumn: "auto / span 2", margin: "8px", fontSize: 16 }}>
           Check out ☞ <br></br>
-          <a href="https://www.youtube.com/watch?v=BDyvjkAs5-Y" target="_blank">
+          <a href="https://www.youtube.com/watch?v=2qfjJ-0ZeVM" target="_blank">
             {" "}
-            "Top 9 ways to make Sand" [Luke Wilson]
+            "Top 9 ways to make Water" (Lu Wilson)
           </a>
           <br></br>
           <a
-            href="https://www.youtube.com/watch?v=ui1Rvfi25Wc&feature=youtu.be"
+            href="https://www.roblox.com/games/7000824340/Melon-Rancher"
             target="_blank"
           >
             {" "}
-            "Lucky Frog - Silence" [Music Video]
+            Melon Rancher (Roblox Game by me)
           </a>
         </p>
         <NavLink exact to="/browse/">

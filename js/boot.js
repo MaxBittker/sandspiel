@@ -30,12 +30,12 @@ async function boot(width, height) {
       Math.random() * 6 + 10,
       Species.Sand
     );
-    window.u.paint(
-      width - x,
-      Math.floor(height - 40 + 5 * Math.sin(x / 20)),
-      Math.random() * 6 + 10,
-      Species.Sand
-    );
+    // window.u.paint(
+    //   width - x,
+    //   Math.floor(height - 40 + 5 * Math.sin(x / 20)),
+    //   Math.random() * 6 + 10,
+    //   Species.Sand
+    // );
     if (window.stopboot) return;
     await sleep(16);
   }
@@ -48,7 +48,7 @@ async function boot(width, height) {
     );
     if (window.stopboot) return;
 
-    await sleep(80);
+    await sleep(180);
   }
 
   //   for (let a = 0; a <= 180; a += 4) {

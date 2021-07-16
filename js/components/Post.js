@@ -103,7 +103,7 @@ export function Post({
             style={{
               flexGrow: 1,
               wordWrap: "break-word",
-              fontSize: submission.data.title.length > 100 ? " 0.9em" : "1.1em",
+              fontSize: submission.data.title.length > 130 ? " 1.0em" : "1.1em",
               //   marginTop: hasParent ? 35 : 0,
             }}
           >

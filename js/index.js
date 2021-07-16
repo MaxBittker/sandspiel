@@ -4,8 +4,7 @@ import { Wasm as WasmIntegration } from "@sentry/wasm";
 import { boot } from "./boot";
 
 Sentry.init({
-  dsn:
-    "https://4bf8c3ab764f40569d573fc4021efe40@o40136.ingest.sentry.io/1331284",
+  dsn: "https://4bf8c3ab764f40569d573fc4021efe40@o40136.ingest.sentry.io/1331284",
 
   // Alternatively, use `process.env.npm_package_version` for a dynamic release version
   // if your build tool supports it.
