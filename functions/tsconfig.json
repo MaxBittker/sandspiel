@@ -9,6 +9,7 @@
   },
   "compileOnSave": true,
   "include": [
-    "src"
+    "src",
+    readme 
   ]
 }
