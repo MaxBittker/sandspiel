@@ -470,6 +470,12 @@ app.get("/reports", async (req: express.Request, res) => {
 app.get("/creations/:id", async (req, res) => {
   const id = req.params.id;
   try {
+    //todo:
+    // WHERE NOT EXISTS(
+    //   SELECT
+    //   FROM rulings as r
+    //   WHERE r.id = c.id and r.bad = 'yes'
+    // )
     const get = await pgPool.query("SELECT *  FROM creations WHERE id = $1", [
       id,
     ]);
@@ -541,11 +547,53 @@ app.put("/creations/:id/vote", validateFirebaseIdToken, async (req, res) => {
   }
 });
 
-app.put("/creations/:id/report", async (req, res) => {
+async function report_reply(user, id: string, uid: any) {
+  if (!user.emailVerified) {
+    return;
+  }
+  const get = await pgPool.query("SELECT *  FROM creations WHERE id = $1", [
+    id,
+  ]);
+
+  if (get.rowCount === 0) {
+    return;
+  }
+
+  const { parent_id } = get.rows[0];
+  if (!parent_id) {
+    return;
+  }
+  const getParent = await pgPool.query(
+    "SELECT *  FROM creations WHERE id = $1",
+    [parent_id.slice(0, 20)]
+  );
+  if (getParent.rowCount === 0) {
+    return;
+  }
+  const { user_id } = getParent.rows[0];
+
+  if (user_id === uid) {
+    console.log("reported_reply_success");
+    await pgPool.query(
+      `INSERT INTO rulings(id, bad) VALUES($1, $2) 
+                 ON CONFLICT (id)
+                 DO NOTHING;`,
+      [id, true]
+    );
+  }
+}
+
+app.put("/creations/:id/report", validateFirebaseIdToken, async (req, res) => {
   const id = req.params.id;
   const ip = req.header("x-appengine-user-ip");
 
+  const { uid } = req["user"];
+  const user = await admin.auth().getUser(uid);
+
   try {
+    report_reply(user, id, uid).catch((err) => {
+      console.error(err);
+    });
     const values = [id, ip];
 
     try {
