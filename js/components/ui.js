@@ -455,7 +455,8 @@ class Index extends React.Component {
             <img src={this.state.data.dataURL} className="submissionImg" />
             <SignInButton>
               <div style={{ display: "flex" }}>
-                <input
+                <input 
+                  maxlength="200"
                   placeholder="title"
                   onChange={(e) => this.setState({ title: e.target.value })}
                 />
