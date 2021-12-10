@@ -1,5 +1,4 @@
 import { height, universe, width } from "./index.js";
-import { sizeMap } from "./components/ui";
 const canvas = document.getElementById("sand-canvas");
 
 const eventDistance = (a, b) => {
@@ -96,7 +95,8 @@ function smoothPaint(event) {
   if (!painting) {
     return;
   }
-  let size = sizeMap[window.UI.state.size];
+  let size = document.getElementById("SizeSlider");
+  //use a range input?
   let i = 0;
   paint(startEvent);
   if (lastPaint) {
@@ -145,7 +145,9 @@ const paint = event => {
   universe.paint(
     x,
     y,
-    sizeMap[window.UI.state.size],
+    
+    
+    [window.UI.state.size],
     window.UI.state.selectedElement
   );
 };
