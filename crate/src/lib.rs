@@ -249,7 +249,6 @@ impl Universe {
     pub fn burns(&self) -> *const Wind {
         self.burns.as_ptr()
     }
-
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let size = size;
         let radius: f64 = (size as f64) / 2.0;
@@ -264,7 +263,9 @@ impl Universe {
                 };
                 let px = x + dx;
                 let py = y + dy;
-
+                let ndx = (dx as f64) / radius + 0.2;
+                let ndy = (dy as f64) / radius + 0.2;
+                let ndz = (1.0 - (ndx * ndx) - (ndy * ndy)).sqrt();
                 let i = self.get_index(px, py);
 
                 if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
@@ -273,10 +274,12 @@ impl Universe {
                 if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
                         species: species,
-                        ra: 60
-                            + (size as u8)
-                            + (self.rng.gen::<f32>() * 30.) as u8
-                            + ((self.generation % 127) as i8 - 60).abs() as u8,
+                        ra: (40 as u8)
+                            .wrapping_add(size as u8)
+                            .wrapping_add((ndz * 50.) as u8)
+                            .wrapping_add((self.rng.gen::<f32>() * 30.) as u8)
+                            .wrapping_add(((self.generation % 127) as i8 - 60).abs() as u8),
+
                         rb: 0,
                         clock: self.generation,
                     }

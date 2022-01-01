@@ -9,11 +9,11 @@ const eventDistance = (a, b) => {
   );
 };
 
-const magnitude = a => {
+const magnitude = (a) => {
   return Math.sqrt(Math.pow(a.clientX, 2) + Math.pow(a.clientY, 2), 2);
 };
 
-const norm = a => {
+const norm = (a) => {
   let mag = magnitude(a);
   return { clientX: a.clientX / mag, clientY: a.clientY / mag };
 };
@@ -31,7 +31,7 @@ let painting = false;
 let lastPaint = null;
 let repeat = null;
 
-canvas.addEventListener("mousedown", event => {
+canvas.addEventListener("mousedown", (event) => {
   event.preventDefault();
   universe.push_undo();
   painting = true;
@@ -41,7 +41,7 @@ canvas.addEventListener("mousedown", event => {
   lastPaint = event;
 });
 
-document.body.addEventListener("mouseup", event => {
+document.body.addEventListener("mouseup", (event) => {
   clearInterval(repeat);
   if (painting) {
     event.preventDefault();
@@ -50,17 +50,17 @@ document.body.addEventListener("mouseup", event => {
   }
 });
 
-canvas.addEventListener("mousemove", event => {
+canvas.addEventListener("mousemove", (event) => {
   clearInterval(repeat);
   smoothPaint(event);
 });
 
-canvas.addEventListener("mouseleave", event => {
+canvas.addEventListener("mouseleave", (event) => {
   clearInterval(repeat);
   lastPaint = null;
 });
 
-canvas.addEventListener("touchstart", event => {
+canvas.addEventListener("touchstart", (event) => {
   universe.push_undo();
   if (event.cancelable) {
     event.preventDefault();
@@ -70,7 +70,7 @@ canvas.addEventListener("touchstart", event => {
   handleTouches(event);
 });
 
-canvas.addEventListener("touchend", event => {
+canvas.addEventListener("touchend", (event) => {
   if (event.cancelable) {
     event.preventDefault();
   }
@@ -79,7 +79,7 @@ canvas.addEventListener("touchend", event => {
   clearInterval(repeat);
 });
 
-canvas.addEventListener("touchmove", event => {
+canvas.addEventListener("touchmove", (event) => {
   if (!window.paused) {
     if (event.cancelable) {
       event.preventDefault();
@@ -98,25 +98,27 @@ function smoothPaint(event) {
   }
   let size = sizeMap[window.UI.state.size];
   let i = 0;
-  paint(startEvent);
+  let step = Math.max(size / 5, 1);
   if (lastPaint) {
-    while (eventDistance(startEvent, lastPaint) > size / 3) {
+    while (eventDistance(startEvent, lastPaint) > step) {
       let d = eventDistance(startEvent, lastPaint);
-      startEvent = add(
-        startEvent,
-        scale(norm(sub(lastPaint, event)), Math.min(size / 3, d))
+      lastPaint = add(
+        lastPaint,
+        scale(norm(sub(lastPaint, event)), -Math.min(step, d))
       );
       i++;
       if (i > 1000) {
         break;
       }
-      paint(startEvent);
+      paint(lastPaint);
     }
   }
+  paint(startEvent);
+
   lastPaint = event;
 }
 
-const handleTouches = event => {
+const handleTouches = (event) => {
   let touches = Array.from(event.touches);
   if (touches.length == 1) {
     smoothPaint(touches[0]);
@@ -125,7 +127,7 @@ const handleTouches = event => {
   }
 };
 
-const paint = event => {
+const paint = (event) => {
   if (!painting) {
     return;
   }
