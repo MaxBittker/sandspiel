@@ -193,7 +193,7 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
        `,
       [ip]
     );
-    if (countRows[0] && countRows[0].count > 40) {
+    if (countRows[0] && countRows[0].count > 28) {
       res.sendStatus(302);
       return;
     }
