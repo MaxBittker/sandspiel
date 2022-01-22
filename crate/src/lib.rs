@@ -263,9 +263,6 @@ impl Universe {
                 };
                 let px = x + dx;
                 let py = y + dy;
-                let ndx = (dx as f64) / radius + 0.2;
-                let ndy = (dy as f64) / radius + 0.2;
-                let ndz = (1.0 - (ndx * ndx) - (ndy * ndy)).sqrt();
                 let i = self.get_index(px, py);
 
                 if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
