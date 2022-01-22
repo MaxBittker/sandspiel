@@ -6,6 +6,14 @@ import * as pg from "pg";
 import * as Twit from "twit";
 import * as wordfilter from "wordfilter";
 
+const Sentry = require("@sentry/serverless");
+
+Sentry.GCPFunction.init({
+  dsn:
+    "https://700bf2d8e80445c78e5ed7e5a0ad95cc@o40136.ingest.sentry.io/1756959",
+  tracesSampleRate: 0.01,
+});
+
 import admins from "./admin";
 
 const connectionName = functions.config().pg.connection_name;

@@ -274,12 +274,10 @@ impl Universe {
                 if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
                         species: species,
-                        ra: (40 as u8)
-                            .wrapping_add(size as u8)
-                            .wrapping_add((ndz * 50.) as u8)
-                            .wrapping_add((self.rng.gen::<f32>() * 30.) as u8)
-                            .wrapping_add(((self.generation % 127) as i8 - 60).abs() as u8),
-
+                        ra: 60
+                            + (size as u8)
+                            + (self.rng.gen::<f32>() * 30.) as u8
+                            + ((self.generation % 127) as i8 - 60).abs() as u8,
                         rb: 0,
                         clock: self.generation,
                     }

@@ -220,6 +220,7 @@ img {
 }
 .submission img {
   width: 100%;
+  max-height: 50vw;
 }
 .img-link {
   width: 50%;
