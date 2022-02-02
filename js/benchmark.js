@@ -75,9 +75,9 @@ function runTest(n, m, log) {
     fluidMax = Math.max(fluidTime, fluidMax);
     fluidSum += fluidTime / n;
 
-    let trialResult = ` t${i} ${(delta / m).toPrecision(3)}ms           ${(
+    let trialResult = ` t${i} ${(delta / m).toPrecision(3)}ms      ${(
       cpuTime / m
-    ).toPrecision(3)}ms cpu     ${(fluidTime / m).toPrecision(3)}ms fluid `;
+    ).toPrecision(3)}ms cpu  ${(fluidTime / m).toPrecision(3)}ms fluid `;
     log(trialResult);
   }
   let avg = sum / n;
@@ -86,9 +86,10 @@ function runTest(n, m, log) {
   let fDev = (fluidMax - fluidMin) / 2;
   let resultString = `avg:${(avg / m).toPrecision(3)}±${(dev / m).toPrecision(
     3
-  )}ms      ${(cpuSum / m).toPrecision(3)}±${(cDev / m).toPrecision(3)}ms    ${(
+  )}ms ${(cpuSum / m).toPrecision(3)}±${(cDev / m).toPrecision(3)}ms ${(
     fluidSum / m
-  ).toPrecision(3)}±${(fDev / m).toPrecision(3)}ms`;
+  ).toPrecision(3)}±${(fDev / m).toPrecision(3)}ms
+  `;
   log(resultString);
 }
 function runBenchmark(addLogLine) {

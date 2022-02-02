@@ -355,9 +355,9 @@ img {
 
 .benchmark {
   position: absolute;
-  left:10px;
-  top:60px;
+  bottom:25px;
+  right:10px;
   background-color: white;
-  font-size: 30px;
+  font-size: 18px;
   z-index: 9999;
 }

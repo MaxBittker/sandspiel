@@ -4,9 +4,12 @@ import { runBenchmark } from "../benchmark";
 class BenchmarkRunner extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { lines: ["TESTING:"] };
+    this.state = { lines: ["TESTING:"], show: true };
   }
   componentDidMount() {
+    this.run();
+  }
+  run() {
     runBenchmark((newline) =>
       this.setState(({ lines }) => {
         return {
@@ -17,9 +20,28 @@ class BenchmarkRunner extends React.Component {
   }
 
   render() {
-    let { lines } = this.state;
+    let { lines, show } = this.state;
 
-    return <pre className="benchmark">{lines.join("\n")}</pre>;
+    if (!show) {
+      return null;
+    }
+    return (
+      <div className="benchmark">
+        <pre>{lines.join("\n")}</pre>
+        <span>
+          <button
+            onClick={() => {
+              this.run();
+            }}
+          >
+            {" "}
+            re-run
+          </button>
+          {"    "}
+          <button onClick={() => this.setState({ show: false })}> close</button>
+        </span>
+      </div>
+    );
   }
 }
 export default BenchmarkRunner;
