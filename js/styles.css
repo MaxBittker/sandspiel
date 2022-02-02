@@ -352,3 +352,12 @@ img {
 .firebaseui-title {
   /* display: none; */
 }
+
+.benchmark {
+  position: absolute;
+  left:10px;
+  top:60px;
+  background-color: white;
+  font-size: 30px;
+  z-index: 9999;
+}

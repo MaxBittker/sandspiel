@@ -2,19 +2,21 @@ import * as Sentry from "@sentry/browser";
 import { Integrations } from "@sentry/tracing";
 import { Wasm as WasmIntegration } from "@sentry/wasm";
 import { boot } from "./boot";
+if (!window.location.host.startsWith("localhost")) {
+  Sentry.init({
+    dsn: "https://4bf8c3ab764f40569d573fc4021efe40@o40136.ingest.sentry.io/1331284",
 
-Sentry.init({
-  dsn: "https://4bf8c3ab764f40569d573fc4021efe40@o40136.ingest.sentry.io/1331284",
+    // Alternatively, use `process.env.npm_package_version` for a dynamic release version
+    // if your build tool supports it.
+    integrations: [new Integrations.BrowserTracing(), new WasmIntegration()],
 
-  // Alternatively, use `process.env.npm_package_version` for a dynamic release version
-  // if your build tool supports it.
-  integrations: [new Integrations.BrowserTracing(), new WasmIntegration()],
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 0.01,
+  });
+}
 
-  // Set tracesSampleRate to 1.0 to capture 100%
-  // of transactions for performance monitoring.
-  // We recommend adjusting this value in production
-  tracesSampleRate: 0.01,
-});
 import "./api";
 import { Universe } from "../crate/pkg";
 
@@ -23,9 +25,8 @@ import { fps } from "./fps";
 import {} from "./paint";
 import {} from "./app";
 import { startFluid } from "./fluid";
-// import { runBenchmark } from "./benchmark";
 
-// runBenchmark();
+const isBench = window.location.pathname === "/bench";
 if (window.safari) {
   history.pushState(null, null, location.href);
   window.onpopstate = function (event) {
@@ -69,7 +70,7 @@ if (mobileAndTabletcheck()) {
 // }
 
 let n = 300;
-const universe = Universe.new(n, n);
+const universe = isBench ? window.u : Universe.new(n, n);
 
 let width = n;
 let height = n;
@@ -137,10 +138,15 @@ resize();
 window.addEventListener("deviceorientation", resize, true);
 window.addEventListener("resize", resize);
 
-let fluid = startFluid({ universe });
-
-let drawSand = startWebGL({ canvas, universe });
-
+let fluid;
+let drawSand;
+if (!isBench) {
+  fluid = startFluid({ universe });
+  drawSand = startWebGL({ canvas, universe });
+} else {
+  fluid = window.f;
+  drawSand = window.r;
+}
 const renderLoop = () => {
   if (!window.paused) {
     fps.render(); // new
@@ -151,11 +157,13 @@ const renderLoop = () => {
 
   window.animationId = requestAnimationFrame(renderLoop);
 };
-
 renderLoop();
 window.u = universe;
 
-boot(width, height);
+if (!isBench) {
+  boot(width, height);
+}
+
 function reset() {
   fluid.reset();
   fluid.update();

@@ -8,6 +8,7 @@ import Browse from "./components/browse";
 import Admin from "./components/admin";
 import Menu from "./components/menu";
 import SignInScreen from "./components/signin";
+import BenchmarkRunner from "./components/benchmarkRunner";
 
 let sizeMap = [2, 5, 10, 18, 30, 45];
 
@@ -48,6 +49,7 @@ function AppRouter() {
           </Menu>
         )}
       />
+      <Route exact path="/bench" component={BenchmarkRunner} />
       <Route path="/browse" component={BrowseRouter} />
       <Route path="/admin" component={AdminRouter} />
       <Route path="/login" component={SigninRouter} />
