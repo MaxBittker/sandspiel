@@ -26,8 +26,8 @@ function setup() {
   return { universe, fluid, render };
 }
 
-function trial(m) {
-  let { universe, fluid, render } = setup();
+function trial(m,{ universe, fluid, render }  ) {
+
   const t0 = performance.now();
   let cpuTime = 0;
   let fluidTime = 0;
@@ -61,8 +61,9 @@ function runTest(n, m, log) {
   let fluidMin = 0;
   let fluidMax = 0;
   log(`Running ${n} trials of ${m} reps`);
+  let world = setup();
   for (let i = 0; i < n; i++) {
-    let [delta, cpuTime, fluidTime] = trial(m);
+    let [delta, cpuTime, fluidTime] = trial(m, world);
     min = Math.min(delta, min);
     max = Math.max(delta, max);
     sum += delta;
