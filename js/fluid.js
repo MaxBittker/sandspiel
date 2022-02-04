@@ -32,7 +32,7 @@ function startFluid({ universe }) {
   canvas.width = universe.width();
   canvas.height = universe.height();
   let config = {
-    TEXTURE_DOWNSAMPLE: 0,
+    TEXTURE_DOWNSAMPLE: 2,
     DENSITY_DISSIPATION: 0.98,
     VELOCITY_DISSIPATION: 0.99,
     PRESSURE_DISSIPATION: 0.8,
@@ -354,8 +354,8 @@ function startFluid({ universe }) {
     );
     velocityOut = createFBO(
       9,
-      texWidth / 4,
-      texHeight / 4,
+      texWidth,
+      texHeight,
       gl.RGBA,
       gl.RGBA,
       gl.UNSIGNED_BYTE,

@@ -4,8 +4,8 @@ varying vec2 vUv;
 uniform sampler2D uTexture;
 uniform sampler2D uPressure;
 void main() {
-  vec2 v = texture2D(uTexture, vUv*4.).rg;
-  float p = texture2D(uPressure, vUv*4.).r;
+  vec2 v = texture2D(uTexture, vUv).rg;
+  float p = texture2D(uPressure, vUv).r;
   vec3 vp = vec3(v, p);
   vp = max(vp, vec3(-250.));
   vp = min(vp, vec3(250.));
