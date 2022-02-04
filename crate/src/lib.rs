@@ -13,7 +13,6 @@ use rand_isaac::Isaac64Rng;
 use species::Species;
 use std::collections::VecDeque;
 use wasm_bindgen::prelude::*;
-// use web_sys::console;
 
 #[wasm_bindgen]
 #[repr(C)]
@@ -107,7 +106,9 @@ impl<'a> SandApi<'a> {
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
     }
     pub fn get_fluid(&mut self) -> Wind {
-        self.universe.get_wind(self.x, self.y)
+        // self.universe.get_wind(self.x, self.y)
+        let i = self.universe.get_downsized_index(self.x / 4, self.y / 4);
+        return self.universe.winds[i];
     }
     pub fn set_fluid(&mut self, v: Wind) {
         let idx = self.universe.get_index(self.x, self.y);
@@ -346,7 +347,7 @@ impl Universe {
     }
 
     fn get_wind(&self, x: i32, y: i32) -> Wind {
-        let i = self.get_downsized_index(x / 4, y / 4);
+        let i = self.get_downsized_index(x.wrapping_div(4), y.wrapping_div(4));
         return self.winds[i];
     }
 
