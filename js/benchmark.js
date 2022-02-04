@@ -55,10 +55,10 @@ function runTest(n, m, log) {
   let max = 0;
   let sum = 0;
   let cpuSum = 0;
-  let cpuMin = 0;
+  let cpuMin = Infinity;
   let cpuMax = 0;
   let fluidSum = 0;
-  let fluidMin = 0;
+  let fluidMin = Infinity;
   let fluidMax = 0;
   log(`Running ${n} trials of ${m} reps`);
   let world = setup();
@@ -86,10 +86,10 @@ function runTest(n, m, log) {
   let cDev = (cpuMax - cpuMin) / 2;
   let fDev = (fluidMax - fluidMin) / 2;
   let resultString = `avg:${(avg / m).toPrecision(3)}±${(dev / m).toPrecision(
-    3
-  )}ms ${(cpuSum / m).toPrecision(3)}±${(cDev / m).toPrecision(3)}ms ${(
+    2
+  )}ms ${(cpuSum / m).toPrecision(3)}±${(cDev / m).toPrecision(2)}ms ${(
     fluidSum / m
-  ).toPrecision(3)}±${(fDev / m).toPrecision(3)}ms
+  ).toPrecision(3)}±${(fDev / m).toPrecision(2)}ms
   `;
   log(resultString);
 }
