@@ -57,6 +57,7 @@ static EMPTY_CELL: Cell = Cell {
 };
 
 #[wasm_bindgen]
+#[no_mangle]
 pub struct Universe {
     width: i32,
     height: i32,

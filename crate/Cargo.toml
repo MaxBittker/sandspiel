@@ -29,9 +29,13 @@ wasm-bindgen-test = "0.2"
 # Tell `rustc` to optimize for small code size.
 opt-level = 3
 lto = true
+debug = 2
 
 [package.metadata.wasm-pack.profile.release]
 wasm-opt = ['-O4']
+
+[package.metadata.wasm-pack.profile.release.wasm-bindgen]
+dwarf-debug-info = true
 
 [dependencies.web-sys]
 version = "0.3"
