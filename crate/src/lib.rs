@@ -36,6 +36,7 @@ pub struct Cell {
 }
 
 impl Cell {
+	
     pub fn new(species: Species) -> Cell {
         Cell {
             species: species,
@@ -44,6 +45,7 @@ impl Cell {
             clock: 0,
         }
     }
+	
     pub fn update(&self, api: SandApi) {
         self.species.update(*self, api);
     }
@@ -57,7 +59,6 @@ static EMPTY_CELL: Cell = Cell {
 };
 
 #[wasm_bindgen]
-#[no_mangle]
 pub struct Universe {
     width: i32,
     height: i32,
@@ -76,6 +77,8 @@ pub struct SandApi<'a> {
 }
 
 impl<'a> SandApi<'a> {
+	
+	#[no_mangle]
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
         if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
             panic!("oob set");
@@ -92,6 +95,8 @@ impl<'a> SandApi<'a> {
         }
         self.universe.get_cell(nx, ny)
     }
+	
+	#[no_mangle]
     pub fn set(&mut self, dx: i32, dy: i32, v: Cell) {
         if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
             panic!("oob set");
@@ -107,28 +112,38 @@ impl<'a> SandApi<'a> {
         self.universe.cells[i] = v;
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
     }
+
+	#[no_mangle]
     pub fn get_fluid(&mut self) -> Wind {
         let idx = self.universe.get_index(self.x, self.y);
 
         self.universe.winds[idx]
     }
+
+	#[no_mangle]
     pub fn set_fluid(&mut self, v: Wind) {
         let idx = self.universe.get_index(self.x, self.y);
 
         self.universe.burns[idx] = v;
     }
 
+	#[no_mangle]
     pub fn rand_int(&mut self, n: i32) -> i32 {
         self.universe.rng.gen_range(0..n)
     }
 
+	#[no_mangle]
     pub fn once_in(&mut self, n: i32) -> bool {
         self.rand_int(n) == 0
     }
+
+	#[no_mangle]
     pub fn rand_dir(&mut self) -> i32 {
         let i = self.rand_int(1000);
         (i % 3) - 1
     }
+
+	#[no_mangle]
     pub fn rand_dir_2(&mut self) -> i32 {
         let i = self.rand_int(1000);
         if (i % 2) == 0 {
@@ -138,6 +153,7 @@ impl<'a> SandApi<'a> {
         }
     }
 
+	#[no_mangle]
     pub fn rand_vec(&mut self) -> (i32, i32) {
         let i = self.rand_int(2000);
         match i % 9 {
@@ -153,6 +169,7 @@ impl<'a> SandApi<'a> {
         }
     }
 
+	#[no_mangle]
     pub fn rand_vec_8(&mut self) -> (i32, i32) {
         let i = self.rand_int(8);
         match i {
@@ -170,6 +187,8 @@ impl<'a> SandApi<'a> {
 
 #[wasm_bindgen]
 impl Universe {
+	
+	#[no_mangle]
     pub fn reset(&mut self) {
         for x in 0..self.width {
             for y in 0..self.height {
@@ -178,6 +197,8 @@ impl Universe {
             }
         }
     }
+
+	#[no_mangle]
     pub fn tick(&mut self) {
         // let mut next = self.cells.clone();
         // let dx = self.winds[(self.width * self.height / 2) as usize].dx;
@@ -231,25 +252,32 @@ impl Universe {
         self.generation = self.generation.wrapping_add(1);
     }
 
+	#[no_mangle]
     pub fn width(&self) -> i32 {
         self.width
     }
 
+	#[no_mangle]
     pub fn height(&self) -> i32 {
         self.height
     }
 
+	#[no_mangle]
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
 
+	#[no_mangle]
     pub fn winds(&self) -> *const Wind {
         self.winds.as_ptr()
     }
 
+	#[no_mangle]
     pub fn burns(&self) -> *const Wind {
         self.burns.as_ptr()
     }
+	
+	#[no_mangle]
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let size = size;
         let radius: f64 = (size as f64) / 2.0;
@@ -284,11 +312,13 @@ impl Universe {
         }
     }
 
+	#[no_mangle]
     pub fn push_undo(&mut self) {
         self.undo_stack.push_front(self.cells.clone());
         self.undo_stack.truncate(50);
     }
 
+	#[no_mangle]
     pub fn pop_undo(&mut self) {
         let old_state = self.undo_stack.pop_front();
         match old_state {
@@ -297,10 +327,12 @@ impl Universe {
         };
     }
 
+	#[no_mangle]
     pub fn flush_undos(&mut self) {
         self.undo_stack.clear();
     }
 
+	#[no_mangle]
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
         let winds: Vec<Wind> = (0..width * height)
@@ -320,6 +352,7 @@ impl Universe {
                 density: 0,
             })
             .collect();
+			
         let rng: Isaac64Rng = SeedableRng::seed_from_u64(0x734f6b89de5f83cc);
         Universe {
             width,
@@ -336,20 +369,25 @@ impl Universe {
 
 //private methods
 impl Universe {
+	
+	#[no_mangle]
     fn get_index(&self, x: i32, y: i32) -> usize {
         (x * self.height + y) as usize
     }
 
+	#[no_mangle]
     fn get_cell(&self, x: i32, y: i32) -> Cell {
         let i = self.get_index(x, y);
         return self.cells[i];
     }
 
+	#[no_mangle]
     fn get_wind(&self, x: i32, y: i32) -> Wind {
         let i = self.get_index(x, y);
         return self.winds[i];
     }
 
+	#[no_mangle]
     fn blow_wind(cell: Cell, wind: Wind, mut api: SandApi) {
         if cell.clock - api.universe.generation == 1 {
             return;
@@ -431,6 +469,8 @@ impl Universe {
             return;
         }
     }
+
+	#[no_mangle]
     fn update_cell(cell: Cell, api: SandApi) {
         if cell.clock - api.universe.generation == 1 {
             return;
