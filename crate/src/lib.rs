@@ -46,6 +46,7 @@ impl Cell {
         }
     }
 	
+	#[no_mangle]
     pub fn update(&self, api: SandApi) {
         self.species.update(*self, api);
     }
