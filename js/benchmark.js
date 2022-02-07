@@ -96,7 +96,7 @@ function runTest(n, m, log) {
 function runBenchmark(addLogLine) {
   window.paused = true;
   console.log("running test");
-  return runTest(10, 20, (line) => {
+  return runTest(50, 20, (line) => {
     console.log(line);
     addLogLine(line);
   });
