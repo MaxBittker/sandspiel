@@ -4,7 +4,7 @@
   (table $table0 34 34 funcref)
   (memory $memory (;0;) (export "memory") 17)
   (global $global0 (mut i32) (i32.const 1048576))
-  (elem $elem0 (i32.const 1) funcref (ref.func $func131) (ref.func $func74) (ref.func $func107) (ref.func $func131) (ref.func $func128) (ref.func $func132) (ref.func $func131) (ref.func $func75) (ref.func $func36) (ref.func $func73) (ref.func $func100) (ref.func $func41) (ref.func $func59) (ref.func $func80) (ref.func $func114) (ref.func $func99) (ref.func $func129) (ref.func $func128) (ref.func $func119) (ref.func $func118) (ref.func $func131) (ref.func $func130) (ref.func $func101) (ref.func $func102) (ref.func $func102) (ref.func $func62) (ref.func $func104) (ref.func $func102) (ref.func $func104) (ref.func $func106) (ref.func $func108) (ref.func $func105) (ref.func $func103))
+  (elem $elem0 (i32.const 1) funcref (ref.func $func132) (ref.func $func74) (ref.func $func108) (ref.func $func132) (ref.func $func129) (ref.func $func133) (ref.func $func132) (ref.func $func75) (ref.func $func36) (ref.func $func73) (ref.func $func101) (ref.func $func41) (ref.func $func59) (ref.func $func81) (ref.func $func115) (ref.func $func100) (ref.func $func130) (ref.func $func129) (ref.func $func120) (ref.func $func119) (ref.func $func132) (ref.func $func131) (ref.func $func102) (ref.func $func103) (ref.func $func103) (ref.func $func62) (ref.func $func105) (ref.func $func103) (ref.func $func105) (ref.func $func107) (ref.func $func109) (ref.func $func106) (ref.func $func104))
   (func $update_seed (;2;) (export "update_seed") (param $var0 i32) (param $var1 i32)
     (local $var2 i32) (local $var3 i32) (local $var4 i32) (local $var5 i32) (local $var6 i32) (local $var7 i32) (local $var8 i32) (local $var9 i32) (local $var10 i32) (local $var11 i32) (local $var12 i32) (local $var13 i32) (local $var14 i32) (local $var15 i32) (local $var16 i32) (local $var17 i32) (local $var18 f64)
     local.get $var1
@@ -961,7 +961,7 @@
                                             unreachable
                                           end $label11
                                           i32.const 1048872
-                                          call $func98
+                                          call $func99
                                           unreachable
                                         end $label14
                                         local.get $var5
@@ -1527,7 +1527,7 @@
                                 br $label27
                               end
                               i32.const 1048872
-                              call $func98
+                              call $func99
                               unreachable
                             end $label37
                             local.get $var3
@@ -3445,7 +3445,7 @@
                                             unreachable
                                           end $label24
                                           i32.const 1048872
-                                          call $func98
+                                          call $func99
                                           unreachable
                                         end $label26
                                         local.get $var2
@@ -3491,7 +3491,7 @@
                             unreachable
                           end $label51
                           i32.const 1048872
-                          call $func98
+                          call $func99
                           unreachable
                         end $label53
                         local.get $var9
@@ -4375,7 +4375,7 @@
                             i32.add
                             i32.const -65536
                             i32.and
-                            call $func83
+                            call $func84
                             local.get $var8
                             i32.load
                             local.tee $var3
@@ -5948,7 +5948,7 @@
                                       unreachable
                                     end $label3
                                     i32.const 1048872
-                                    call $func98
+                                    call $func99
                                     unreachable
                                   end $label5
                                   local.get $var7
@@ -8340,7 +8340,7 @@
                                                                 unreachable
                                                               end $label3
                                                               i32.const 1048872
-                                                              call $func98
+                                                              call $func99
                                                               unreachable
                                                             end $label5
                                                             local.get $var4
@@ -8386,7 +8386,7 @@
                                                 unreachable
                                               end $label25
                                               i32.const 1048872
-                                              call $func98
+                                              call $func99
                                               unreachable
                                             end $label27
                                             local.get $var4
@@ -10748,7 +10748,7 @@
                                                         br $label12
                                                       end
                                                       i32.const 1048872
-                                                      call $func98
+                                                      call $func99
                                                       unreachable
                                                     end $label2
                                                     local.get $var3
@@ -10758,7 +10758,7 @@
                                                     unreachable
                                                   end $label3
                                                   i32.const 1048872
-                                                  call $func98
+                                                  call $func99
                                                   unreachable
                                                 end $label5
                                                 local.get $var3
@@ -13777,7 +13777,7 @@
                               unreachable
                             end $label7
                             i32.const 1048872
-                            call $func98
+                            call $func99
                             unreachable
                           end $label6
                           local.get $var1
@@ -15973,7 +15973,7 @@
                         unreachable
                       end $label14
                       i32.const 1048872
-                      call $func98
+                      call $func99
                       unreachable
                     end $label16
                     local.get $var6
@@ -19855,13 +19855,13 @@
                       br_if $label8
                       local.get $var1
                       local.get $var5
-                      call $func89
+                      call $func90
                       local.get $var1
                       local.get $var5
                       i32.add
                       local.tee $var5
                       local.get $var4
-                      call $func89
+                      call $func90
                       local.get $var5
                       local.get $var4
                       call $func31
@@ -19877,7 +19877,7 @@
                     br_if $label5
                     local.get $var1
                     local.get $var5
-                    call $func89
+                    call $func90
                     local.get $var1
                     local.get $var5
                     i32.add
@@ -19915,7 +19915,7 @@
                     if
                       local.get $var1
                       local.get $var6
-                      call $func89
+                      call $func90
                       i32.const 0
                       local.set $var4
                       i32.const 0
@@ -19931,7 +19931,7 @@
                     local.set $var7
                     local.get $var1
                     local.get $var5
-                    call $func89
+                    call $func90
                     local.get $var6
                     local.get $var4
                     i32.const 1
@@ -19994,13 +19994,13 @@
               if
                 local.get $var1
                 local.get $var5
-                call $func89
+                call $func90
                 local.get $var1
                 local.get $var5
                 i32.add
                 local.tee $var4
                 local.get $var6
-                call $func89
+                call $func90
                 local.get $var4
                 local.get $var6
                 call $func31
@@ -20008,7 +20008,7 @@
               end
               local.get $var1
               local.get $var8
-              call $func89
+              call $func90
             end $label8
             local.get $var1
             br_if $label10
@@ -20533,12 +20533,12 @@
             local.set $var6
             br $label2
           end $label0
-          call $func117
+          call $func118
           unreachable
         end $label1
         local.get $var5
         i32.const 1
-        call $func113
+        call $func114
         local.tee $var6
         i32.eqz
         br_if $label3
@@ -20603,7 +20603,7 @@
       if
         local.get $var5
         i32.const 1
-        call $func113
+        call $func114
         local.tee $var6
         i32.eqz
         br_if $label3
@@ -20660,7 +20660,7 @@
       if
         local.get $var5
         i32.const 1
-        call $func113
+        call $func114
         local.tee $var6
         i32.eqz
         br_if $label3
@@ -20715,7 +20715,7 @@
       i32.const 8432
       i32.add
       local.tee $var3
-      call $func87
+      call $func88
       local.get $var2
       i32.const 4207
       i32.add
@@ -20733,7 +20733,7 @@
       block $label4
         i32.const 768
         i32.const 4
-        call $func113
+        call $func114
         local.tee $var3
         if
           local.get $var2
@@ -20813,7 +20813,7 @@
           drop
           i32.const 4200
           i32.const 8
-          call $func113
+          call $func114
           local.tee $var0
           i32.eqz
           br_if $label4
@@ -20908,12 +20908,12 @@
             local.set $var9
             br $label2
           end $label0
-          call $func117
+          call $func118
           unreachable
         end $label1
         local.get $var6
         i32.const 1
-        call $func113
+        call $func114
         local.tee $var9
         i32.eqz
         br_if $label3
@@ -20982,7 +20982,7 @@
       if
         local.get $var6
         i32.const 1
-        call $func113
+        call $func114
         local.tee $var7
         i32.eqz
         br_if $label3
@@ -21039,7 +21039,7 @@
       if
         local.get $var6
         i32.const 1
-        call $func113
+        call $func114
         local.tee $var7
         i32.eqz
         br_if $label3
@@ -21094,7 +21094,7 @@
       i32.const 40
       i32.add
       local.tee $var3
-      call $func87
+      call $func88
       local.get $var4
       i32.const 2120
       i32.add
@@ -21111,7 +21111,7 @@
       drop
       i32.const 768
       i32.const 4
-      call $func113
+      call $func114
       local.tee $var3
       if
         local.get $var0
@@ -24012,10 +24012,10 @@
           if
             local.get $var1
             local.get $var3
-            call $func89
+            call $func90
             local.get $var0
             local.get $var2
-            call $func89
+            call $func90
             local.get $var0
             local.get $var2
             call $func31
@@ -24051,7 +24051,7 @@
         br_if $label4
         local.get $var1
         local.get $var4
-        call $func89
+        call $func90
         local.get $var1
         local.get $var4
         i32.add
@@ -24060,7 +24060,7 @@
         local.get $var4
         i32.sub
         local.tee $var0
-        call $func89
+        call $func90
         local.get $var2
         local.get $var0
         call $func31
@@ -24269,7 +24269,7 @@
       global.set $global0
       return
     end $label1
-    call $func117
+    call $func118
     unreachable
   )
   (func $func36 (param $var0 i32) (param $var1 i32) (result i32)
@@ -25085,7 +25085,7 @@
     i64.store offset=24
     i32.const 12
     i32.const 4
-    call $func113
+    call $func114
     local.tee $var1
     i32.eqz
     if
@@ -25298,7 +25298,7 @@
             if
               local.get $var4
               i32.const 1
-              call $func113
+              call $func114
               local.tee $var1
               i32.eqz
               br_if $label2
@@ -25382,13 +25382,13 @@
             i32.store
             return
           end
-          call $func120
+          call $func121
           unreachable
         end $label0
-        call $func121
+        call $func122
         unreachable
       end $label1
-      call $func117
+      call $func118
       unreachable
     end $label2
     local.get $var4
@@ -25644,10 +25644,10 @@
         global.set $global0
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
   (func $get (;46;) (export "get") (param $var0 i32) (param $var1 i32) (param $var2 i32) (result i32)
@@ -25759,7 +25759,7 @@
         return
       end $label0
       i32.const 1048872
-      call $func98
+      call $func99
       unreachable
     end $label2
     local.get $var0
@@ -25798,7 +25798,7 @@
         if
           local.get $var4
           i32.const 1
-          call $func113
+          call $func114
           local.tee $var1
           i32.eqz
           br_if $label1
@@ -25880,7 +25880,7 @@
         call $func32
         return
       end $label0
-      call $func117
+      call $func118
       unreachable
     end $label1
     local.get $var4
@@ -26008,10 +26008,10 @@
         i32.store
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
   (func $func49 (param $var0 i32) (param $var1 i32)
@@ -26131,7 +26131,7 @@
       global.set $global0
       return
     end $label0
-    call $func117
+    call $func118
     unreachable
   )
   (func $universe_paint (;50;) (export "universe_paint") (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32) (param $var4 i32)
@@ -26238,7 +26238,7 @@
             end $label11
             i32.const 1049000
             i32.const 25
-            call $func122
+            call $func123
             unreachable
           end $label18
           i32.const 17
@@ -26257,10 +26257,10 @@
         i32.store
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
   (func $func51 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32)
@@ -26473,7 +26473,7 @@
           return
         end $label0
         i32.const 1048888
-        call $func98
+        call $func99
         unreachable
       end $label2
       local.get $var0
@@ -26973,7 +26973,7 @@
       global.set $global0
       return
     end $label0
-    call $func117
+    call $func118
     unreachable
   )
   (func $rand_vec_8 (;58;) (export "rand_vec_8") (param $var0 i32) (param $var1 i32)
@@ -27231,10 +27231,10 @@
         i32.store
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
   (func $adjacency_left (;61;) (export "adjacency_left") (param $var0 i32) (param $var1 i32) (param $var2 i32)
@@ -27374,7 +27374,7 @@
           local.get $var4
           i32.const 4
           local.get $var5
-          call $func109
+          call $func110
           local.tee $var2
           i32.eqz
           br_if $label1
@@ -27393,7 +27393,7 @@
       end
       i32.const 1050740
       i32.const 48
-      call $func122
+      call $func123
       unreachable
     end $label1
     local.get $var5
@@ -27461,14 +27461,14 @@
             local.get $var3
             local.get $var2
             local.get $var1
-            call $func109
+            call $func110
             local.tee $var3
             br_if $label6
             br $label7
           end $label4
           local.get $var1
           local.get $var2
-          call $func113
+          call $func114
           local.tee $var3
           i32.eqz
           br_if $label7
@@ -27530,7 +27530,7 @@
             local.get $var2
             i32.const 1
             local.get $var1
-            call $func109
+            call $func110
             br $label3
           end $label0
           local.get $var1
@@ -27540,7 +27540,7 @@
         end $label2
         local.get $var1
         i32.const 1
-        call $func113
+        call $func114
       end $label3
       local.tee $var2
       if
@@ -27969,7 +27969,7 @@
     i32.const 8
     i32.add
     local.get $var2
-    call $func91
+    call $func92
     unreachable
   )
   (func $func71 (param $var0 i32) (param $var1 i32)
@@ -28021,7 +28021,7 @@
     i32.const 8
     i32.add
     i32.const 1049764
-    call $func91
+    call $func92
     unreachable
   )
   (func $update_cell (;72;) (export "update_cell") (param $var0 i32) (param $var1 i32)
@@ -28133,7 +28133,7 @@
         local.set $var3
         i32.const 8
         i32.const 4
-        call $func113
+        call $func114
         local.tee $var1
         i32.eqz
         br_if $label0
@@ -28343,10 +28343,41 @@
     i32.store
     local.get $var3
     local.get $var2
-    call $func91
+    call $func92
     unreachable
   )
-  (func $func80 (param $var0 i32) (param $var1 i32)
+  (func $update (;80;) (export "update") (param $var0 i32) (param $var1 i32)
+    (local $var2 i32) (local $var3 i32)
+    global.get $global0
+    i32.const 16
+    i32.sub
+    local.tee $var2
+    global.set $global0
+    local.get $var0
+    i32.load align=1
+    local.set $var3
+    local.get $var2
+    i32.const 8
+    i32.add
+    local.get $var1
+    i32.const 8
+    i32.add
+    i32.load
+    i32.store
+    local.get $var2
+    local.get $var1
+    i64.load align=4
+    i64.store
+    local.get $var0
+    local.get $var3
+    local.get $var2
+    call $func29
+    local.get $var2
+    i32.const 16
+    i32.add
+    global.set $global0
+  )
+  (func $func81 (param $var0 i32) (param $var1 i32)
     (local $var2 i32) (local $var3 i32)
     local.get $var1
     i32.load offset=4
@@ -28356,7 +28387,7 @@
     local.set $var3
     i32.const 8
     i32.const 4
-    call $func113
+    call $func114
     local.tee $var1
     i32.eqz
     if
@@ -28384,7 +28415,7 @@
     local.get $var1
     i32.store
   )
-  (func $get_cell (;81;) (export "get_cell") (param $var0 i32) (param $var1 i32) (param $var2 i32) (result i32)
+  (func $get_cell (;82;) (export "get_cell") (param $var0 i32) (param $var1 i32) (param $var2 i32) (result i32)
     (local $var3 i32)
     local.get $var0
     i32.const 4144
@@ -28414,7 +28445,7 @@
     i32.add
     i32.load align=1
   )
-  (func $get_wind (;82;) (export "get_wind") (param $var0 i32) (param $var1 i32) (param $var2 i32) (result i32)
+  (func $get_wind (;83;) (export "get_wind") (param $var0 i32) (param $var1 i32) (param $var2 i32) (result i32)
     (local $var3 i32)
     local.get $var0
     i32.const 4172
@@ -28444,7 +28475,7 @@
     i32.add
     i32.load align=1
   )
-  (func $func83 (param $var0 i32) (param $var1 i32)
+  (func $func84 (param $var0 i32) (param $var1 i32)
     (local $var2 i32)
     local.get $var1
     i32.const 16
@@ -28474,7 +28505,7 @@
     select
     i32.store
   )
-  (func $func84 (param $var0 i32)
+  (func $func85 (param $var0 i32)
     (local $var1 i32) (local $var2 i32) (local $var3 i32)
     global.get $global0
     i32.const 16
@@ -28521,7 +28552,7 @@
     call $func69
     unreachable
   )
-  (func $universe_flush_undos (;85;) (export "universe_flush_undos") (param $var0 i32)
+  (func $universe_flush_undos (;86;) (export "universe_flush_undos") (param $var0 i32)
     block $label0
       local.get $var0
       if
@@ -28541,13 +28572,13 @@
         i32.store
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
-  (func $universe_tick (;86;) (export "universe_tick") (param $var0 i32)
+  (func $universe_tick (;87;) (export "universe_tick") (param $var0 i32)
     block $label0
       local.get $var0
       if
@@ -28566,13 +28597,13 @@
         i32.store
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
-  (func $func87 (param $var0 i32)
+  (func $func88 (param $var0 i32)
     (local $var1 i32)
     global.get $global0
     i32.const 2048
@@ -28596,7 +28627,7 @@
     i32.add
     global.set $global0
   )
-  (func $split_dy_dx (;88;) (export "split_dy_dx") (param $var0 i32) (param $var1 i32)
+  (func $split_dy_dx (;89;) (export "split_dy_dx") (param $var0 i32) (param $var1 i32)
     (local $var2 i32)
     local.get $var0
     local.get $var1
@@ -28620,7 +28651,7 @@
     i32.add
     i32.store offset=4
   )
-  (func $func89 (param $var0 i32) (param $var1 i32)
+  (func $func90 (param $var0 i32) (param $var1 i32)
     local.get $var0
     local.get $var0
     i32.load offset=4
@@ -28643,7 +28674,7 @@
     i32.or
     i32.store
   )
-  (func $__wbg_cell_free (;90;) (export "__wbg_cell_free") (export "__wbg_wind_free") (param $var0 i32)
+  (func $__wbg_cell_free (;91;) (export "__wbg_cell_free") (export "__wbg_wind_free") (param $var0 i32)
     block $label0
       local.get $var0
       if
@@ -28657,13 +28688,13 @@
         call $func18
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
-  (func $func91 (param $var0 i32) (param $var1 i32)
+  (func $func92 (param $var0 i32) (param $var1 i32)
     (local $var2 i32)
     global.get $global0
     i32.const 16
@@ -28683,10 +28714,10 @@
     i32.const 1050388
     i32.store
     local.get $var2
-    call $func84
+    call $func85
     unreachable
   )
-  (func $universe_width (;92;) (export "universe_width") (param $var0 i32) (result i32)
+  (func $universe_width (;93;) (export "universe_width") (param $var0 i32) (result i32)
     block $label0
       local.get $var0
       if
@@ -28701,13 +28732,13 @@
         i32.load
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
-  (func $universe_height (;93;) (export "universe_height") (param $var0 i32) (result i32)
+  (func $universe_height (;94;) (export "universe_height") (param $var0 i32) (result i32)
     block $label0
       local.get $var0
       if
@@ -28722,13 +28753,13 @@
         i32.load
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
-  (func $universe_cells (;94;) (export "universe_cells") (param $var0 i32) (result i32)
+  (func $universe_cells (;95;) (export "universe_cells") (param $var0 i32) (result i32)
     block $label0
       local.get $var0
       if
@@ -28743,13 +28774,13 @@
         i32.load
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
-  (func $universe_winds (;95;) (export "universe_winds") (param $var0 i32) (result i32)
+  (func $universe_winds (;96;) (export "universe_winds") (param $var0 i32) (result i32)
     block $label0
       local.get $var0
       if
@@ -28764,13 +28795,13 @@
         i32.load
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
-  (func $universe_burns (;96;) (export "universe_burns") (param $var0 i32) (result i32)
+  (func $universe_burns (;97;) (export "universe_burns") (param $var0 i32) (result i32)
     block $label0
       local.get $var0
       if
@@ -28785,13 +28816,13 @@
         i32.load
         return
       end
-      call $func120
+      call $func121
       unreachable
     end $label0
-    call $func121
+    call $func122
     unreachable
   )
-  (func $func97 (param $var0 i32) (param $var1 i32) (param $var2 i32)
+  (func $func98 (param $var0 i32) (param $var1 i32) (param $var2 i32)
     (local $var3 i32)
     global.get $global0
     i32.const 16
@@ -28813,7 +28844,7 @@
     call $func51
     unreachable
   )
-  (func $func98 (param $var0 i32)
+  (func $func99 (param $var0 i32)
     (local $var1 i32)
     global.get $global0
     i32.const 16
@@ -28835,10 +28866,10 @@
     i32.load offset=4
     local.get $var1
     i32.load offset=8
-    call $func97
+    call $func98
     unreachable
   )
-  (func $func99 (param $var0 i32)
+  (func $func100 (param $var0 i32)
     block $label0
       local.get $var0
       i32.const 4
@@ -28855,7 +28886,7 @@
       call $func18
     end $label0
   )
-  (func $func100 (param $var0 i32)
+  (func $func101 (param $var0 i32)
     (local $var1 i32)
     block $label0
       local.get $var0
@@ -28873,13 +28904,13 @@
       call $func18
     end $label0
   )
-  (func $func101 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32) (param $var4 i32) (param $var5 i32) (result i32)
+  (func $func102 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32) (param $var4 i32) (param $var5 i32) (result i32)
     local.get $var0
     i32.eqz
     if
       i32.const 1050740
       i32.const 48
-      call $func122
+      call $func123
       unreachable
     end
     local.get $var0
@@ -28891,13 +28922,13 @@
     i32.load offset=16
     call_indirect (param i32 i32 i32 i32 i32) (result i32)
   )
-  (func $func102 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32) (param $var4 i32)
+  (func $func103 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32) (param $var4 i32)
     local.get $var0
     i32.eqz
     if
       i32.const 1050740
       i32.const 48
-      call $func122
+      call $func123
       unreachable
     end
     local.get $var0
@@ -28908,13 +28939,13 @@
     i32.load offset=16
     call_indirect (param i32 i32 i32 i32)
   )
-  (func $func103 (param $var0 i32) (param $var1 i32) (param $var2 f64) (param $var3 i32) (param $var4 i32)
+  (func $func104 (param $var0 i32) (param $var1 i32) (param $var2 f64) (param $var3 i32) (param $var4 i32)
     local.get $var0
     i32.eqz
     if
       i32.const 1050740
       i32.const 48
-      call $func122
+      call $func123
       unreachable
     end
     local.get $var0
@@ -28925,13 +28956,13 @@
     i32.load offset=16
     call_indirect (param i32 f64 i32 i32)
   )
-  (func $func104 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32) (param $var4 i32) (result i32)
+  (func $func105 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32) (param $var4 i32) (result i32)
     local.get $var0
     i32.eqz
     if
       i32.const 1050740
       i32.const 48
-      call $func122
+      call $func123
       unreachable
     end
     local.get $var0
@@ -28942,13 +28973,13 @@
     i32.load offset=16
     call_indirect (param i32 i32 i32 i32) (result i32)
   )
-  (func $func105 (param $var0 i32) (param $var1 i32) (param $var2 f32) (param $var3 i32) (param $var4 i32)
+  (func $func106 (param $var0 i32) (param $var1 i32) (param $var2 f32) (param $var3 i32) (param $var4 i32)
     local.get $var0
     i32.eqz
     if
       i32.const 1050740
       i32.const 48
-      call $func122
+      call $func123
       unreachable
     end
     local.get $var0
@@ -28959,13 +28990,13 @@
     i32.load offset=16
     call_indirect (param i32 f32 i32 i32)
   )
-  (func $func106 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32)
+  (func $func107 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32)
     local.get $var0
     i32.eqz
     if
       i32.const 1050740
       i32.const 48
-      call $func122
+      call $func123
       unreachable
     end
     local.get $var0
@@ -28975,7 +29006,7 @@
     i32.load offset=16
     call_indirect (param i32 i32 i32)
   )
-  (func $func107 (param $var0 i32) (param $var1 i32)
+  (func $func108 (param $var0 i32) (param $var1 i32)
     local.get $var1
     i32.load
     i32.eqz
@@ -28989,13 +29020,13 @@
     local.get $var1
     i32.store
   )
-  (func $func108 (param $var0 i32) (param $var1 i32) (param $var2 i32) (result i32)
+  (func $func109 (param $var0 i32) (param $var1 i32) (param $var2 i32) (result i32)
     local.get $var0
     i32.eqz
     if
       i32.const 1050740
       i32.const 48
-      call $func122
+      call $func123
       unreachable
     end
     local.get $var0
@@ -29004,14 +29035,14 @@
     i32.load offset=16
     call_indirect (param i32 i32) (result i32)
   )
-  (func $func109 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32) (result i32)
+  (func $func110 (param $var0 i32) (param $var1 i32) (param $var2 i32) (param $var3 i32) (result i32)
     local.get $var0
     local.get $var1
     local.get $var2
     local.get $var3
     call $func21
   )
-  (func $join_dy_dx (;110;) (export "join_dy_dx") (param $var0 i32) (param $var1 i32) (result i32)
+  (func $join_dy_dx (;111;) (export "join_dy_dx") (param $var0 i32) (param $var1 i32) (result i32)
     local.get $var0
     i32.const 3
     i32.mul
@@ -29020,14 +29051,14 @@
     i32.const 4
     i32.add
   )
-  (func $once_in (;111;) (export "once_in") (param $var0 i32) (param $var1 i32) (result i32)
+  (func $once_in (;112;) (export "once_in") (param $var0 i32) (param $var1 i32) (result i32)
     local.get $var0
     i32.load offset=8
     local.get $var1
     call $func42
     i32.eqz
   )
-  (func $get_index (;112;) (export "get_index") (param $var0 i32) (param $var1 i32) (param $var2 i32) (result i32)
+  (func $get_index (;113;) (export "get_index") (param $var0 i32) (param $var1 i32) (param $var2 i32) (result i32)
     local.get $var0
     i32.load offset=4132
     local.get $var1
@@ -29035,12 +29066,12 @@
     local.get $var2
     i32.add
   )
-  (func $func113 (param $var0 i32) (param $var1 i32) (result i32)
+  (func $func114 (param $var0 i32) (param $var1 i32) (result i32)
     local.get $var0
     local.get $var1
     call $func34
   )
-  (func $func114 (param $var0 i32) (param $var1 i32)
+  (func $func115 (param $var0 i32) (param $var1 i32)
     local.get $var0
     i32.const 1050308
     i32.store offset=4
@@ -29048,27 +29079,27 @@
     local.get $var1
     i32.store
   )
-  (func $rand_int (;115;) (export "rand_int") (param $var0 i32) (param $var1 i32) (result i32)
+  (func $rand_int (;116;) (export "rand_int") (param $var0 i32) (param $var1 i32) (result i32)
     local.get $var0
     i32.load offset=8
     local.get $var1
     call $func42
   )
-  (func $flush_undos (;116;) (export "flush_undos") (param $var0 i32)
+  (func $flush_undos (;117;) (export "flush_undos") (param $var0 i32)
     local.get $var0
     i32.const 4148
     i32.add
     i32.const 0
     call $func32
   )
-  (func $func117
+  (func $func118
     i32.const 1050352
     i32.const 17
     i32.const 1050372
     call $func79
     unreachable
   )
-  (func $func118 (param $var0 i32) (param $var1 i32) (result i32)
+  (func $func119 (param $var0 i32) (param $var1 i32) (result i32)
     local.get $var0
     i32.load
     drop
@@ -29077,70 +29108,70 @@
     end $label0
     unreachable
   )
-  (func $func119 (param $var0 i32) (param $var1 i32) (result i32)
+  (func $func120 (param $var0 i32) (param $var1 i32) (result i32)
     local.get $var0
     i64.load32_u
     local.get $var1
     call $func37
   )
-  (func $func120
+  (func $func121
     i32.const 1050008
     i32.const 27
-    call $func122
+    call $func123
     unreachable
   )
-  (func $func121
+  (func $func122
     i32.const 1050035
     i32.const 79
-    call $func122
+    call $func123
     unreachable
   )
-  (func $func122 (param $var0 i32) (param $var1 i32)
+  (func $func123 (param $var0 i32) (param $var1 i32)
     local.get $var0
     local.get $var1
     call $./sandtable_bg.js.__wbindgen_throw
     unreachable
   )
-  (func $width (;123;) (export "width") (param $var0 i32) (result i32)
+  (func $width (;124;) (export "width") (param $var0 i32) (result i32)
     local.get $var0
     i32.load offset=4128
   )
-  (func $height (;124;) (export "height") (param $var0 i32) (result i32)
+  (func $height (;125;) (export "height") (param $var0 i32) (result i32)
     local.get $var0
     i32.load offset=4132
   )
-  (func $cells (;125;) (export "cells") (param $var0 i32) (result i32)
+  (func $cells (;126;) (export "cells") (param $var0 i32) (result i32)
     local.get $var0
     i32.load offset=4136
   )
-  (func $winds (;126;) (export "winds") (param $var0 i32) (result i32)
+  (func $winds (;127;) (export "winds") (param $var0 i32) (result i32)
     local.get $var0
     i32.load offset=4164
   )
-  (func $burns (;127;) (export "burns") (param $var0 i32) (result i32)
+  (func $burns (;128;) (export "burns") (param $var0 i32) (result i32)
     local.get $var0
     i32.load offset=4176
   )
-  (func $func128 (param $var0 i32) (result i64)
+  (func $func129 (param $var0 i32) (result i64)
     i64.const 9147559743429524724
   )
-  (func $func129 (param $var0 i32) (result i64)
+  (func $func130 (param $var0 i32) (result i64)
     i64.const -2306166442677192007
   )
-  (func $func130 (param $var0 i32) (result i64)
+  (func $func131 (param $var0 i32) (result i64)
     i64.const -3005123615467915227
   )
-  (func $func131 (param $var0 i32)
+  (func $func132 (param $var0 i32)
     nop
   )
-  (func $func132 (param $var0 i32) (param $var1 i32)
+  (func $func133 (param $var0 i32) (param $var1 i32)
     nop
   )
-  (func $__webpack_init__ (;133;) (export "__webpack_init__")
+  (func $__webpack_init__ (;134;) (export "__webpack_init__")
   )
   (data (i32.const 1048576) "\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\01\00\00\00\01")
   (data (i32.const 1048660) "\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff")
   (data (i32.const 1048684) "\01\00\00\00\01\00\00\00\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff")
-  (data (i32.const 1048824) "\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00oob setsrc\5clib.rs\00\00\00\1b\01\10\00\0a\00\00\00T\00\00\00\0d\00\00\00\1b\01\10\00\0a\00\00\00f\00\00\00\0d\00\00\00\1b\01\10\00\0a\00\00\00p\00\00\00\09\00\00\00\1b\01\10\00\0a\00\00\00q\00\00\00\09\00\00\00\1b\01\10\00\0a\00\00\00x\00\00\00\09\00\00\00\1b\01\10\00\0a\00\00\00\7f\00\00\00\09\00\00\00\1b\01\10\00\0a\00\00\00}\01\00\00\10\00\00\00\1b\01\10\00\0a\00\00\00\83\01\00\00\10\00\00\00invalid enum value passed\00\00\00\1b\01\10\00\0a\00\00\00\c4\00\00\00\11\00\00\00\1b\01\10\00\0a\00\00\00\eb\00\00\00\11\00\00\00\1b\01\10\00\0a\00\00\00-\01\00\00\15\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff2\00\00\00\1e\00\00\006\00\00\00#\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00\f4\01\00\00\f4\01\00\00\1e\00\00\00(\00\00\00\05\00\00\00\f4\01\00\00\05\00\00\00F\00\00\00<\00\00\00<\00\00\00(\00\00\00<\00\00\00(\00\00\00F\00\00\00\0a\00\00\00\1e\00\00\00\fe\ff\ff\ff\fe\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\fe\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\fe\ff\ff\ff\ff\ff\ff\ff\fe\ff\ff\ff\fe\ff\ff\ff\fe\ff\ff\ff\fe\ff\ff\ff\01\00\00\00\08\00\00\00\04\00\00\00\02\00\00\00\03\00\00\00cannot sample empty rangeC:\5cUsers\5cLuke\5c.cargo\5cregistry\5csrc\5cgithub.com-1ecc6299db9ec823\5crand-0.8.4\5csrc\5crng.rsY\03\10\00S\00\00\00\86\00\00\00\09\00\00\00assertion failed: mid <= self.len()/rustc/f1edd0429582dd29cccacaf50fd134b05593bd9c/library/core/src/slice/mod.rs\df\03\10\00M\00\00\00\1f\06\00\00\09\00\00\00/rustc/f1edd0429582dd29cccacaf50fd134b05593bd9c/library/alloc/src/collections/vec_deque/ring_slices.rs\00\00<\04\10\00f\00\00\00 \00\00\00\0e\00\00\00/rustc/f1edd0429582dd29cccacaf50fd134b05593bd9c/library/alloc/src/collections/vec_deque/mod.rsassertion failed: self.cap() == old_cap * 2\00\00\00\b4\04\10\00^\00\00\00\8d\08\00\00\0d\00\00\00\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff")
+  (data (i32.const 1048824) "\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00oob setsrc\5clib.rs\00\00\00\1b\01\10\00\0a\00\00\00U\00\00\00\0d\00\00\00\1b\01\10\00\0a\00\00\00g\00\00\00\0d\00\00\00\1b\01\10\00\0a\00\00\00q\00\00\00\09\00\00\00\1b\01\10\00\0a\00\00\00r\00\00\00\09\00\00\00\1b\01\10\00\0a\00\00\00y\00\00\00\09\00\00\00\1b\01\10\00\0a\00\00\00\80\00\00\00\09\00\00\00\1b\01\10\00\0a\00\00\00~\01\00\00\10\00\00\00\1b\01\10\00\0a\00\00\00\84\01\00\00\10\00\00\00invalid enum value passed\00\00\00\1b\01\10\00\0a\00\00\00\c5\00\00\00\11\00\00\00\1b\01\10\00\0a\00\00\00\ec\00\00\00\11\00\00\00\1b\01\10\00\0a\00\00\00.\01\00\00\15\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff2\00\00\00\1e\00\00\006\00\00\00#\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00(\00\00\00\f4\01\00\00\f4\01\00\00\1e\00\00\00(\00\00\00\05\00\00\00\f4\01\00\00\05\00\00\00F\00\00\00<\00\00\00<\00\00\00(\00\00\00<\00\00\00(\00\00\00F\00\00\00\0a\00\00\00\1e\00\00\00\fe\ff\ff\ff\fe\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\fe\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\ff\fe\ff\ff\ff\ff\ff\ff\ff\fe\ff\ff\ff\fe\ff\ff\ff\fe\ff\ff\ff\fe\ff\ff\ff\01\00\00\00\08\00\00\00\04\00\00\00\02\00\00\00\03\00\00\00cannot sample empty rangeC:\5cUsers\5cLuke\5c.cargo\5cregistry\5csrc\5cgithub.com-1ecc6299db9ec823\5crand-0.8.4\5csrc\5crng.rsY\03\10\00S\00\00\00\86\00\00\00\09\00\00\00assertion failed: mid <= self.len()/rustc/f1edd0429582dd29cccacaf50fd134b05593bd9c/library/core/src/slice/mod.rs\df\03\10\00M\00\00\00\1f\06\00\00\09\00\00\00/rustc/f1edd0429582dd29cccacaf50fd134b05593bd9c/library/alloc/src/collections/vec_deque/ring_slices.rs\00\00<\04\10\00f\00\00\00 \00\00\00\0e\00\00\00/rustc/f1edd0429582dd29cccacaf50fd134b05593bd9c/library/alloc/src/collections/vec_deque/mod.rsassertion failed: self.cap() == old_cap * 2\00\00\00\b4\04\10\00^\00\00\00\8d\08\00\00\0d\00\00\00\00\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\01\00\00\00\00\00\00\00\ff\ff\ff\ff\ff\ff\ff\ff")
   (data (i32.const 1049976) "\ff\ff\ff\ff\ff\ff\ff\ff\04\00\00\00\08\00\00\00\04\00\00\00\05\00\00\00\04\00\00\00\00\00\00\00null pointer passed to rustrecursive use of an object detected which would lead to unsafe aliasing in rust\00\00\07\00\00\00\04\00\00\00\04\00\00\00\08\00\00\00\09\00\00\00\0a\00\00\00called `Option::unwrap()` on a `None` value\00\01\00\00\00\00\00\00\00library/std/src/panicking.rsP\06\10\00\1c\00\00\00\03\02\00\00\1f\00\00\00P\06\10\00\1c\00\00\00\04\02\00\00\1e\00\00\00\0b\00\00\00\10\00\00\00\04\00\00\00\0c\00\00\00\0d\00\00\00\07\00\00\00\08\00\00\00\04\00\00\00\0e\00\00\00\0f\00\00\00\10\00\00\00\0c\00\00\00\04\00\00\00\11\00\00\00\07\00\00\00\08\00\00\00\04\00\00\00\12\00\00\00library/alloc/src/raw_vec.rscapacity overflow\00\00\00\d4\06\10\00\1c\00\00\002\02\00\00\05\00\00\00\15\00\00\00\00\00\00\00\01\00\00\00\16\00\00\00index out of bounds: the len is  but the index is \00\00$\07\10\00 \00\00\00D\07\10\00\12\00\00\0000010203040506070809101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798081828384858687888990919293949596979899 out of range for slice of length range end index \00\00R\08\10\00\10\00\00\000\08\10\00\22\00\00\00closure invoked recursively or destroyed already")
 )
