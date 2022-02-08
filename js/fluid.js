@@ -418,6 +418,7 @@ function startFluid({ universe }) {
     };
   }
 
+
   const blit = (() => {
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(
@@ -425,12 +426,20 @@ function startFluid({ universe }) {
       new Float32Array([-1, -1, -1, 1, 1, 1, 1, -1]),
       gl.STATIC_DRAW
     );
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl.createBuffer());
+	gl.bufferData(
+	  gl.ELEMENT_ARRAY_BUFFER,
+	  new Uint16Array([0, 1, 2, 0, 2, 3]),
+	  gl.STATIC_DRAW
+	);
+	const pbo = gl.createBuffer();
+	gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
     gl.bufferData(
-      gl.ELEMENT_ARRAY_BUFFER,
-      new Uint16Array([0, 1, 2, 0, 2, 3]),
+      gl.PIXEL_PACK_BUFFER,
+      new Uint8Array(width * height * 4),
       gl.STATIC_DRAW
     );
+
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(0);
 
@@ -768,7 +777,13 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, winds);
+    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+
+	/*gl.bufferData(
+		gl.PIXEL_PACK_BUFFER,
+		new Uint16Array([0, 1, 2, 0, 2, 3]),
+		gl.STATIC_DRAW
+	);*/
 
     // GRADIENT SUBTRACT
     // burns
