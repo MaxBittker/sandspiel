@@ -13,7 +13,6 @@ use rand_isaac::Isaac64Rng;
 use species::Species;
 use std::collections::VecDeque;
 use wasm_bindgen::prelude::*;
-// use web_sys::console;
 
 #[wasm_bindgen]
 #[repr(C)]
@@ -107,9 +106,9 @@ impl<'a> SandApi<'a> {
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
     }
     pub fn get_fluid(&mut self) -> Wind {
-        let idx = self.universe.get_index(self.x, self.y);
-
-        self.universe.winds[idx]
+        // self.universe.get_wind(self.x, self.y)
+        let i = self.universe.get_downsized_index(self.x / 4, self.y / 4);
+        return self.universe.winds[i];
     }
     pub fn set_fluid(&mut self, v: Wind) {
         let idx = self.universe.get_index(self.x, self.y);
@@ -302,7 +301,7 @@ impl Universe {
 
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
-        let winds: Vec<Wind> = (0..width * height)
+        let winds: Vec<Wind> = (0..(width / 4) * (height / 4))
             .map(|_i| Wind {
                 dx: 0,
                 dy: 0,
@@ -339,13 +338,16 @@ impl Universe {
         (x * self.height + y) as usize
     }
 
+    fn get_downsized_index(&self, x: i32, y: i32) -> usize {
+        (x * (self.height / 4) + y) as usize
+    }
     fn get_cell(&self, x: i32, y: i32) -> Cell {
         let i = self.get_index(x, y);
         return self.cells[i];
     }
 
     fn get_wind(&self, x: i32, y: i32) -> Wind {
-        let i = self.get_index(x, y);
+        let i = self.get_downsized_index(x.wrapping_div(4), y.wrapping_div(4));
         return self.winds[i];
     }
 
