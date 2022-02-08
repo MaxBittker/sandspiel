@@ -36,9 +36,36 @@ pub enum Species {
     Rocket = 17,
 }
 
+type Updater = fn(Cell, SandApi);
+
+static UPDATERS: [Updater; 20] = [
+	update_empty,
+	update_empty,
+	update_sand,
+	update_water,
+	update_gas,
+	update_cloner,
+	update_fire,
+	update_wood,
+	update_lava,
+	update_ice,
+	update_empty,
+	update_plant,
+	update_acid,
+	update_stone,
+	update_dust,
+	update_mite,
+	update_oil,
+	update_rocket,
+	update_fungus,
+	update_seed,
+];
+
 impl Species {
+
     pub fn update(&self, cell: Cell, api: SandApi) {
-        match self {
+		UPDATERS[*self as usize](cell, api);
+        /*match self {
             Species::Empty => {}
             Species::Wall => {}
             Species::Sand => update_sand(cell, api),
@@ -50,20 +77,24 @@ impl Species {
             Species::Rocket => update_rocket(cell, api),
             Species::Fire => update_fire(cell, api),
             Species::Wood => update_wood(cell, api),
-            Species::Lava => update_lava(cell, api),
             Species::Ice => update_ice(cell, api),
             // Species::Snow => update_ice(cell, api),
             //lightning
             // Species::Sink => update_sink(cell, api),
-            Species::Plant => update_plant(cell, api),
             Species::Acid => update_acid(cell, api),
             Species::Mite => update_mite(cell, api),
             Species::Oil => update_oil(cell, api),
             Species::Fungus => update_fungus(cell, api),
             Species::Seed => update_seed(cell, api),
+            Species::Plant => update_plant(cell, api),
+            Species::Lava => update_lava(cell, api),
             // Species::X => update_x(cell, api),
-        }
+        }*/
     }
+}
+
+pub fn update_empty(cell: Cell, mut api: SandApi) {
+
 }
 
 #[no_mangle]
