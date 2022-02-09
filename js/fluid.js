@@ -421,6 +421,13 @@ function startFluid({ universe }) {
   const width = universe.width();
   const height = universe.height();
 
+  const WIND_PARTS = 8;
+  const windPartWidth = Math.round(width / WIND_PARTS);
+  const windPartHeight = Math.round(height / WIND_PARTS);
+  const windPartLength = windPartWidth * windPartHeight * 4;
+  console.log(windPartWidth, windPartHeight);
+  console.log(windPartLength);
+
   const blit = (() => {
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(
@@ -777,7 +784,7 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
-    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds);
+    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds, 0, windPartLength);
 
     // GRADIENT SUBTRACT
     // burns
