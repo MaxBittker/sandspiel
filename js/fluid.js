@@ -442,8 +442,6 @@ function startFluid({ universe }) {
       gl.STATIC_DRAW
     );
 
-    console.log("width:", width, "height:", height);
-
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(0);
 
@@ -779,6 +777,7 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds, 0, width * height * 4 * 0.2);
 
     /*gl.bufferData(
 		gl.PIXEL_PACK_BUFFER,
