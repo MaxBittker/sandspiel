@@ -777,13 +777,7 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
     gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
-    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds, 0, width * height * 4 * 0.2);
-
-    /*gl.bufferData(
-		gl.PIXEL_PACK_BUFFER,
-		new Uint16Array([0, 1, 2, 0, 2, 3]),
-		gl.STATIC_DRAW
-	);*/
+    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds);
 
     // GRADIENT SUBTRACT
     // burns
