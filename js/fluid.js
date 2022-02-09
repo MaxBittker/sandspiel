@@ -418,6 +418,9 @@ function startFluid({ universe }) {
     };
   }
 
+  const width = universe.width();
+  const height = universe.height();
+
   const blit = (() => {
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(
@@ -439,6 +442,8 @@ function startFluid({ universe }) {
       gl.STATIC_DRAW
     );
 
+    console.log("width:", width, "height:", height);
+
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(0);
 
@@ -451,9 +456,6 @@ function startFluid({ universe }) {
   let lastTime = Date.now();
 
   // multipleSplats(parseInt(Math.random() * 20) + 5);
-
-  const width = universe.width();
-  const height = universe.height();
 
   let winds = new Uint8Array(
     memory.buffer,
