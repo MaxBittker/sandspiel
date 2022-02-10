@@ -519,6 +519,8 @@ function startFluid({ universe }) {
     velocity.swap();
   }
 
+  let pixelReadDelayTicker = 0;
+
   function update() {
     winds = new Uint8Array(memory.buffer, universe.winds(), width * height * 4);
 
@@ -776,8 +778,14 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
-    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds);
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+    if (pixelReadDelayTicker <= 0) {
+      gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds);
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+      pixelReadDelayTicker = 8;
+    }
+    else {
+      pixelReadDelayTicker--;
+    }
 
     // GRADIENT SUBTRACT
     // burns
