@@ -439,7 +439,7 @@ function startFluid({ universe }) {
     gl.bufferData(
       gl.PIXEL_PACK_BUFFER,
       new Uint8Array(width * height * 4),
-      gl.STATIC_DRAW
+      gl.DYNAMIC_READ
     );
 
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
