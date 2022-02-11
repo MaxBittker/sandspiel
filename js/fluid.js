@@ -519,6 +519,8 @@ function startFluid({ universe }) {
     velocity.swap();
   }
 
+  let sync = undefined;
+
   function update() {
     winds = new Uint8Array(memory.buffer, universe.winds(), width * height * 4);
 
@@ -776,8 +778,19 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
-    gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds);
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+    
+    // Init pixel reading!
+    if (sync === undefined) {
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+      sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+    } else {
+      const status = gl.clientWaitSync(sync, 0, 0);
+      if (status === gl.CONDITION_SATISFIED) {
+        gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds);
+        gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+        sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+      }
+    }
 
     // GRADIENT SUBTRACT
     // burns
