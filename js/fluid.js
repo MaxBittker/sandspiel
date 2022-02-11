@@ -779,7 +779,6 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
     
-    // Init pixel reading!
     if (sync === undefined) {
       gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
       sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
