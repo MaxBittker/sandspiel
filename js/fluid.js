@@ -27,7 +27,22 @@ const canvas = document.getElementById("fluid-canvas");
 const sandCanvas = document.getElementById("sand-canvas");
 
 let fluidColor = [1, 1, 0.8];
+function iOS() {
+  return (
+    [
+      "iPad Simulator",
+      "iPhone Simulator",
+      "iPod Simulator",
+      "iPad",
+      "iPhone",
+      "iPod",
+    ].includes(navigator.platform) ||
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+  );
+}
 
+const isIOS = iOS();
 function startFluid({ universe }) {
   canvas.width = universe.width();
   canvas.height = universe.height();
@@ -436,7 +451,7 @@ function startFluid({ universe }) {
       gl.STATIC_DRAW
     );
 
-    if (isWebGL2) {
+    if (isWebGL2 && !isIOS) {
       const pbo = gl.createBuffer();
       gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
       gl.bufferData(
@@ -782,7 +797,7 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
-    if (!isWebGL2) {
+    if (!isWebGL2 || isIOS) {
       gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, winds);
     } else if (sync === undefined) {
       gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
