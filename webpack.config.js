@@ -4,6 +4,7 @@ const dist = path.resolve(__dirname, "dist");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const WasmPackPlugin = require("@wasm-tool/wasm-pack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
+const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 const { GenerateSW } = require("workbox-webpack-plugin");
 
@@ -24,6 +25,7 @@ module.exports = {
   mode: "development",
   devtool: "source-map",
   plugins: [
+    new CleanWebpackPlugin(),
     new WasmPackPlugin({ crateDirectory: path.resolve(__dirname, "crate") }),
     new CopyWebpackPlugin([
       "index.html",
@@ -32,7 +34,29 @@ module.exports = {
       "assets/*",
     ]),
     new HtmlWebpackPlugin({ template: "index.html" }),
-    new GenerateSW({ navigateFallback: "index.html" }),
+    new GenerateSW({
+      navigateFallback: "index.html",
+      // Define runtime caching rules.
+      runtimeCaching: [
+        {
+          // Match any request that ends with .png, .jpg, .jpeg or .svg.
+          urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
+
+          // Apply a cache-first strategy.
+          handler: "CacheFirst",
+
+          options: {
+            // Use a custom cache name.
+            cacheName: "images",
+
+            // Only cache 300 images.
+            expiration: {
+              maxEntries: 300,
+            },
+          },
+        },
+      ],
+    }),
   ],
   module: {
     rules: [

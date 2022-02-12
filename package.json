@@ -45,6 +45,7 @@
     "@sentry/tracing": "^6.2.5",
     "@sentry/wasm": "^6.2.5",
     "classnames": "^2.2.6",
+    "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^5.0.2",
     "dat.gui": "^0.7.5",
     "firebase": "^8.2.8",
