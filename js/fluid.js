@@ -43,6 +43,7 @@ function startFluid({ universe }) {
 
   let pointers = [];
   let splatStack = [];
+  let isWebGL2;
 
   const { gl, ext } = getWebGLContext(canvas);
   let {
@@ -71,7 +72,7 @@ function startFluid({ universe }) {
     };
 
     let gl = canvas.getContext("webgl2", params);
-    const isWebGL2 = !!gl;
+    isWebGL2 = !!gl;
     if (!isWebGL2)
       gl =
         canvas.getContext("webgl", params) ||
@@ -80,7 +81,7 @@ function startFluid({ universe }) {
     let halfFloat;
     let supportLinearFiltering;
     if (isWebGL2) {
-      gl.getExtension("EXT_color_buffer_float");
+      halfFloat = gl.getExtension("EXT_color_buffer_float");
       supportLinearFiltering = gl.getExtension("OES_texture_float_linear");
     } else {
       halfFloat = gl.getExtension("OES_texture_half_float");
@@ -434,13 +435,16 @@ function startFluid({ universe }) {
       new Uint16Array([0, 1, 2, 0, 2, 3]),
       gl.STATIC_DRAW
     );
-    const pbo = gl.createBuffer();
-    gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
-    gl.bufferData(
-      gl.PIXEL_PACK_BUFFER,
-      new Uint8Array(width * height * 4),
-      gl.STATIC_DRAW
-    );
+
+    if (isWebGL2) {
+      const pbo = gl.createBuffer();
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
+      gl.bufferData(
+        gl.PIXEL_PACK_BUFFER,
+        new Uint8Array(width * height * 4),
+        gl.STATIC_DRAW
+      );
+    }
 
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(0);
@@ -778,8 +782,9 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
-    
-    if (sync === undefined) {
+    if (!isWebGL2) {
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, winds);
+    } else if (sync === undefined) {
       gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
       sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
     } else {
