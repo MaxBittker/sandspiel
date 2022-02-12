@@ -189,6 +189,10 @@ class Browse extends React.Component {
         <SignInScreen />
         <p style={{ gridColumn: "auto / span 2", margin: "8px", fontSize: 16 }}>
           Check out ☞ <br></br>
+          <a href="https://sandspiel-staging.firebaseapp.com/">
+            Faster Sandspiel [BETA] (post if you see a difference and tag #beta)
+          </a>
+          <br></br>
           <a href="https://www.youtube.com/watch?v=2qfjJ-0ZeVM" target="_blank">
             {" "}
             "Top 9 ways to make Water" (Lu Wilson)
