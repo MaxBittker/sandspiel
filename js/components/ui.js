@@ -214,6 +214,7 @@ class Index extends React.Component {
     localStorage.setItem("postList", JSON.stringify(postList));
 
     this.setState({ submitting: true });
+    // var this=
     currentUser.getIdToken().then((token) => {
       fetch(functions._url("api/creations"), {
         method: "POST",
@@ -223,14 +224,23 @@ class Index extends React.Component {
           Authorization: "Bearer " + token,
         },
       })
-        .then((res) => res.json())
+        .then((res) => res.json(),
+             (err) => {
+                console.error("Request failed, let's not leave people hanging");
+                // Not sure if this is right, but worth a try
+                this.setState({ submissionMenuOpen: false, submitting: false });
+                this.play();
+              }
+             )
         .then((response) => {
           console.log("Success:", JSON.stringify(response));
+          this.setState({ submissionMenuOpen: false, submitting: false });
           this.play();
         })
         .catch((error) => console.error("Error:", error))
         .then(() => {
           this.setState({ submissionMenuOpen: false, submitting: false });
+          this.play();
         });
     });
   }
