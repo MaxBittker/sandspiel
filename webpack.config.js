@@ -39,6 +39,10 @@ module.exports = {
       // Define runtime caching rules.
       runtimeCaching: [
         {
+          urlPattern: /\.html$/,
+          handler: "StaleWhileRevalidate",
+        },
+        {
           // Match any request that ends with .png, .jpg, .jpeg or .svg.
           urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
 

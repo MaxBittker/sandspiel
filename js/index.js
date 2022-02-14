@@ -25,8 +25,7 @@ import { fps } from "./fps";
 import {} from "./paint";
 import {} from "./app";
 import { startFluid } from "./fluid";
-import {  } from "./layout";
-
+import {} from "./layout";
 
 const isBench = window.location.pathname === "/bench";
 if (window.safari) {
@@ -64,6 +63,7 @@ if ("serviceWorker" in navigator) {
       .register("/service-worker.js")
       .then((registration) => {
         console.log("SW registered: ", registration);
+        fetch("index.html"); // refresh cache (?)
       })
       .catch((registrationError) => {
         console.log("SW registration failed: ", registrationError);
@@ -89,8 +89,6 @@ document.getElementById("background").addEventListener("touchmove", (e) => {
     }
   }
 });
-
-
 
 let fluid;
 let drawSand;
