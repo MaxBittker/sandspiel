@@ -27,7 +27,22 @@ const canvas = document.getElementById("fluid-canvas");
 const sandCanvas = document.getElementById("sand-canvas");
 
 let fluidColor = [1, 1, 0.8];
+function iOS() {
+  return (
+    [
+      "iPad Simulator",
+      "iPhone Simulator",
+      "iPod Simulator",
+      "iPad",
+      "iPhone",
+      "iPod",
+    ].includes(navigator.platform) ||
+    // iPad on iOS 13 detection
+    (navigator.userAgent.includes("Mac") && "ontouchend" in document)
+  );
+}
 
+const isIOS = iOS();
 function startFluid({ universe }) {
   canvas.width = universe.width();
   canvas.height = universe.height();
@@ -43,6 +58,7 @@ function startFluid({ universe }) {
 
   let pointers = [];
   let splatStack = [];
+  let isWebGL2;
 
   const { gl, ext } = getWebGLContext(canvas);
   let {
@@ -71,7 +87,7 @@ function startFluid({ universe }) {
     };
 
     let gl = canvas.getContext("webgl2", params);
-    const isWebGL2 = !!gl;
+    isWebGL2 = !!gl;
     if (!isWebGL2)
       gl =
         canvas.getContext("webgl", params) ||
@@ -80,7 +96,7 @@ function startFluid({ universe }) {
     let halfFloat;
     let supportLinearFiltering;
     if (isWebGL2) {
-      gl.getExtension("EXT_color_buffer_float");
+      halfFloat = gl.getExtension("EXT_color_buffer_float");
       supportLinearFiltering = gl.getExtension("OES_texture_float_linear");
     } else {
       halfFloat = gl.getExtension("OES_texture_half_float");
@@ -418,6 +434,9 @@ function startFluid({ universe }) {
     };
   }
 
+  const width = universe.width();
+  const height = universe.height();
+
   const blit = (() => {
     gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
     gl.bufferData(
@@ -431,6 +450,17 @@ function startFluid({ universe }) {
       new Uint16Array([0, 1, 2, 0, 2, 3]),
       gl.STATIC_DRAW
     );
+
+    if (isWebGL2 && !isIOS) {
+      const pbo = gl.createBuffer();
+      gl.bindBuffer(gl.PIXEL_PACK_BUFFER, pbo);
+      gl.bufferData(
+        gl.PIXEL_PACK_BUFFER,
+        new Uint8Array(width * height * 4),
+        gl.STATIC_DRAW
+      );
+    }
+
     gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(0);
 
@@ -443,9 +473,6 @@ function startFluid({ universe }) {
   let lastTime = Date.now();
 
   // multipleSplats(parseInt(Math.random() * 20) + 5);
-
-  const width = universe.width();
-  const height = universe.height();
 
   let winds = new Uint8Array(
     memory.buffer,
@@ -510,6 +537,8 @@ function startFluid({ universe }) {
     blit(velocity.write[1]);
     velocity.swap();
   }
+
+  let sync = undefined;
 
   function update() {
     winds = new Uint8Array(memory.buffer, universe.winds(), width * height * 4);
@@ -768,7 +797,20 @@ function startFluid({ universe }) {
     // gl.uniform1i(velocityOutProgram.uniforms.uTexture, velocity.read[2]);
     // gl.uniform1i(velocityOutProgram.uniforms.uPressure, pressure.read[2]);
     blit(velocityOut[1]);
-    gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, winds);
+    if (!isWebGL2 || isIOS) {
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, winds);
+    } else if (sync === undefined) {
+      gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+      sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+    } else {
+      const status = gl.clientWaitSync(sync, 0, 0);
+
+      if (status === gl.ALREADY_SIGNALED || status === gl.CONDITION_SATISFIED) {
+        gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds);
+        gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
+        sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
+      }
+    }
 
     // GRADIENT SUBTRACT
     // burns
