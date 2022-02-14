@@ -804,7 +804,8 @@ function startFluid({ universe }) {
       sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
     } else {
       const status = gl.clientWaitSync(sync, 0, 0);
-      if (status === gl.CONDITION_SATISFIED) {
+
+      if (status === gl.ALREADY_SIGNALED || status === gl.CONDITION_SATISFIED) {
         gl.getBufferSubData(gl.PIXEL_PACK_BUFFER, 0, winds);
         gl.readPixels(0, 0, width, height, gl.RGBA, gl.UNSIGNED_BYTE, 0);
         sync = gl.fenceSync(gl.SYNC_GPU_COMMANDS_COMPLETE, 0);
