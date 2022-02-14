@@ -36,14 +36,14 @@ const ElementButton = (name, selectedElement, setElement) => {
   }
   return (
     <button
-      className={selected ? "selected" : ""}
+      className={selected ? "ebutton selected" : "ebutton"}
       key={name}
       onClick={() => {
         setElement(elementID);
       }}
       style={{
         background,
-        backgroundColor: selected ? color.replace("0.25", "1.5") : color,
+        backgroundColor: selected ? color.replace("0.25", "1.5") : color
       }}
     >
       {"  "}
@@ -66,7 +66,7 @@ class Index extends React.Component {
       size: 2,
       dataURL: {},
       currentSubmission: null,
-      selectedElement: Species.Water,
+      selectedElement: Species.Water
     };
     window.UI = this;
     //if we start in the background, pause;
@@ -118,7 +118,7 @@ class Index extends React.Component {
   setSize(event, size) {
     event.preventDefault();
     this.setState({
-      size,
+      size
     });
   }
   reset() {
@@ -177,7 +177,7 @@ class Index extends React.Component {
     this.pause();
     this.setState({
       data: { dataURL, cells: cellData },
-      submissionMenuOpen: true,
+      submissionMenuOpen: true
     });
   }
   rateLimited() {
@@ -204,7 +204,7 @@ class Index extends React.Component {
       title,
       image: dataURL,
       parent_id: currentSubmission?.data?.id,
-      cells,
+      cells
     };
 
     var postList = JSON.parse(localStorage.getItem("postList") || "[]");
@@ -220,8 +220,8 @@ class Index extends React.Component {
         body: JSON.stringify(payload), // data can be `string` or {object}!
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + token,
-        },
+          Authorization: "Bearer " + token
+        }
       })
         .then((res) => res.json())
         .then((response) => {
@@ -249,8 +249,8 @@ class Index extends React.Component {
     fetch(functions._url(`api/creations/${id}`), {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     })
       .then((res) => res.json())
       .then((data) => {
@@ -261,7 +261,7 @@ class Index extends React.Component {
           .getDownloadURL()
           .then((dlurl) => {
             fetch(dlurl, {
-              method: "GET",
+              method: "GET"
             })
               .then((res) => res.blob())
               .then((blob) => {
@@ -325,14 +325,14 @@ class Index extends React.Component {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + token,
-          },
+            Authorization: "Bearer " + token
+          }
         })
           .then((res) => res.json())
           .then((data) => {
             if (currentSubmission != null) {
               this.setState({
-                currentSubmission: { ...currentSubmission, data },
+                currentSubmission: { ...currentSubmission, data }
               });
             }
           })
@@ -355,9 +355,21 @@ class Index extends React.Component {
           className={paused ? "selected" : ""}
         >
           {paused ? (
-            <svg height="20" width="20" id="d" viewBox="0 0 300 300">
-              <polygon id="play" points="0,0 , 300,150 0,300" />
-            </svg>
+            <>
+              <svg
+                width="12"
+                height="17"
+                viewBox="0 0 12 17"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M2 14.5V3.5H3.5V4.5H5V5.5H6.5V6.5H8V7.5H9.5V8.5H10.5V9.5H9.5V10.5H8V11.5H6.5V12.5H5V13.5H3.5V14.5H2Z"
+                  fill="white"
+                />
+              </svg>
+              Play
+            </>
           ) : (
             <svg height="20" width="20" id="d" viewBox="0 0 300 300">
               <polygon id="bar2" points="0,0 110,0 110,300 0,300" />
@@ -372,7 +384,7 @@ class Index extends React.Component {
             <Link
               to={{
                 pathname: "/browse/",
-                hash,
+                hash
               }}
             >
               <button>Browse</button>
@@ -384,7 +396,7 @@ class Index extends React.Component {
         <Link
           to={{
             pathname: "/info/",
-            hash,
+            hash
           }}
         >
           <button>Info</button>
@@ -410,9 +422,23 @@ class Index extends React.Component {
             reset();
             universe.pop_undo();
           }}
-          style={{ fontSize: 35 }}
         >
-          ↜
+          {/* ↜ */}
+          <svg
+            width="20"
+            height="11"
+            viewBox="0 0 20 11"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M6 7.5V11H5V10H4V9H3V8H2V7H1V6H0V5H1V4H2V3H3V2H4V1H5V0H6V3.5H10V4.5H12V5.5H13V6.5H14V7.5H15V9.5H14V8.5H12V7.5H6Z"
+              fill="black"
+            />
+          </svg>
+          Undo
         </button>
         <button
           className={-1 == selectedElement ? "selected" : ""}
@@ -430,12 +456,12 @@ class Index extends React.Component {
               this.setState({ selectedElement: id })
             )
           )}
-        <span className="promo">
+        {/* <span className="promo">
           *new*{" "}
           <a href="https://orb.farm" target="_blank">
             orb.farm
           </a>
-        </span>
+        </span> */}
         {this.state.currentSubmission && (
           <div className="submission-title">
             <button onClick={() => this.incScore()}>
@@ -455,7 +481,7 @@ class Index extends React.Component {
             <img src={this.state.data.dataURL} className="submissionImg" />
             <SignInButton>
               <div style={{ display: "flex" }}>
-                <input 
+                <input
                   maxlength="200"
                   placeholder="title"
                   onChange={(e) => this.setState({ title: e.target.value })}

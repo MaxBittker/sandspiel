@@ -9,7 +9,7 @@ let vsh = require("./glsl/sandVertex.glsl");
 let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   const regl = reglBuilder({
     canvas,
-    attributes: { preserveDrawingBuffer: isSnapshot },
+    attributes: { preserveDrawingBuffer: isSnapshot }
   });
   // const lastFrame = regl.texture();
   const width = universe.width();
@@ -34,10 +34,10 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
       },
       resolution: ({ viewportWidth, viewportHeight }) => [
         viewportWidth,
-        viewportHeight,
+        viewportHeight
       ],
       dpi: window.devicePixelRatio * 2,
-      isSnapshot,
+      isSnapshot
       // backBuffer: lastFrame
     },
 
@@ -47,11 +47,11 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
       position: [
         [-1, 4],
         [-1, -1],
-        [4, -1],
-      ],
+        [4, -1]
+      ]
     },
     // Our triangle has 3 vertices
-    count: 3,
+    count: 3
   });
 
   return () => {
@@ -70,6 +70,42 @@ let snapshot = (universe) => {
   return canvas.toDataURL("image/png");
 };
 
+let sprites = () => {
+  let canvas = document.createElement("canvas");
+  window.document.body.appendChild(canvas);
+  let species = Object.values(Species).filter((x) => Number.isInteger(x));
+  let range = Math.max(...species) + 1;
+  let size = 30;
+  let universe = Universe.new(range * size, size * range);
+  canvas.width = size * range;
+  canvas.height = range * size;
+  canvas.style = `
+  
+  position: absolute;
+  z-index: 300;`;
+  universe.reset();
+
+  species.forEach((id) =>
+    universe.paint(Math.floor(id * size), size / 2, size / 2, id)
+  );
+
+  let render = startWebGL({ universe, canvas, isSnapshot: true });
+  render();
+  // let ctx = canvas.getContext("webgl");
+  // let data = new Uint8Array(size * range * size * 4);
+  // ctx.readPixels(0, 0, 1, range, ctx.RGBA, ctx.UNSIGNED_BYTE, data);
+  // let colors = {};
+  // species.forEach((id) => {
+  //   let index = (range - 1 - id) * 4;
+  //   let color = `rgba(${data[index]},${data[index + 1]}, ${
+  //     data[index + 2]
+  //   }, 0.25)`;
+  //   colors[id] = color;
+  // });
+  return canvas;
+};
+
+// sprites();
 let pallette = () => {
   let canvas = document.createElement("canvas");
 
@@ -98,4 +134,4 @@ let pallette = () => {
   return colors;
 };
 
-export { startWebGL, snapshot, pallette };
+export { startWebGL, snapshot, pallette, sprites };

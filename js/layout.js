@@ -1,5 +1,5 @@
-
 const canvas = document.getElementById("sand-canvas");
+const canvases = document.getElementById("canvases");
 const canvas2 = document.getElementById("fluid-canvas");
 const ui = document.getElementById("ui");
 
@@ -12,31 +12,38 @@ let resize = () => {
   let uiStyle = "";
   let adStyle = "display:none;";
 
-
   if (screen_width > screen_height) {
     if (screen_width - window.innerHeight < 400) {
       // landscape compressed
-      canvasStyle = `height: ${window.innerHeight}px; margin:3px`;
-      uiStyle = `width: ${screen_width - window.innerHeight - 12}px; margin: 2px;`;
+      canvasStyle = `right:0;
+      width: ${window.innerHeight}px;
+      height: ${window.innerHeight}px;
+       margin:2px`;
+      uiStyle = `width: ${
+        screen_width - window.innerHeight - 24
+      }px; margin: 4px; position: absolute`;
     } else {
       // landscape wide
       canvasStyle = `
        height: ${window.innerHeight}px;
        width:${window.innerHeight}px;
        margin:0;
-       left: auto;
-       right: 206px`;
-      uiStyle = `width: 200px; margin: 2px;`;
-      adStyle = `width: ${        screen_width - window.innerHeight - (206 + 150)      }px; margin: 1px;`;
+       right: auto;
+       left: 206px`;
+      uiStyle = `width: 200px;  right:2px`;
+      adStyle = `width: ${
+        screen_width - window.innerHeight - (206 + 150)
+      }px; margin: 1px;`;
     }
   } else {
     //portrait (mobile)
-    canvasStyle = `width: ${screen_width}px; bottom:3px;`;
-    uiStyle = "";
+    canvasStyle = `width: ${screen_width}px; height: ${screen_width}px; top:40px;`;
+    uiStyle = "bottom:0; position: absolute;";
   }
   ui.style = uiStyle;
-  canvas.style = canvasStyle;
-  canvas2.style = canvasStyle;
+  canvases.style = canvasStyle;
+  // canvas.style = canvasStyle;
+  // canvas2.style = canvasStyle;
   document.getElementsByClassName("adslot_1")[0].style = adStyle;
 };
 
