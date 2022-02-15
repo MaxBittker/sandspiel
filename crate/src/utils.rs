@@ -1,5 +1,6 @@
 use cfg_if::cfg_if;
 
+#[no_mangle]
 pub fn adjacency_right(dir: (i32, i32)) -> (i32, i32) {
     match dir {
         (0, 1) => (1, 1),
@@ -13,6 +14,7 @@ pub fn adjacency_right(dir: (i32, i32)) -> (i32, i32) {
         _ => (0, 0),
     }
 }
+#[no_mangle]
 pub fn adjacency_left(dir: (i32, i32)) -> (i32, i32) {
     match dir {
         (0, 1) => (-1, 1),
@@ -26,10 +28,12 @@ pub fn adjacency_left(dir: (i32, i32)) -> (i32, i32) {
         _ => (0, 0),
     }
 }
+#[no_mangle]
 pub fn join_dy_dx(dx: i32, dy: i32) -> u8 {
     (((dx + 1) * 3) + (dy + 1)) as u8
 }
 
+#[no_mangle]
 pub fn split_dy_dx(s: u8) -> (i32, i32) {
     let s: i32 = s as i32;
 

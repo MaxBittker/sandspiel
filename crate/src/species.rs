@@ -66,6 +66,7 @@ impl Species {
     }
 }
 
+#[no_mangle]
 pub fn update_sand(cell: Cell, mut api: SandApi) {
     let dx = api.rand_dir_2();
 
@@ -88,6 +89,7 @@ pub fn update_sand(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_dust(cell: Cell, mut api: SandApi) {
     let dx = api.rand_dir();
     let fluid = api.get_fluid();
@@ -127,6 +129,7 @@ pub fn update_dust(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_stone(cell: Cell, mut api: SandApi) {
     if api.get(-1, -1).species == Species::Stone && api.get(1, -1).species == Species::Stone {
         return;
@@ -164,6 +167,7 @@ pub fn update_stone(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_water(cell: Cell, mut api: SandApi) {
     let mut dx = api.rand_dir();
     let below = api.get(0, 1);
@@ -281,6 +285,7 @@ pub fn update_water(cell: Cell, mut api: SandApi) {
     // }
 }
 
+#[no_mangle]
 pub fn update_oil(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
     let (dx, dy) = api.rand_vec();
@@ -367,6 +372,7 @@ pub fn update_oil(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_gas(cell: Cell, mut api: SandApi) {
     let (dx, dy) = api.rand_vec();
 
@@ -425,6 +431,7 @@ pub fn update_gas(cell: Cell, mut api: SandApi) {
 //     }
 // }
 
+#[no_mangle]
 pub fn update_cloner(cell: Cell, mut api: SandApi) {
     let mut clone_species = unsafe { mem::transmute(cell.rb as u8) };
     let g = api.universe.generation;
@@ -470,6 +477,7 @@ pub fn update_cloner(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_rocket(cell: Cell, mut api: SandApi) {
     // rocket has complicated behavior that is staged piecewise in ra.
     // it would be awesome to diagram the ranges of values and their meaning
@@ -588,6 +596,7 @@ pub fn update_rocket(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_fire(cell: Cell, mut api: SandApi) {
     let ra = cell.ra;
     let mut degraded = cell.clone();
@@ -629,6 +638,7 @@ pub fn update_fire(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_lava(cell: Cell, mut api: SandApi) {
     api.set_fluid(Wind {
         dx: 0,
@@ -677,6 +687,7 @@ pub fn update_lava(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_wood(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
@@ -752,6 +763,7 @@ pub fn update_wood(cell: Cell, mut api: SandApi) {
         );
     }
 }
+#[no_mangle]
 pub fn update_ice(cell: Cell, mut api: SandApi) {
     let (dx, dy) = api.rand_vec();
 
@@ -799,6 +811,7 @@ pub fn update_ice(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_plant(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
@@ -927,6 +940,7 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_seed(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
     let ra = cell.ra;
@@ -1043,6 +1057,7 @@ pub fn update_seed(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_fungus(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
@@ -1171,6 +1186,7 @@ pub fn update_fungus(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_acid(cell: Cell, mut api: SandApi) {
     let dx = api.rand_dir();
 
@@ -1215,6 +1231,7 @@ pub fn update_acid(cell: Cell, mut api: SandApi) {
     }
 }
 
+#[no_mangle]
 pub fn update_mite(cell: Cell, mut api: SandApi) {
     let mut i = api.rand_int(100);
     let mut dx = 0;
