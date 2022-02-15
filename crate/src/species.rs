@@ -37,6 +37,7 @@ pub enum Species {
 }
 
 impl Species {
+    #[no_mangle]
     pub fn update(&self, cell: Cell, api: SandApi) {
         match self {
             Species::Empty => {}

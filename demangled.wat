@@ -21796,7 +21796,7 @@
                       local.get $var4
                       i32.const 16
                       i32.add
-                      call $func29
+                      call $update
                     end
                     local.get $var3
                     local.get $var10
@@ -22524,7 +22524,7 @@
     global.set $global0
     local.get $var0
   )
-  (func $func29 (param $var0 i32) (param $var1 i32) (param $var2 i32)
+  (func $update (;29;) (export "update") (param $var0 i32) (param $var1 i32) (param $var2 i32)
     (local $var3 i32)
     global.get $global0
     i32.const 16
@@ -28066,7 +28066,7 @@
       i32.add
       local.get $var0
       local.get $var3
-      call $func29
+      call $update
     end
     local.get $var2
     i32.const 32
