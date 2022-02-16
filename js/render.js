@@ -72,10 +72,10 @@ let snapshot = (universe) => {
 
 let sprites = () => {
   let canvas = document.createElement("canvas");
-  window.document.body.appendChild(canvas);
+  // window.document.body.appendChild(canvas);
   let species = Object.values(Species).filter((x) => Number.isInteger(x));
   let range = Math.max(...species) + 1;
-  let size = 30;
+  let size = 22;
   let universe = Universe.new(range * size, size * range);
   canvas.width = size * range;
   canvas.height = range * size;
@@ -86,11 +86,14 @@ let sprites = () => {
   universe.reset();
 
   species.forEach((id) =>
-    universe.paint(Math.floor(id * size), size / 2, size / 2, id)
+    universe.paint(Math.floor((id - 0.5) * size), size / 2, size / 2, id)
   );
 
-  let render = startWebGL({ universe, canvas, isSnapshot: true });
+  let render = startWebGL({ universe, canvas, isSnapshot: false });
   render();
+
+  window.sprites = canvas.toDataURL("image/png");
+
   // let ctx = canvas.getContext("webgl");
   // let data = new Uint8Array(size * range * size * 4);
   // ctx.readPixels(0, 0, 1, range, ctx.RGBA, ctx.UNSIGNED_BYTE, data);
@@ -105,7 +108,7 @@ let sprites = () => {
   return canvas;
 };
 
-// sprites();
+sprites();
 let pallette = () => {
   let canvas = document.createElement("canvas");
 

@@ -41,11 +41,24 @@ const ElementButton = (name, selectedElement, setElement) => {
       onClick={() => {
         setElement(elementID);
       }}
-      style={{
-        background,
-        backgroundColor: selected ? color.replace("0.25", "1.5") : color
-      }}
+      style={
+        {
+          // border: "none"
+          // background,
+          // backgroundColor: selected ? color.replace("0.25", "1.5") : color
+        }
+      }
     >
+      <img
+        style={{
+          objectFit: "none",
+          zoom: 2,
+          objectPosition: `${(parseInt(elementID) - 1) * -22 - 4}px -6px`,
+          width: 13,
+          height: 13
+        }}
+        src={window.sprites}
+      />
       {"  "}
       {name}
       {"  "}

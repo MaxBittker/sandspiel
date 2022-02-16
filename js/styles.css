@@ -146,7 +146,22 @@ button.selected {
   /* text-shadow: 1.6px 1.5px 0 grey, -1px -1px 0 grey, 1px -1px 0 grey, */
     /* -1px 1px 0 grey, 1px 1px 0 grey; */
 }
-
+.ebutton{
+  font-size: 16px;;
+  height: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: column;
+  border:none;
+  background-color: transparent !important;;
+}
+.ebutton img{
+}
+.ebutton.selected{
+  color:black;
+  /* border: 1px solid black; */
+}
 .submission-title {
   z-index: 3;
   position: relative;
