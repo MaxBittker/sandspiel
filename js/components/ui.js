@@ -5,66 +5,14 @@ import { memory } from "../../crate/pkg/sandtable_bg";
 import { Species } from "../../crate/pkg/sandtable";
 
 import { height, universe, width, reset } from "../index.js";
-import { snapshot, pallette } from "../render.js";
+import { snapshot, spriteSize } from "../render.js";
 import { functions, storage } from "../api.js";
 import SignInButton from "./signinButton.js";
+import ElementButtons from "./ElementButtons.js";
 
 import Menu from "./menu";
 
 window.species = Species;
-let pallette_data = pallette();
-
-const ElementButton = (name, selectedElement, setElement) => {
-  let elementID = Species[name];
-
-  let color = pallette_data[elementID];
-  let selected = elementID == selectedElement;
-
-  let background = "inherit";
-  if (elementID == 14) {
-    background = `linear-gradient(45deg, 
-    rgba(202, 121, 125, 0.25), 
-    rgba(169, 120, 200, 0.25), 
-    rgba(117, 118, 195, 0.25), 
-    rgba(117, 196, 193, 0.25), 
-    rgba(122, 203, 168, 0.25), 
-    rgba(185, 195, 117, 0.25), 
-    rgba(204, 186, 122, 0.25))`;
-    if (selected) {
-      background = background.replace(/0.25/g, "1.0");
-    }
-  }
-  return (
-    <button
-      className={selected ? "ebutton selected" : "ebutton"}
-      key={name}
-      onClick={() => {
-        setElement(elementID);
-      }}
-      style={
-        {
-          // border: "none"
-          // background,
-          // backgroundColor: selected ? color.replace("0.25", "1.5") : color
-        }
-      }
-    >
-      <img
-        style={{
-          objectFit: "none",
-          zoom: 2,
-          objectPosition: `${(parseInt(elementID) - 1) * -22 - 4}px -6px`,
-          width: 13,
-          height: 13
-        }}
-        src={window.sprites}
-      />
-      {"  "}
-      {name}
-      {"  "}
-    </button>
-  );
-};
 
 let sizeMap = [1, 3, 7, 19, 39];
 
@@ -381,16 +329,18 @@ class Index extends React.Component {
                   fill="white"
                 />
               </svg>
-              Play
+              Play&nbsp;&nbsp;&nbsp;
             </>
           ) : (
-            <svg height="20" width="20" id="d" viewBox="0 0 300 300">
-              <polygon id="bar2" points="0,0 110,0 110,300 0,300" />
-              <polygon id="bar1" points="190,0 300,0 300,300 190,300" />
-            </svg>
+            <>
+              <svg height="17" width="20" id="d" viewBox="0 0 300 300">
+                <polygon id="bar2" points="0,0 110,0 110,300 0,300" />
+                <polygon id="bar1" points="190,0 300,0 300,300 190,300" />
+              </svg>
+              Pause
+            </>
           )}
         </button>
-
         {!window.location.pathname.includes("school") && (
           <>
             <button onClick={() => this.upload()}>Upload</button>
@@ -404,8 +354,6 @@ class Index extends React.Component {
             </Link>
           </>
         )}
-
-        <button onClick={() => this.reset()}>Reset</button>
         <Link
           to={{
             pathname: "/info/",
@@ -415,75 +363,7 @@ class Index extends React.Component {
           <button>Info</button>
         </Link>
 
-        {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
-        <span className="sizes">
-          {sizeMap.map((v, i) => (
-            <button
-              key={i}
-              className={i == size ? "selected" : ""}
-              onClick={(e) => this.setSize(e, i)}
-              style={{ padding: "0px" }}
-            >
-              <svg height="23" width="23" id="d" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r={3 + v} />
-              </svg>
-            </button>
-          ))}
-        </span>
-        <button
-          onClick={() => {
-            reset();
-            universe.pop_undo();
-          }}
-        >
-          {/* ↜ */}
-          <svg
-            width="20"
-            height="11"
-            viewBox="0 0 20 11"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M6 7.5V11H5V10H4V9H3V8H2V7H1V6H0V5H1V4H2V3H3V2H4V1H5V0H6V3.5H10V4.5H12V5.5H13V6.5H14V7.5H15V9.5H14V8.5H12V7.5H6Z"
-              fill="black"
-            />
-          </svg>
-          Undo
-        </button>
-        <button
-          className={-1 == selectedElement ? "selected" : ""}
-          key={name}
-          onClick={() => {
-            this.setState({ selectedElement: -1 });
-          }}
-        >
-          Wind
-        </button>
-        {Object.keys(Species)
-          .filter((x) => !Number.isInteger(Number.parseInt(x)))
-          .map((n) =>
-            ElementButton(n, selectedElement, (id) =>
-              this.setState({ selectedElement: id })
-            )
-          )}
-        {/* <span className="promo">
-          *new*{" "}
-          <a href="https://orb.farm" target="_blank">
-            orb.farm
-          </a>
-        </span> */}
-        {this.state.currentSubmission && (
-          <div className="submission-title">
-            <button onClick={() => this.incScore()}>
-              +♡{this.state.currentSubmission.data.score}{" "}
-            </button>
-            {this.state.currentSubmission.data.title}
-          </div>
-        )}
-
+        <button onClick={() => this.reset()}>Reset</button>
         {this.state.submissionMenuOpen && (
           <Menu close={() => this.closeMenu()}>
             <h4>Share your creation with the people! (try using #hashtags)</h4>
@@ -508,6 +388,62 @@ class Index extends React.Component {
               </div>
             </SignInButton>
           </Menu>
+        )}
+        {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
+        <button
+          onClick={() => {
+            reset();
+            universe.pop_undo();
+          }}
+        >
+          {/* ↜ */}
+          <svg
+            width="20"
+            height="11"
+            viewBox="0 0 20 11"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              fillRule="evenodd"
+              clipRule="evenodd"
+              d="M6 7.5V11H5V10H4V9H3V8H2V7H1V6H0V5H1V4H2V3H3V2H4V1H5V0H6V3.5H10V4.5H12V5.5H13V6.5H14V7.5H15V9.5H14V8.5H12V7.5H6Z"
+              fill="black"
+            />
+          </svg>
+          Undo
+        </button>
+        <span className="sizes">
+          {sizeMap.map((v, i) => (
+            <button
+              key={i}
+              className={i == size ? "selected" : ""}
+              onClick={(e) => this.setSize(e, i)}
+              style={{ padding: "0px", marginLeft: 0, marginRight: -1 }}
+            >
+              <svg height="23" width="23" id="d" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r={3 + v} />
+              </svg>
+            </button>
+          ))}
+        </span>
+        <ElementButtons
+          selectedElement={selectedElement}
+          setSelected={(id) => this.setState({ selectedElement: id })}
+        />
+        {/* <span className="promo">
+          *new*{" "}
+          <a href="https://orb.farm" target="_blank">
+            orb.farm
+          </a>
+        </span> */}
+        {this.state.currentSubmission && (
+          <div className="submission-title">
+            <button onClick={() => this.incScore()}>
+              +♡{this.state.currentSubmission.data.score}{" "}
+            </button>
+            {this.state.currentSubmission.data.title}
+          </div>
         )}
       </React.Fragment>
     );

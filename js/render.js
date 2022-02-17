@@ -69,13 +69,13 @@ let snapshot = (universe) => {
 
   return canvas.toDataURL("image/png");
 };
-
+export const spriteSize = 26;
 let sprites = () => {
   let canvas = document.createElement("canvas");
   // window.document.body.appendChild(canvas);
   let species = Object.values(Species).filter((x) => Number.isInteger(x));
   let range = Math.max(...species) + 1;
-  let size = 22;
+  let size = spriteSize;
   let universe = Universe.new(range * size, size * range);
   canvas.width = size * range;
   canvas.height = range * size;

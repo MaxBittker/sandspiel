@@ -146,6 +146,10 @@ button.selected {
   /* text-shadow: 1.6px 1.5px 0 grey, -1px -1px 0 grey, 1px -1px 0 grey, */
     /* -1px 1px 0 grey, 1px 1px 0 grey; */
 }
+.pallette{
+  display: flex;
+  flex-wrap: wrap;
+}
 .ebutton{
   font-size: 16px;;
   height: 40px;
@@ -156,7 +160,9 @@ button.selected {
   border:none;
   background-color: transparent !important;;
 }
-.ebutton img{
+.ebutton.selected img{
+  filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black) drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black);
+
 }
 .ebutton.selected{
   color:black;

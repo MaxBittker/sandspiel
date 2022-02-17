@@ -37,7 +37,7 @@ void main() {
     hue = 0.0;
     saturation = 0.1;
     lightness = 0.1;
-    a = 0.1;
+    a = 0.0;
     if (isSnapshot) {
       saturation = 0.05;
       lightness = 1.01;
