@@ -118,7 +118,8 @@ impl<'a> SandApi<'a> {
     }
 
     pub fn rand_int(&mut self, n: i32) -> i32 {
-        self.universe.rng.gen_range(0..n)
+        0
+        //self.universe.rng.gen_range(0..n)
     }
 
     pub fn once_in(&mut self, n: i32) -> bool {
