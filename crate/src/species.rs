@@ -802,7 +802,7 @@ pub fn update_ice(cell: Cell, mut api: SandApi) {
 pub fn update_plant(cell: Cell, mut api: SandApi) {
     let rb = cell.rb;
 
-    let mut i = api.rand_int(100);
+    let mut i = api.rand_int(14);
     let (dx, dy) = api.rand_vec();
 
     let nbr_species = api.get(dx, dy).species;
@@ -836,14 +836,14 @@ pub fn update_plant(cell: Cell, mut api: SandApi) {
             );
         }
     }
-    if api.rand_int(100) > 80
+    if api.rand_int(5) > 4
         && (nbr_species == Species::Water
             || nbr_species == Species::Fungus
                 && (api.get(-dx, dy).species == Species::Empty
                     || api.get(-dx, dy).species == Species::Water
                     || api.get(-dx, dy).species == Species::Fungus))
     {
-        i = api.rand_int(100);
+        i = api.rand_int(14);
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
         api.set(

@@ -125,12 +125,12 @@ impl<'a> SandApi<'a> {
         self.rand_int(n) == 0
     }
     pub fn rand_dir(&mut self) -> i32 {
-        let i = self.rand_int(1000);
-        (i % 3) - 1
+        let i = self.rand_int(3);
+        i - 1
     }
     pub fn rand_dir_2(&mut self) -> i32 {
-        let i = self.rand_int(1000);
-        if (i % 2) == 0 {
+        let i = self.rand_int(2);
+        if i == 0 {
             -1
         } else {
             1
@@ -138,8 +138,8 @@ impl<'a> SandApi<'a> {
     }
 
     pub fn rand_vec(&mut self) -> (i32, i32) {
-        let i = self.rand_int(2000);
-        match i % 9 {
+        let i = self.rand_int(8);
+        match i {
             0 => (1, 1),
             1 => (1, 0),
             2 => (1, -1),
