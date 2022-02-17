@@ -118,7 +118,8 @@ impl<'a> SandApi<'a> {
     }
 
     pub fn rand_int(&mut self, n: i32) -> i32 {
-        self.universe.rng.gen_range(0..n)
+        let i = self.universe.rng.gen_range(0..1000);
+        i % n
     }
 
     pub fn once_in(&mut self, n: i32) -> bool {
@@ -138,7 +139,7 @@ impl<'a> SandApi<'a> {
     }
 
     pub fn rand_vec(&mut self) -> (i32, i32) {
-        let i = self.rand_int(2000);
+        let i = self.rand_int(1000);
         match i % 9 {
             0 => (1, 1),
             1 => (1, 0),
