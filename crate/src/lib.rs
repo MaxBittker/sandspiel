@@ -68,7 +68,6 @@ pub struct Universe {
     rng: Isaac64Rng,
 }
 
-
 pub struct CacheSandApi {
     neighbour_ids: [i32; 25],
 }
