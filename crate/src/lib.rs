@@ -183,7 +183,7 @@ impl Universe {
         // let js: JsValue = (dx).into();
         // console::log_2(&"dx: ".into(), &js);
 
-        for x in 0..self.width {
+       /* for x in 0..self.width {
             for y in 0..self.height {
                 let cell = self.get_cell(x, y);
                 let wind = self.get_wind(x, y);
@@ -197,7 +197,7 @@ impl Universe {
                     },
                 )
             }
-        }
+        }*/
         self.generation = self.generation.wrapping_add(1);
         for x in 0..self.width {
             let scanx = if self.generation % 2 == 0 {
@@ -209,6 +209,17 @@ impl Universe {
             for y in 0..self.height {
                 let idx = self.get_index(scanx, y);
                 let cell = self.get_cell(scanx, y);
+                let wind = self.get_wind(scanx, y);
+                
+                Universe::blow_wind(
+                    cell,
+                    wind,
+                    SandApi {
+                        universe: self,
+                        x: scanx,
+                        y,
+                    },
+                );
 
                 self.burns[idx] = Wind {
                     dx: 0,
