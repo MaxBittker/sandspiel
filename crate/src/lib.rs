@@ -68,14 +68,12 @@ pub struct Universe {
     rng: Isaac64Rng,
 }
 
-pub struct SandApi<'a> {
-    x: i32,
-    y: i32,
-    universe: &'a mut Universe,
+
+pub struct CacheSandApi {
+    neighbour_ids: [i32; 25],
 }
 
-impl<'a> SandApi<'a> {
-
+impl CacheSandApi {
     pub fn get_neighbor_id(dx: i32, dy: i32) -> i32 {
         let position = (dx, dy);
         match position {
@@ -111,6 +109,15 @@ impl<'a> SandApi<'a> {
             _ => panic!("oob set"),
         }
     }
+}
+
+pub struct SandApi<'a> {
+    x: i32,
+    y: i32,
+    universe: &'a mut Universe,
+}
+
+impl<'a> SandApi<'a> {
 
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
         if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
