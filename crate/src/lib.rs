@@ -61,7 +61,7 @@ pub struct Universe {
     width: i32,
     height: i32,
     cells: Vec<Cell>,
-    neighbor_caches: Vec<NeighborCache>,
+    cache_apis: Vec<CacheSandApi>,
     undo_stack: VecDeque<Vec<Cell>>,
     winds: Vec<Wind>,
     burns: Vec<Wind>,
@@ -69,16 +69,29 @@ pub struct Universe {
     rng: Isaac64Rng,
 }
 
-pub struct NeighborCache {
-    ids: [usize; 25],
+pub struct CacheSandApi {
+    neighbor_cell_ids: [usize; 25],
 }
 
-impl NeighborCache {
-    pub fn new(index: i32) -> NeighborCache {
-        NeighborCache {
-            ids: [0; 25],
+impl CacheSandApi {
+    pub fn new(index: i32, height: i32) -> CacheSandApi {
+        /*let (x, y) = CacheSandApi::get_cell_position(cell_index, height);
+        let mut neighbor_cell_ids = [0; 25];
+        for i in 0..24 {
+            let (dx, dy) = CacheSandApi::get_neighbor_position(i);
+            let (nx, ny) = (x + dx, y + dy);
+            let neighbor_index = CacheSandApi::get_cell_index(nx, ny, height);
+            neighbor_cell_ids[i] = neighbor_index;
+        }
+        CacheSandApi {
+            neighbor_cell_ids,
+        }*/
+        CacheSandApi {
+            neighbor_cell_ids: [0; 25],
         }
     }
+
+    
 }
 
 pub struct SandApi<'a> {
@@ -315,9 +328,9 @@ impl Universe {
 
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
-        let neighbor_caches = (0..width * height)
+        let cache_apis = (0..width * height)
             .map(|i| {
-                NeighborCache::new(i)
+                CacheSandApi::new(i, height)
             }).collect();
 
         let winds: Vec<Wind> = (0..width * height)
@@ -342,7 +355,7 @@ impl Universe {
             width,
             height,
             cells,
-            neighbor_caches,
+            cache_apis,
             undo_stack: VecDeque::with_capacity(50),
             burns,
             winds,
