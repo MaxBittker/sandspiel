@@ -9,12 +9,12 @@ import { snapshot, spriteSize } from "../render.js";
 import { functions, storage } from "../api.js";
 import SignInButton from "./signinButton.js";
 import ElementButtons from "./ElementButtons.js";
+import PlayPause from "./PlayPauseButton";
+import SizeButtons, { sizeMap } from "./SizeButtons";
 
 import Menu from "./menu";
 
 window.species = Species;
-
-let sizeMap = [1, 3, 7, 19, 39];
 
 class Index extends React.Component {
   constructor(props) {
@@ -311,132 +311,97 @@ class Index extends React.Component {
         : "";
     return (
       <React.Fragment>
-        <button
-          onClick={() => this.togglePause()}
-          className={paused ? "selected" : ""}
-        >
-          {paused ? (
+        <div id="topBar">
+          <Link
+            to={{
+              pathname: "/info/",
+              hash
+            }}
+          >
+            <button>Info</button>
+          </Link>
+
+          {!window.location.pathname.includes("school") && (
             <>
-              <svg
-                width="12"
-                height="17"
-                viewBox="0 0 12 17"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
+              <button onClick={() => this.upload()}>Post</button>
+              <Link
+                to={{
+                  pathname: "/browse/",
+                  hash
+                }}
               >
-                <path
-                  d="M2 14.5V3.5H3.5V4.5H5V5.5H6.5V6.5H8V7.5H9.5V8.5H10.5V9.5H9.5V10.5H8V11.5H6.5V12.5H5V13.5H3.5V14.5H2Z"
-                  fill="white"
-                />
-              </svg>
-              Play&nbsp;&nbsp;&nbsp;
-            </>
-          ) : (
-            <>
-              <svg height="17" width="20" id="d" viewBox="0 0 300 300">
-                <polygon id="bar2" points="0,0 110,0 110,300 0,300" />
-                <polygon id="bar1" points="190,0 300,0 300,300 190,300" />
-              </svg>
-              Pause
+                <button>Browse</button>
+              </Link>
             </>
           )}
-        </button>
-        {!window.location.pathname.includes("school") && (
-          <>
-            <button onClick={() => this.upload()}>Upload</button>
-            <Link
-              to={{
-                pathname: "/browse/",
-                hash
-              }}
-            >
-              <button>Browse</button>
-            </Link>
-          </>
-        )}
-        <Link
-          to={{
-            pathname: "/info/",
-            hash
-          }}
-        >
-          <button>Info</button>
-        </Link>
-
-        <button onClick={() => this.reset()}>Reset</button>
-        {this.state.submissionMenuOpen && (
-          <Menu close={() => this.closeMenu()}>
-            <h4>Share your creation with the people! (try using #hashtags)</h4>
-            <p>
-              Please be nice. Users who post hateful or sexually explicit
-              content will be banned.
-            </p>
-            <img src={this.state.data.dataURL} className="submissionImg" />
-            <SignInButton>
-              <div style={{ display: "flex" }}>
-                <input
-                  maxlength="200"
-                  placeholder="title"
-                  onChange={(e) => this.setState({ title: e.target.value })}
-                />
-                <button
-                  disabled={this.state.submitting || this.rateLimited()}
-                  onClick={() => this.submit()}
-                >
-                  Submit
-                </button>
-              </div>
-            </SignInButton>
-          </Menu>
-        )}
-        {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
-        <button
-          onClick={() => {
-            reset();
-            universe.pop_undo();
-          }}
-        >
-          {/* ↜ */}
-          <svg
-            width="20"
-            height="11"
-            viewBox="0 0 20 11"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
+          <PlayPause paused={paused} togglePause={() => this.togglePause()} />
+        </div>
+        <div id="bottomBar">
+          <button onClick={() => this.reset()}>Reset</button>
+          {this.state.submissionMenuOpen && (
+            <Menu close={() => this.closeMenu()}>
+              <h4>
+                Share your creation with the people! (try using #hashtags)
+              </h4>
+              <p>
+                Please be nice. Users who post hateful or sexually explicit
+                content will be banned.
+              </p>
+              <img src={this.state.data.dataURL} className="submissionImg" />
+              <SignInButton>
+                <div style={{ display: "flex" }}>
+                  <input
+                    maxlength="200"
+                    placeholder="title"
+                    onChange={(e) => this.setState({ title: e.target.value })}
+                  />
+                  <button
+                    disabled={this.state.submitting || this.rateLimited()}
+                    onClick={() => this.submit()}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </SignInButton>
+            </Menu>
+          )}
+          {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
+          <button
+            onClick={() => {
+              reset();
+              universe.pop_undo();
+            }}
           >
-            <path
-              fillRule="evenodd"
-              clipRule="evenodd"
-              d="M6 7.5V11H5V10H4V9H3V8H2V7H1V6H0V5H1V4H2V3H3V2H4V1H5V0H6V3.5H10V4.5H12V5.5H13V6.5H14V7.5H15V9.5H14V8.5H12V7.5H6Z"
-              fill="black"
-            />
-          </svg>
-          Undo
-        </button>
-        <span className="sizes">
-          {sizeMap.map((v, i) => (
-            <button
-              key={i}
-              className={i == size ? "selected" : ""}
-              onClick={(e) => this.setSize(e, i)}
-              style={{ padding: "0px", marginLeft: 0, marginRight: -1 }}
+            {/* ↜ */}
+            <svg
+              width="20"
+              height="11"
+              viewBox="0 0 20 11"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <svg height="23" width="23" id="d" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r={3 + v} />
-              </svg>
-            </button>
-          ))}
-        </span>
-        <ElementButtons
-          selectedElement={selectedElement}
-          setSelected={(id) => this.setState({ selectedElement: id })}
-        />
-        {/* <span className="promo">
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M6 7.5V11H5V10H4V9H3V8H2V7H1V6H0V5H1V4H2V3H3V2H4V1H5V0H6V3.5H10V4.5H12V5.5H13V6.5H14V7.5H15V9.5H14V8.5H12V7.5H6Z"
+                fill="black"
+              />
+            </svg>
+            Undo
+          </button>
+          <SizeButtons size={size} setSize={(e, i) => this.setSize(e, i)} />
+          <ElementButtons
+            selectedElement={selectedElement}
+            setSelected={(id) => this.setState({ selectedElement: id })}
+          />
+          {/* <span className="promo">
           *new*{" "}
           <a href="https://orb.farm" target="_blank">
             orb.farm
           </a>
         </span> */}
+        </div>
+
         {this.state.currentSubmission && (
           <div className="submission-title">
             <button onClick={() => this.incScore()}>

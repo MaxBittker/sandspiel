@@ -10,20 +10,21 @@
 }
 @font-face {
   font-family: "NeueBit";
-  src: url("./assets/PPNeueBit-Regular.otf") format("truetype");
-  font-weight: 100;
+  src: url("./assets/PPNeueBit-Bold.otf") format("truetype");
+  font-weight: 500;
 }
 
 * {
   margin: 0;
+  box-sizing: border-box;
   /* font-family: monospace; */
   /* font-family: "Inconsolata", monospace; */
   /* font-family: "Mondwest", sans-serif; */
   font-family: "Mondwest", sans-serif;
-  font-smooth: antialiased;
+  /* font-smooth: antialiased; */
 
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  /* -webkit-font-smoothing: antialiased; */
+  /* -moz-osx-font-smoothing: grayscale; */
   /* font-smooth: never; */
   /* -webkit-font-smoothing: none; */
 
@@ -53,10 +54,10 @@ body,
 #canvases{
   position: absolute;
 /* width:100%; */
-height: calc(100vw - 4px);
-border: 2px solid black;
+height: calc(100vw - 10px);
+border: 1px solid black;
 box-sizing: border-box;
-
+overflow: hidden;
   margin: 3px auto;
 }
 #canvases canvas {
@@ -110,18 +111,18 @@ button {
   position: relative;
   height: 30px;
   min-width: 30px;
-  font-size: 25px;
-  padding: 4px;
+  font-size: 20px;
+  padding: 4px 12px;
   background-color: white;
   color: black;
-  border: 2px solid white;
-  border-color: black;
-  flex-grow: 1;
-  max-width: 150px;
+  border: 1px solid black;
+  /* flex-grow: 1;
+  max-width: 150px; */
   fill: black;
   line-height: 0px;
   cursor: pointer;
   margin:4px;
+  border-radius: 15px;
 }
 .active button,
 button.active {
@@ -149,12 +150,14 @@ button.selected {
 .pallette{
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
 }
 .ebutton{
   font-size: 16px;;
   height: 40px;
+  padding: 0 ;
   display: flex;
-  justify-content: space-between;
+  /* justify-content: space-between; */
   align-items: center;
   flex-direction: column;
   border:none;
@@ -178,8 +181,36 @@ button.selected {
   display: flex;
   flex-wrap: wrap;
   float: right;
-}
+  /* justify-content: space-between;; */
+  width: 100%;
+  padding: 0px 4px;
 
+}
+#topBar{
+  display: flex;
+  align-items: center;;
+  justify-content: flex-start;
+  height: 42px;
+  width: calc(100% - 4px);
+  box-sizing: border-box;
+  padding: 0px 2px;
+}
+#bottomBar{
+  display: flex;
+  flex-wrap: wrap;
+
+  justify-content: flex-start;
+
+  box-sizing: border-box;
+  padding: 0px 2px;
+}
+.pauseButton{
+  width: 5em;
+ margin-left: auto;
+}
+.sizes{
+margin-left: auto;  
+}
 #fps {
   pointer-events: none;
 
@@ -206,7 +237,7 @@ button.selected {
 }
 
 .menu {
-  position: absolute;
+  position: fixed;
   left: 10px;
   right: 10px;
   top: 10px;

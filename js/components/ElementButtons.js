@@ -45,7 +45,7 @@ const ElementButton = ({ name, selectedElement, setSelected }) => {
       <img
         style={{
           objectFit: "none",
-          // zoom: 1.5,
+          zoom: 1.5,
           objectPosition: `${(parseInt(elementID) - 1) * -spriteSize}px 0px`,
           width: spriteSize,
           height: spriteSize

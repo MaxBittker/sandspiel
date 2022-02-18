@@ -2,6 +2,7 @@ const canvas = document.getElementById("sand-canvas");
 const canvases = document.getElementById("canvases");
 const canvas2 = document.getElementById("fluid-canvas");
 const ui = document.getElementById("ui");
+const topBar = document.getElementById("topBar");
 
 let resize = () => {
   let screen_width = window.innerWidth;
@@ -10,6 +11,8 @@ let resize = () => {
 
   let canvasStyle = "";
   let uiStyle = "";
+  let topBarStyle = "";
+  let bottomBarStyle = "";
   let adStyle = "display:none;";
 
   if (screen_width > screen_height) {
@@ -38,9 +41,13 @@ let resize = () => {
   } else {
     //portrait (mobile)
     canvasStyle = `width: ${screen_width}px; height: ${screen_width}px; top:40px;`;
-    uiStyle = "bottom:0; position: absolute;";
+    topBarStyle = "top:0; position: fixed; ";
+    bottomBarStyle = `top:${screen_width + 46}px; position: fixed; `;
+    uiStyle = "bottom:4px; position: absolute;";
   }
   ui.style = uiStyle;
+  topBar.style = topBarStyle;
+  bottomBar.style = bottomBarStyle;
   canvases.style = canvasStyle;
   // canvas.style = canvasStyle;
   // canvas2.style = canvasStyle;
