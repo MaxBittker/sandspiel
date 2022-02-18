@@ -168,12 +168,14 @@ impl CacheSandApi {
             _ => panic!("oob set"),
         }
     }
+    
 }
 
 pub struct SandApi<'a> {
     x: i32,
     y: i32,
     universe: &'a mut Universe,
+    neighbor_ids: [usize; 25],
 }
 
 impl<'a> SandApi<'a> {
@@ -296,6 +298,7 @@ impl Universe {
                         universe: self,
                         x,
                         y,
+                        neighbor_ids: [0; 25],
                     },
                 )
             }
@@ -324,6 +327,7 @@ impl Universe {
                         universe: self,
                         x: scanx,
                         y,
+                        neighbor_ids: [0; 25],
                     },
                 );
             }
@@ -404,9 +408,7 @@ impl Universe {
 
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
-        let apis = (0..width * height).map(|i| {
-            CacheSandApi::new(i, height)
-        }).collect();
+        let apis = Vec<SandApi>
 
         let winds: Vec<Wind> = (0..width * height)
             .map(|_i| Wind {
