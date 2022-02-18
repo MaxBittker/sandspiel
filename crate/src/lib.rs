@@ -67,47 +67,130 @@ pub struct Universe {
     burns: Vec<Wind>,
     generation: u8,
     rng: Isaac64Rng,
+    edge_index: usize,
 }
 
 pub struct CacheSandApi {
-    neighbor_cell_ids: [usize; 25],
+    neighbors: [usize; 25],
 }
 
 impl CacheSandApi {
-    pub fn new(index: i32, height: i32) -> CacheSandApi {
-        /*let (x, y) = CacheSandApi::get_cell_position(cell_index, height);
-        let mut neighbor_cell_ids = [0; 25];
+    pub fn new(cell_index: i32, width:i32, height: i32) -> CacheSandApi {
+        let (x, y) = CacheSandApi::get_cell_position(cell_index, height);
+        let mut neighbors = [0; 25];
         for i in 0..24 {
             let (dx, dy) = CacheSandApi::get_neighbor_position(i);
             let (nx, ny) = (x + dx, y + dy);
-            let neighbor_index = CacheSandApi::get_cell_index(nx, ny, height);
-            neighbor_cell_ids[i] = neighbor_index;
+            if nx < 0 || nx > width - 1 || ny < 0 || ny > height - 1 {
+                neighbors[i] = (width * height) as usize;
+            } else {
+                let neighbor_index = CacheSandApi::get_cell_index(nx, ny, height);
+                neighbors[i] = neighbor_index;
+            }
         }
         CacheSandApi {
-            neighbor_cell_ids,
-        }*/
-        CacheSandApi {
-            neighbor_cell_ids: [0; 25],
+            neighbors,
         }
     }
 
+    pub fn get_index(&self, dx: i32, dy: i32) -> usize {
+        let neighbor_index = CacheSandApi::get_neighbor_index(dx, dy);
+        self.neighbors[neighbor_index]
+    }
+    
+    pub fn get_cell_index(x: i32, y: i32, height: i32) -> usize {
+        (x * height + y) as usize
+    }
+
+    pub fn get_cell_position(cell_index: i32, height: i32) -> (i32, i32) {
+        let x = cell_index / height;
+        let y = cell_index % height;
+        (x, y)
+    }
+
+    pub fn get_neighbor_position(index: usize) -> (i32, i32) {
+        match index {
+            0 => (-2,-2),
+            1 => (-2,-1),
+            2 => (-2, 0),
+            3 => (-2, 1),
+            4 => (-2, 2),
+
+            5 => (-1,-2),
+            6 => (-1,-1),
+            7 => (-1, 0),
+            8 => (-1, 1),
+            9 => (-1, 2),
+
+            10 => (0,-2),
+            11 => (0,-1),
+            12 => (0, 0),
+            13 => (0, 1),
+            14 => (0, 2),
+
+            15 => (1,-2),
+            16 => (1,-1),
+            17 => (1, 0),
+            18 => (1, 1),
+            19 => (1, 2),
+
+            20 => (2,-2),
+            21 => (2,-1),
+            22 => (2, 0),
+            23 => (2, 1),
+            24 => (2, 2),
+            _ => panic!("oob set"),
+        }
+    }
+
+    pub fn get_neighbor_index(dx: i32, dy: i32) -> usize {
+        let position = (dx, dy);
+        match position {
+            (-2,-2) => 0,
+            (-2,-1) => 1,
+            (-2, 0) => 2,
+            (-2, 1) => 3,
+            (-2, 2) => 4,
+
+            (-1,-2) => 5,
+            (-1,-1) => 6,
+            (-1, 0) => 7,
+            (-1, 1) => 8,
+            (-1, 2) => 9,
+
+            (0,-2) => 10,
+            (0,-1) => 11,
+            (0, 0) => 12,
+            (0, 1) => 13,
+            (0, 2) => 14,
+
+            (1,-2) => 15,
+            (1,-1) => 16,
+            (1, 0) => 17,
+            (1, 1) => 18,
+            (1, 2) => 19,
+
+            (2,-2) => 20,
+            (2,-1) => 21,
+            (2, 0) => 22,
+            (2, 1) => 23,
+            (2, 2) => 24,
+            _ => panic!("oob set"),
+        }
+    }
     
 }
 
 pub struct SandApi<'a> {
-    x: i32,
-    y: i32,
+    index: usize,
     universe: &'a mut Universe,
 }
 
 impl<'a> SandApi<'a> {
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
-        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
-            panic!("oob set");
-        }
-        let nx = self.x + dx;
-        let ny = self.y + dy;
-        if nx < 0 || nx > self.universe.width - 1 || ny < 0 || ny > self.universe.height - 1 {
+        let cache_api = &self.universe.cache_apis[self.index];
+        let cell_index = cache_api.get_index(dx, dy);
+        if cell_index >= self.universe.edge_index {
             return Cell {
                 species: Species::Wall,
                 ra: 0,
@@ -115,32 +198,27 @@ impl<'a> SandApi<'a> {
                 clock: self.universe.generation,
             };
         }
-        self.universe.get_cell(nx, ny)
+        self.universe.cells[cell_index]
     }
     pub fn set(&mut self, dx: i32, dy: i32, v: Cell) {
-        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
-            panic!("oob set");
-        }
-        let nx = self.x + dx;
-        let ny = self.y + dy;
 
-        if nx < 0 || nx > self.universe.width - 1 || ny < 0 || ny > self.universe.height - 1 {
+        let cache_api = &self.universe.cache_apis[self.index];
+        let cell_index = cache_api.get_index(dx, dy);
+        if cell_index >= self.universe.edge_index {
             return;
         }
-        let i = self.universe.get_index(nx, ny);
-        // v.clock += 1;
-        self.universe.cells[i] = v;
-        self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
+        self.universe.cells[cell_index] = v;
+        self.universe.cells[cell_index].clock = self.universe.generation.wrapping_add(1);
     }
     pub fn get_fluid(&mut self) -> Wind {
-        let idx = self.universe.get_index(self.x, self.y);
-
-        self.universe.winds[idx]
+        let cache_api = &self.universe.cache_apis[self.index];
+        let cell_index = cache_api.get_index(0, 0);
+        self.universe.winds[cell_index]
     }
     pub fn set_fluid(&mut self, v: Wind) {
-        let idx = self.universe.get_index(self.x, self.y);
-
-        self.universe.burns[idx] = v;
+        let cache_api = &self.universe.cache_apis[self.index];
+        let cell_index = cache_api.get_index(0, 0);
+        self.universe.burns[cell_index] = v;
     }
 
     pub fn rand_int(&mut self, n: i32) -> i32 {
@@ -209,48 +287,36 @@ impl Universe {
         // let js: JsValue = (dx).into();
         // console::log_2(&"dx: ".into(), &js);
 
-        for x in 0..self.width {
-            for y in 0..self.height {
-                let cell = self.get_cell(x, y);
-                let wind = self.get_wind(x, y);
-                Universe::blow_wind(
-                    cell,
-                    wind,
-                    SandApi {
-                        universe: self,
-                        x,
-                        y,
-                    },
-                )
-            }
+        for index in 0..self.edge_index-1 {
+            let cell = self.cells[index];
+            let wind = self.winds[index];
+            Universe::blow_wind(
+                cell,
+                wind,
+                SandApi {
+                    universe: self,
+                    index,
+                },
+            )
         }
         self.generation = self.generation.wrapping_add(1);
-        for x in 0..self.width {
-            let scanx = if self.generation % 2 == 0 {
-                self.width - (1 + x)
-            } else {
-                x
+        for index in 0..self.edge_index-1 {
+            
+            let cell = self.cells[index];
+
+            self.burns[index] = Wind {
+                dx: 0,
+                dy: 0,
+                pressure: 0,
+                density: 0,
             };
-
-            for y in 0..self.height {
-                let idx = self.get_index(scanx, y);
-                let cell = self.get_cell(scanx, y);
-
-                self.burns[idx] = Wind {
-                    dx: 0,
-                    dy: 0,
-                    pressure: 0,
-                    density: 0,
-                };
-                Universe::update_cell(
-                    cell,
-                    SandApi {
-                        universe: self,
-                        x: scanx,
-                        y,
-                    },
-                );
-            }
+            Universe::update_cell(
+                cell,
+                SandApi {
+                    universe: self,
+                    index,
+                },
+            );
         }
 
         self.generation = self.generation.wrapping_add(1);
@@ -330,7 +396,7 @@ impl Universe {
         let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
         let cache_apis = (0..width * height)
             .map(|i| {
-                CacheSandApi::new(i, height)
+                CacheSandApi::new(i, width, height)
             }).collect();
 
         let winds: Vec<Wind> = (0..width * height)
@@ -361,6 +427,7 @@ impl Universe {
             winds,
             generation: 0,
             rng,
+            edge_index: (width * height) as usize,
         }
     }
 }
