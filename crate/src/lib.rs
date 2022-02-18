@@ -13,7 +13,7 @@ use rand_isaac::Isaac64Rng;
 use species::Species;
 use std::collections::VecDeque;
 use wasm_bindgen::prelude::*;
-// use web_sys::console;
+use web_sys::console;
 
 #[wasm_bindgen]
 #[repr(C)]
@@ -61,6 +61,7 @@ pub struct Universe {
     width: i32,
     height: i32,
     cells: Vec<Cell>,
+    apis: Vec<CacheSandApi>,
     undo_stack: VecDeque<Vec<Cell>>,
     winds: Vec<Wind>,
     burns: Vec<Wind>,
@@ -69,11 +70,70 @@ pub struct Universe {
 }
 
 pub struct CacheSandApi {
-    neighbour_ids: [i32; 25],
+    neighbor_cell_ids: [usize; 25],
 }
 
 impl CacheSandApi {
-    pub fn get_neighbor_id(dx: i32, dy: i32) -> i32 {
+    pub fn new (cell_index: i32, height: i32) -> CacheSandApi {
+        let (x, y) = CacheSandApi::get_cell_position(cell_index, height);
+        let mut neighbor_cell_ids = [0; 25];
+        for i in 0..24 {
+            let (dx, dy) = CacheSandApi::get_neighbor_position(i);
+            let (nx, ny) = (x + dx, y + dy);
+            let neighbor_index = CacheSandApi::get_cell_index(nx, ny, height);
+            neighbor_cell_ids[i] = neighbor_index;
+        }
+        CacheSandApi {
+            neighbor_cell_ids,
+        }
+    }
+
+    pub fn get_cell_index(x: i32, y: i32, height: i32) -> usize {
+        (x * height + y) as usize
+    }
+
+    pub fn get_cell_position(index: i32, height: i32) -> (i32, i32) {
+        let x = index / height;
+        let y = index % height;
+        (x, y)
+    }
+
+    pub fn get_neighbor_position(index: usize) -> (i32, i32) {
+        match index {
+            0 => (-2,-2),
+            1 => (-2,-1),
+            2 => (-2, 0),
+            3 => (-2, 1),
+            4 => (-2, 2),
+            
+            5 => (-1,-2),
+            6 => (-1,-1),
+            7 => (-1, 0),
+            8 => (-1, 1),
+            9 => (-1, 2),
+            
+            10 => (0,-2),
+            11 => (0,-1),
+            12 => (0, 0),
+            13 => (0, 1),
+            14 => (0, 2),
+            
+            15 => (1,-2),
+            16 => (1,-1),
+            17 => (1, 0),
+            18 => (1, 1),
+            19 => (1, 2),
+            
+            20 => (2,-2),
+            21 => (2,-1),
+            22 => (2, 0),
+            23 => (2, 1),
+            24 => (2, 2),
+            _ => panic!("oob set"),
+        }
+    }
+
+    pub fn get_neighbor_index(dx: i32, dy: i32) -> usize {
         let position = (dx, dy);
         match position {
             (-2,-2) => 0,
@@ -117,7 +177,6 @@ pub struct SandApi<'a> {
 }
 
 impl<'a> SandApi<'a> {
-
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
         if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
             panic!("oob set");
@@ -345,6 +404,10 @@ impl Universe {
 
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
+        let apis = (0..width * height).map(|i| {
+            CacheSandApi::new(i, height)
+        }).collect();
+
         let winds: Vec<Wind> = (0..width * height)
             .map(|_i| Wind {
                 dx: 0,
@@ -367,6 +430,7 @@ impl Universe {
             width,
             height,
             cells,
+            apis,
             undo_stack: VecDeque::with_capacity(50),
             burns,
             winds,
