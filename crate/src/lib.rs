@@ -61,11 +61,24 @@ pub struct Universe {
     width: i32,
     height: i32,
     cells: Vec<Cell>,
+    neighbor_caches: Vec<NeighborCache>,
     undo_stack: VecDeque<Vec<Cell>>,
     winds: Vec<Wind>,
     burns: Vec<Wind>,
     generation: u8,
     rng: Isaac64Rng,
+}
+
+pub struct NeighborCache {
+    ids: [usize; 25],
+}
+
+impl NeighborCache {
+    pub fn new(index: i32) -> NeighborCache {
+        NeighborCache {
+            ids: [0; 25],
+        }
+    }
 }
 
 pub struct SandApi<'a> {
@@ -302,6 +315,10 @@ impl Universe {
 
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
+        let neighbor_caches = (0..width * height)
+            .map(|i| {
+                NeighborCache::new(i)
+            }).collect();
 
         let winds: Vec<Wind> = (0..width * height)
             .map(|_i| Wind {
@@ -325,6 +342,7 @@ impl Universe {
             width,
             height,
             cells,
+            neighbor_caches,
             undo_stack: VecDeque::with_capacity(50),
             burns,
             winds,
