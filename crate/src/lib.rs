@@ -66,6 +66,7 @@ pub struct Universe {
     burns: Vec<Wind>,
     generation: u8,
     rng: Isaac64Rng,
+    rand_int_i: i32,
 }
 
 pub struct SandApi<'a> {
@@ -118,7 +119,8 @@ impl<'a> SandApi<'a> {
     }
 
     pub fn rand_int(&mut self, n: i32) -> i32 {
-        0
+        self.universe.rand_int_i = self.universe.rand_int_i + 1;
+        self.universe.rand_int_i
         //self.universe.rng.gen_range(0..n)
     }
 
@@ -330,6 +332,7 @@ impl Universe {
             winds,
             generation: 0,
             rng,
+            rand_int_i: 0,
         }
     }
 }
