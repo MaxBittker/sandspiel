@@ -1,7 +1,7 @@
 extern crate cfg_if;
 extern crate js_sys;
 extern crate rand;
-extern crate rand_isaac;
+extern crate rand_xoshiro;
 extern crate wasm_bindgen;
 extern crate web_sys;
 
@@ -9,7 +9,7 @@ mod species;
 mod utils;
 
 use rand::{Rng, SeedableRng};
-use rand_isaac::Isaac64Rng;
+use rand_xoshiro::SplitMix64;
 use species::Species;
 use std::collections::VecDeque;
 use wasm_bindgen::prelude::*;
@@ -65,7 +65,7 @@ pub struct Universe {
     winds: Vec<Wind>,
     burns: Vec<Wind>,
     generation: u8,
-    rng: Isaac64Rng,
+    rng: SplitMix64,
 }
 
 pub struct SandApi<'a> {
@@ -319,7 +319,7 @@ impl Universe {
                 density: 0,
             })
             .collect();
-        let rng: Isaac64Rng = SeedableRng::seed_from_u64(0x734f6b89de5f83cc);
+        let rng: SplitMix64 = SeedableRng::seed_from_u64(0x734f6b89de5f83cc);
         Universe {
             width,
             height,

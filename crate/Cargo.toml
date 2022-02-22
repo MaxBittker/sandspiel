@@ -14,7 +14,7 @@ cfg-if = "0.1.7"
 wasm-bindgen = "0.2.42"
 js-sys = "0.3.19"
 rand = "0.8.3"
-rand_isaac = "0.3.0"
+rand_xoshiro = "0.6.0"
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
 # logging them with `console.error`. This is great for development, but requires
