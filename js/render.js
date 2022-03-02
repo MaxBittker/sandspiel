@@ -69,7 +69,7 @@ let snapshot = (universe) => {
 
   return canvas.toDataURL("image/png");
 };
-export const spriteSize = 26;
+export const spriteSize = 29;
 let sprites = () => {
   let canvas = document.createElement("canvas");
   // window.document.body.appendChild(canvas);
@@ -86,26 +86,25 @@ let sprites = () => {
   universe.reset();
 
   species.forEach((id) =>
-    universe.paint(Math.floor((id - 0.5) * size), size / 2, size / 2, id)
+    universe.paint(Math.floor((id + 0.5) * size), size / 2, size * 0.6, id)
   );
 
   let render = startWebGL({ universe, canvas, isSnapshot: false });
   render();
+  let camera = document.createElement("canvas");
+  camera.width = size;
+  camera.height = size;
+  let cameraCtx = camera.getContext("2d");
 
-  window.sprites = canvas.toDataURL("image/png");
+  let sprites = {};
 
-  // let ctx = canvas.getContext("webgl");
-  // let data = new Uint8Array(size * range * size * 4);
-  // ctx.readPixels(0, 0, 1, range, ctx.RGBA, ctx.UNSIGNED_BYTE, data);
-  // let colors = {};
-  // species.forEach((id) => {
-  //   let index = (range - 1 - id) * 4;
-  //   let color = `rgba(${data[index]},${data[index + 1]}, ${
-  //     data[index + 2]
-  //   }, 0.25)`;
-  //   colors[id] = color;
-  // });
-  return canvas;
+  sprites[-1] = camera.toDataURL("image/png");
+  species.forEach((id) => {
+    let x = Math.floor(id * size);
+    cameraCtx.drawImage(canvas, x, 0, size, size, 0, 0, size, size);
+    sprites[id] = camera.toDataURL("image/png");
+  });
+  return sprites;
 };
 
 sprites();

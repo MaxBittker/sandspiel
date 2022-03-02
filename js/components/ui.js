@@ -323,7 +323,6 @@ class Index extends React.Component {
 
           {!window.location.pathname.includes("school") && (
             <>
-              <button onClick={() => this.upload()}>Post</button>
               <Link
                 to={{
                   pathname: "/browse/",
@@ -332,6 +331,7 @@ class Index extends React.Component {
               >
                 <button>Browse</button>
               </Link>
+              <button onClick={() => this.upload()}>Post</button>
             </>
           )}
           <PlayPause paused={paused} togglePause={() => this.togglePause()} />

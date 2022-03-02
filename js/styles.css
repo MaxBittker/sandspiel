@@ -153,8 +153,10 @@ button.selected {
   width: 100%;
 }
 .ebutton{
-  font-size: 16px;;
-  height: 40px;
+  font-size: .9rem;
+  height: unset;;
+  width: 12.5%;
+  flex-grow: 1;
   padding: 0 ;
   display: flex;
   /* justify-content: space-between; */
@@ -163,12 +165,18 @@ button.selected {
   border:none;
   background-color: transparent !important;;
 }
+.ebutton img{
+width: 100% ;
+}
 .ebutton.selected img{
-  filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black) drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black);
+  /* filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black) drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black); */
 
 }
+
 .ebutton.selected{
   color:black;
+background-color: rgba(228, 218, 218, 0.493) !important;
+
   /* border: 1px solid black; */
 }
 .submission-title {
@@ -188,6 +196,7 @@ button.selected {
 }
 #topBar{
   display: flex;
+  flex-wrap: wrap;
   align-items: center;;
   justify-content: flex-start;
   height: 42px;

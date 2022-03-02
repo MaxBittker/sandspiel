@@ -33,10 +33,14 @@ let resize = () => {
        margin:0;
        right: auto;
        left: 206px`;
-      uiStyle = `width: 200px;  right:2px`;
-      adStyle = `width: ${
-        screen_width - window.innerHeight - (206 + 150)
-      }px; margin: 1px;`;
+      uiStyle = `width: 200px; top:0; right:2px`;
+      adStyle = `
+      right:4px;
+      top: 4px;
+      width: ${screen_width - window.innerHeight - 250}px;
+      height: 100vh;
+      margin: 1px;
+      // background-color: yellow;`;
     }
   } else {
     //portrait (mobile)
