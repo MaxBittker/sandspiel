@@ -12,8 +12,7 @@ const SizeButtons = ({ size, setSize }) => {
           style={{
             padding: "0px",
             marginLeft: -1,
-            marginRight: 0,
-
+            marginRight: i === sizeMap.length - 1 ? 2 : 0,
             borderTopRightRadius: i < sizeMap.length - 1 ? 0 : "",
             borderBottomRightRadius: i < sizeMap.length - 1 ? 0 : "",
             borderTopLeftRadius: i > 0 ? 0 : "",

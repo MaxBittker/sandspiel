@@ -116,8 +116,7 @@ button {
   background-color: white;
   color: black;
   border: 1px solid black;
-  /* flex-grow: 1;
-  max-width: 150px; */
+
   fill: black;
   line-height: 0px;
   cursor: pointer;
@@ -151,12 +150,14 @@ button.selected {
   display: flex;
   flex-wrap: wrap;
   width: 100%;
+  justify-content: center;
 }
 .ebutton{
   font-size: .9rem;
   height: unset;;
   width: 12.5%;
-  flex-grow: 1;
+  margin: 0;
+  /* flex-grow: 1; */
   padding: 0 ;
   display: flex;
   /* justify-content: space-between; */
@@ -191,20 +192,21 @@ background-color: rgba(228, 218, 218, 0.493) !important;
   float: right;
   /* justify-content: space-between;; */
   width: 100%;
-  padding: 0px 4px;
 
 }
 #topBar{
+  left:0;
   display: flex;
   flex-wrap: wrap;
   align-items: center;;
   justify-content: flex-start;
   height: 42px;
-  width: calc(100% - 4px);
+  width: 100%;
   box-sizing: border-box;
   padding: 0px 2px;
 }
 #bottomBar{
+  left:0;
   display: flex;
   flex-wrap: wrap;
 
