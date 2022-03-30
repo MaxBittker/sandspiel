@@ -206,7 +206,9 @@ impl Universe {
                 x
             };
 
-            for y in 0..self.height {
+            let mut y = self.height-1;
+
+            while y >= 0 {
                 let idx = self.get_index(scanx, y);
                 let cell = self.get_cell(scanx, y);
 
@@ -224,6 +226,8 @@ impl Universe {
                         y,
                     },
                 );
+
+                y = y - 1;
             }
         }
 
