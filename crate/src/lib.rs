@@ -129,7 +129,7 @@ impl<'a> SandApi<'a> {
         (i % 3) - 1
     }
     pub fn rand_dir_2(&mut self) -> i32 {
-        let i = self.rand_int(1000);
+        let i = self.rand_int(999);
         if (i % 2) == 0 {
             -1
         } else {

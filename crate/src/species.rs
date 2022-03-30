@@ -165,12 +165,27 @@ pub fn update_stone(cell: Cell, mut api: SandApi) {
 }
 
 pub fn update_water(cell: Cell, mut api: SandApi) {
-    let mut dx = api.rand_dir();
+    let dx = api.rand_dir_2();
     let below = api.get(0, 1);
-    let dx1 = api.get(dx, 1);
+    let below_side = api.get(dx, 1);
+    let below_other_side = api.get(-dx, 1);
+    let side = api.get(dx, 0);
+    let other_side = api.get(-dx, 0);
+
+    if below_side.species == Species::Empty || below_side.species == Species::Oil {
+        api.set(0, 0, below_side);
+        api.set(dx, 1, cell);
+    } else if side.species == Species::Empty || side.species == Species::Oil {
+        api.set(0, 0, side);
+        api.set(dx, 0, cell);
+    } else if below.species == Species::Empty || below.species == Species::Oil {
+        api.set(0, 0, below);
+        api.set(0, 1, cell);
+    }
+
     // let mut dx0 = api.get(dx, 0);
     //fall down
-    if below.species == Species::Empty || below.species == Species::Oil {
+    /*if below.species == Species::Empty || below.species == Species::Oil {
         api.set(0, 0, below);
         let mut ra = cell.ra;
         if api.once_in(20) {
@@ -193,9 +208,9 @@ pub fn update_water(cell: Cell, mut api: SandApi) {
     let left = cell.ra % 2 == 0;
     dx = if left { 1 } else { -1 };
     let dx0 = api.get(dx, 0);
-    let dxd = api.get(dx * 2, 0);
+    let dxd = api.get(dx * 2, 0);*/
 
-    if dx0.species == Species::Empty && dxd.species == Species::Empty {
+    /*if dx0.species == Species::Empty && dxd.species == Species::Empty {
         // scoot double
         api.set(0, 0, dxd);
         api.set(2 * dx, 0, Cell { rb: 6, ..cell });
@@ -254,7 +269,7 @@ pub fn update_water(cell: Cell, mut api: SandApi) {
                 ..cell
             },
         );
-    }
+    }*/
     // if api.once_in(8) {
     //     let (dx, dy) = api.rand_vec_8();
     //     let nbr = api.get(dx, dy);
@@ -347,21 +362,19 @@ pub fn update_oil(cell: Cell, mut api: SandApi) {
         return;
     }
 
-    if api.get(0, 1).species == Species::Empty {
-        api.set(0, 0, EMPTY_CELL);
-        api.set(0, 1, new_cell);
-    } else if api.get(dx, 1).species == Species::Empty {
-        api.set(0, 0, EMPTY_CELL);
+    let below = api.get(0, 1);
+    let below_side = api.get(dx, 1);
+    let side = api.get(dx, 0);
+
+    if below_side.species == Species::Empty {
+        api.set(0, 0, below_side);
         api.set(dx, 1, new_cell);
-    } else if api.get(-dx, 1).species == Species::Empty {
-        api.set(0, 0, EMPTY_CELL);
-        api.set(-dx, 1, new_cell);
-    } else if api.get(dx, 0).species == Species::Empty {
-        api.set(0, 0, EMPTY_CELL);
+    } else if side.species == Species::Empty {
+        api.set(0, 0, side);
         api.set(dx, 0, new_cell);
-    } else if api.get(-dx, 0).species == Species::Empty {
-        api.set(0, 0, EMPTY_CELL);
-        api.set(-dx, 0, new_cell);
+    } else if below.species == Species::Empty {
+        api.set(0, 0, below);
+        api.set(0, 1, new_cell);
     } else {
         api.set(0, 0, new_cell);
     }
@@ -1181,15 +1194,28 @@ pub fn update_acid(cell: Cell, mut api: SandApi) {
     if degraded.ra < 80 {
         degraded = EMPTY_CELL;
     }
-    if api.get(0, 1).species == Species::Empty {
-        api.set(0, 0, EMPTY_CELL);
-        api.set(0, 1, cell);
-    } else if api.get(dx, 0).species == Species::Empty {
-        api.set(0, 0, EMPTY_CELL);
+
+    let below = api.get(0, 1);
+    let below_side = api.get(dx, 1);
+    let below_other_side = api.get(-dx, 1);
+    let side = api.get(dx, 0);
+    let other_side = api.get(-dx, 0);
+
+    if below_side.species == Species::Empty {
+        api.set(0, 0, below_side);
+        api.set(dx, 1, cell);
+    } else if below_other_side.species == Species::Empty {
+        api.set(0, 0, below_other_side);
+        api.set(-dx, 1, cell);
+    } else if side.species == Species::Empty {
+        api.set(0, 0, side);
         api.set(dx, 0, cell);
-    } else if api.get(-dx, 0).species == Species::Empty {
-        api.set(0, 0, EMPTY_CELL);
+    } else if other_side.species == Species::Empty {
+        api.set(0, 0, other_side);
         api.set(-dx, 0, cell);
+    } else if below.species == Species::Empty {
+        api.set(0, 0, below);
+        api.set(0, 1, cell);
     } else {
         if api.get(0, 1).species != Species::Wall && api.get(0, 1).species != Species::Acid {
             api.set(0, 0, EMPTY_CELL);
