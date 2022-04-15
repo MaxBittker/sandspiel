@@ -10,6 +10,7 @@ import { functions, storage } from "../api.js";
 import SignInButton from "./signinButton.js";
 
 import Menu from "./menu";
+import { universe_reset } from "../../crate/pkg/sandtable_bg.wasm";
 
 window.species = Species;
 let pallette_data = pallette();
@@ -430,6 +431,17 @@ class Index extends React.Component {
               this.setState({ selectedElement: id })
             )
           )}
+        <button
+          className={-1 == selectedElement ? "selected" : ""}
+          key={name}
+          onClick={() => {
+            console.log(universe.stamp_state());
+            universe.set_stamp_state((universe.stamp_state() + 1) % 3);
+          }}
+        >
+          Stamp
+          {universe?.stamp_state()}
+        </button>
         <span className="promo">
           *new*{" "}
           <a href="https://orb.farm" target="_blank">
@@ -455,7 +467,7 @@ class Index extends React.Component {
             <img src={this.state.data.dataURL} className="submissionImg" />
             <SignInButton>
               <div style={{ display: "flex" }}>
-                <input 
+                <input
                   maxlength="200"
                   placeholder="title"
                   onChange={(e) => this.setState({ title: e.target.value })}

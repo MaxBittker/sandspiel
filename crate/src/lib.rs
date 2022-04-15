@@ -35,6 +35,9 @@ pub struct Cell {
     clock: u8,
 }
 
+static STAMP_SIZE: i32 = 40;
+
+
 impl Cell {
     pub fn new(species: Species) -> Cell {
         Cell {
@@ -65,6 +68,8 @@ pub struct Universe {
     winds: Vec<Wind>,
     burns: Vec<Wind>,
     generation: u8,
+    stamp_state: i32,
+    stamp: Vec<Cell>,
     rng: SplitMix64,
 }
 
@@ -73,6 +78,7 @@ pub struct SandApi<'a> {
     y: i32,
     universe: &'a mut Universe,
 }
+
 
 impl<'a> SandApi<'a> {
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
@@ -238,6 +244,15 @@ impl Universe {
         self.height
     }
 
+    pub fn stamp_state(&self) -> i32 {
+        self.stamp_state
+    }
+
+    pub fn set_stamp_state(&mut self, v: i32) {
+        self.stamp_state = v;
+    }
+
+
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
@@ -249,6 +264,57 @@ impl Universe {
     pub fn burns(&self) -> *const Wind {
         self.burns.as_ptr()
     }
+    pub fn capture_stamp(&mut self, x: i32, y: i32, size: i32) {
+        let size = size;
+        let radius: f64 = (size as f64) / 2.0;
+
+        let floor = (radius + 1.0) as i32;
+        let ciel = (radius + 1.5) as i32;
+
+        for dx in -floor..ciel {
+            for dy in -floor..ciel {
+                if (((dx * dx) + (dy * dy)) as f64) > (radius * radius) {
+                    continue;
+                };
+                let px = x + dx;
+                let py = y + dy;
+                let ci = self.get_index(px, py);
+                let si =  ((dx+STAMP_SIZE/2) * STAMP_SIZE + (dy+STAMP_SIZE/2)) as usize;
+                if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
+                    self.stamp[si] =EMPTY_CELL;
+                    continue;
+                }
+                    self.stamp[si] =self.cells[ci]
+            }
+        }
+    }
+
+    pub fn paint_stamp(&mut self, x: i32, y: i32, size: i32) {
+        let size = size;
+        let radius: f64 = (size as f64) / 2.0;
+
+        let floor = (radius + 1.0) as i32;
+        let ciel = (radius + 1.5) as i32;
+
+        for dx in -floor..ciel {
+            for dy in -floor..ciel {
+                if (((dx * dx) + (dy * dy)) as f64) > (radius * radius) {
+                    continue;
+                };
+                let px = x + dx;
+                let py = y + dy;
+                let i = self.get_index(px, py);
+                let si =  ((dx+STAMP_SIZE/2) * STAMP_SIZE + (dy+STAMP_SIZE/2)) as usize;
+
+                if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
+                    continue;
+                }
+                // if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
+                    self.cells[i] = self.stamp[si]
+            }
+        }
+    }
+
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let size = size;
         let radius: f64 = (size as f64) / 2.0;
@@ -319,6 +385,13 @@ impl Universe {
                 density: 0,
             })
             .collect();
+
+
+        let stamp: Vec<Cell> = (0..STAMP_SIZE * STAMP_SIZE)
+        .map(|_i| EMPTY_CELL)
+        .collect();
+
+
         let rng: SplitMix64 = SeedableRng::seed_from_u64(0x734f6b89de5f83cc);
         Universe {
             width,
@@ -327,6 +400,8 @@ impl Universe {
             undo_stack: VecDeque::with_capacity(50),
             burns,
             winds,
+            stamp,
+            stamp_state:0,
             generation: 0,
             rng,
         }

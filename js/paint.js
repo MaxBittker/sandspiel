@@ -144,10 +144,18 @@ const paint = (event) => {
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
   if (window.UI.state.selectedElement < 0) return;
-  universe.paint(
-    x,
-    y,
-    sizeMap[window.UI.state.size],
-    window.UI.state.selectedElement
-  );
+
+  console.log(universe.stamp_state());
+  if (universe.stamp_state() === 1) {
+    universe.capture_stamp(x, y, sizeMap[window.UI.state.size]);
+  } else if (universe.stamp_state() == 2) {
+    universe.paint_stamp(x, y, sizeMap[window.UI.state.size]);
+  } else {
+    universe.paint(
+      x,
+      y,
+      sizeMap[window.UI.state.size],
+      window.UI.state.selectedElement
+    );
+  }
 };
