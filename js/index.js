@@ -13,7 +13,7 @@ if (!window.location.host.startsWith("localhost")) {
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
-    tracesSampleRate: 0.01
+    tracesSampleRate: 0.01,
   });
 }
 
@@ -25,7 +25,7 @@ import { fps } from "./fps";
 import {} from "./paint";
 import {} from "./app";
 import { startFluid } from "./fluid";
-import {} from "./layout";
+import { resize } from "./layout";
 
 const isBench = window.location.pathname === "/bench";
 if (window.safari) {
@@ -131,6 +131,8 @@ document.addEventListener("keydown", function (event) {
     universe.pop_undo();
   }
 });
+
+resize();
 
 (adsbygoogle = window.adsbygoogle || []).push({});
 export { canvas, width, height, universe, reset };

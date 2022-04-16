@@ -11,7 +11,7 @@ import SignInButton from "./signinButton.js";
 import ElementButtons from "./ElementButtons.js";
 import PlayPause from "./PlayPauseButton";
 import SizeButtons, { sizeMap } from "./SizeButtons";
-
+import { getLayout } from "../layout";
 import Menu from "./menu";
 
 window.species = Species;
@@ -27,7 +27,7 @@ class Index extends React.Component {
       size: 2,
       dataURL: {},
       currentSubmission: null,
-      selectedElement: Species.Water
+      selectedElement: Species.Water,
     };
     window.UI = this;
     //if we start in the background, pause;
@@ -79,7 +79,7 @@ class Index extends React.Component {
   setSize(event, size) {
     event.preventDefault();
     this.setState({
-      size
+      size,
     });
   }
   reset() {
@@ -138,7 +138,7 @@ class Index extends React.Component {
     this.pause();
     this.setState({
       data: { dataURL, cells: cellData },
-      submissionMenuOpen: true
+      submissionMenuOpen: true,
     });
   }
   rateLimited() {
@@ -165,7 +165,7 @@ class Index extends React.Component {
       title,
       image: dataURL,
       parent_id: currentSubmission?.data?.id,
-      cells
+      cells,
     };
 
     var postList = JSON.parse(localStorage.getItem("postList") || "[]");
@@ -181,8 +181,8 @@ class Index extends React.Component {
         body: JSON.stringify(payload), // data can be `string` or {object}!
         headers: {
           "Content-Type": "application/json",
-          Authorization: "Bearer " + token
-        }
+          Authorization: "Bearer " + token,
+        },
       })
         .then((res) => res.json())
         .then((response) => {
@@ -210,8 +210,8 @@ class Index extends React.Component {
     fetch(functions._url(`api/creations/${id}`), {
       method: "GET",
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     })
       .then((res) => res.json())
       .then((data) => {
@@ -222,7 +222,7 @@ class Index extends React.Component {
           .getDownloadURL()
           .then((dlurl) => {
             fetch(dlurl, {
-              method: "GET"
+              method: "GET",
             })
               .then((res) => res.blob())
               .then((blob) => {
@@ -286,14 +286,14 @@ class Index extends React.Component {
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: "Bearer " + token
-          }
+            Authorization: "Bearer " + token,
+          },
         })
           .then((res) => res.json())
           .then((data) => {
             if (currentSubmission != null) {
               this.setState({
-                currentSubmission: { ...currentSubmission, data }
+                currentSubmission: { ...currentSubmission, data },
               });
             }
           })
@@ -309,24 +309,27 @@ class Index extends React.Component {
       currentSubmission && currentSubmission.id
         ? `#${currentSubmission.id}`
         : "";
+
+    let landscape = getLayout() === "landscape";
+    let portrait = getLayout() === "portrait";
+    console.log(window.layout);
     return (
       <React.Fragment>
         <div id="topBar">
           <Link
             to={{
               pathname: "/info/",
-              hash
+              hash,
             }}
           >
             <button>Info</button>
           </Link>
-
           {!window.location.pathname.includes("school") && (
             <>
               <Link
                 to={{
                   pathname: "/browse/",
-                  hash
+                  hash,
                 }}
               >
                 <button>Browse</button>
@@ -389,11 +392,16 @@ class Index extends React.Component {
             </svg>
             Undo
           </button>
-          <SizeButtons size={size} setSize={(e, i) => this.setSize(e, i)} />
+          {portrait && (
+            <SizeButtons size={size} setSize={(e, i) => this.setSize(e, i)} />
+          )}
           <ElementButtons
             selectedElement={selectedElement}
             setSelected={(id) => this.setState({ selectedElement: id })}
           />
+          {landscape && (
+            <SizeButtons size={size} setSize={(e, i) => this.setSize(e, i)} />
+          )}
           {/* <span className="promo">
           *new*{" "}
           <a href="https://orb.farm" target="_blank">
