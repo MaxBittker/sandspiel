@@ -150,9 +150,16 @@ button.selected {
   width: 100%;
   justify-content: center;
 }
+
 .landscape .ebutton {
   width: 25%;
 }
+@media only screen and (max-width: 1000px) {
+  .landscape .ebutton {
+    width: 20%;
+  }
+}
+
 .ebutton {
   font-size: 0.9rem;
   height: unset;
