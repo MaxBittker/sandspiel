@@ -9,7 +9,7 @@ let vsh = require("./glsl/sandVertex.glsl");
 let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   const regl = reglBuilder({
     canvas,
-    attributes: { preserveDrawingBuffer: isSnapshot }
+    attributes: { preserveDrawingBuffer: isSnapshot },
   });
   // const lastFrame = regl.texture();
   const width = universe.width();
@@ -17,6 +17,14 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   let cell_pointer = universe.cells();
   let cells = new Uint8Array(memory.buffer, cell_pointer, width * height * 4);
   const dataTexture = regl.texture({ width, height, data: cells });
+
+  let preview_pointer = universe.preview();
+  let preview = new Uint8Array(
+    memory.buffer,
+    preview_pointer,
+    width * height * 4
+  );
+  const dataTexture2 = regl.texture({ width, height, data: preview });
 
   let drawSand = regl({
     frag: fsh,
@@ -32,12 +40,22 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
 
         return dataTexture({ width, height, data: cells });
       },
+      previewData: () => {
+        let preview_pointer = universe.preview();
+        let preview = new Uint8Array(
+          memory.buffer,
+          preview_pointer,
+          width * height * 4
+        );
+
+        return dataTexture2({ width, height, data: preview });
+      },
       resolution: ({ viewportWidth, viewportHeight }) => [
         viewportWidth,
-        viewportHeight
+        viewportHeight,
       ],
       dpi: window.devicePixelRatio * 2,
-      isSnapshot
+      isSnapshot,
       // backBuffer: lastFrame
     },
 
@@ -47,11 +65,11 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
       position: [
         [-1, 4],
         [-1, -1],
-        [4, -1]
-      ]
+        [4, -1],
+      ],
     },
     // Our triangle has 3 vertices
-    count: 3
+    count: 3,
   });
 
   return () => {

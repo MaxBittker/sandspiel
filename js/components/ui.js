@@ -312,7 +312,6 @@ class Index extends React.Component {
 
     let landscape = getLayout() === "landscape";
     let portrait = getLayout() === "portrait";
-    console.log(window.layout);
     return (
       <React.Fragment>
         <div id="topBar">

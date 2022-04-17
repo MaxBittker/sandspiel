@@ -11,7 +11,7 @@ default = ["console_error_panic_hook"]
 
 [dependencies]
 cfg-if = "0.1.7"
-wasm-bindgen = "0.2.42"
+wasm-bindgen = "0.2.80"
 js-sys = "0.3.19"
 rand = "0.8.3"
 rand_xoshiro = "0.6.0"

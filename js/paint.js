@@ -94,6 +94,7 @@ function smoothPaint(event) {
   repeat = window.setInterval(() => paint(event), 100);
   let startEvent = { clientX: event.clientX, clientY: event.clientY };
   if (!painting) {
+    paint(startEvent);
     return;
   }
   let size = sizeMap[window.UI.state.size];
@@ -128,9 +129,6 @@ const handleTouches = (event) => {
 };
 
 const paint = (event) => {
-  if (!painting) {
-    return;
-  }
   const boundingRect = canvas.getBoundingClientRect();
 
   const scaleX =
@@ -143,11 +141,21 @@ const paint = (event) => {
 
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
-  if (window.UI.state.selectedElement < 0) return;
-  universe.paint(
-    x,
-    y,
-    sizeMap[window.UI.state.size],
-    window.UI.state.selectedElement
-  );
+
+  if (!painting) {
+    universe.paint_preview(
+      x,
+      y,
+      sizeMap[window.UI.state.size],
+      window.UI.state.selectedElement
+    );
+  } else {
+    if (window.UI.state.selectedElement < 0) return;
+    universe.paint(
+      x,
+      y,
+      sizeMap[window.UI.state.size],
+      window.UI.state.selectedElement
+    );
+  }
 };

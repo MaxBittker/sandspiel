@@ -61,6 +61,8 @@ pub struct Universe {
     width: i32,
     height: i32,
     cells: Vec<Cell>,
+    preview: Vec<Cell>,
+    blank_sheet: Vec<Cell>,
     undo_stack: VecDeque<Vec<Cell>>,
     winds: Vec<Wind>,
     burns: Vec<Wind>,
@@ -242,12 +244,60 @@ impl Universe {
         self.cells.as_ptr()
     }
 
+    pub fn preview(&self) -> *const Cell {
+        self.preview.as_ptr()
+    }
+
     pub fn winds(&self) -> *const Wind {
         self.winds.as_ptr()
     }
 
     pub fn burns(&self) -> *const Wind {
         self.burns.as_ptr()
+    }
+
+    pub fn paint_preview(&mut self, x: i32, y: i32, size: i32, species: Species) {
+        self.preview = self.blank_sheet.clone();
+
+        // for x in 0..self.width {
+        //     for y in 0..self.height {
+        //         let i = self.get_index(x, y);
+        //        self.preview[i] = EMPTY_CELL;
+        //     }
+        // }
+        let size = size;
+        let radius: f64 = (size as f64) / 2.0;
+
+        let floor = (radius + 1.0) as i32;
+        let ciel = (radius + 1.5) as i32;
+
+        for dx in -floor..ciel {
+            for dy in -floor..ciel {
+                let r = ((dx * dx) + (dy * dy)) as f64 ;
+                if r > (radius * radius) || r< ((radius*radius) - 8.0) {
+                    continue;
+                };
+                
+                let px = x + dx;
+                let py = y + dy;
+                let i = self.get_index(px, py);
+
+                if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
+                    continue;
+                }
+                if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
+                    self.preview[i] = Cell {
+                        species: species,
+                        ra: 60
+                            + (size as u8)
+                            + (self.rng.gen::<f32>() * 30.) as u8
+                            + ((self.generation % 127) as i8 - 60).abs() as u8,
+                        rb: 0,
+                        clock: self.generation,
+                    }
+                }
+            }
+        }
     }
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let size = size;
@@ -301,7 +351,10 @@ impl Universe {
     }
 
     pub fn new(width: i32, height: i32) -> Universe {
-        let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
+        let cells: Vec<Cell> = (0..width * height).map(|_i| EMPTY_CELL).collect();
+        let blank_sheet= (0..width * height).map(|_i| EMPTY_CELL).collect();
+        let preview= (0..width * height).map(|_i| EMPTY_CELL).collect();
+        
         let winds: Vec<Wind> = (0..width * height)
             .map(|_i| Wind {
                 dx: 0,
@@ -324,6 +377,8 @@ impl Universe {
             width,
             height,
             cells,
+            preview,
+            blank_sheet,
             undo_stack: VecDeque::with_capacity(50),
             burns,
             winds,
