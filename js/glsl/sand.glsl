@@ -28,7 +28,7 @@ void main() {
 
   vec4 data = texture2D(data, textCoord);
   vec4 previewData = texture2D(previewData, textCoord);
-  if (previewData.g > 0.1) {
+  if (previewData.g > 0.1 && int((data.r * 255.) + 0.1) == 0) {
     data = previewData;
   }
   int type = int((data.r * 255.) + 0.1);
@@ -143,5 +143,6 @@ void main() {
   // if (previewData.r > 0.) {
   //   a = 1.0;
   // }
+
   gl_FragColor = vec4(color, a);
 }

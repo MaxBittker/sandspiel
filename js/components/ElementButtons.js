@@ -39,12 +39,37 @@ const ElementButtons = ({ selectedElement, setSelected }) => {
     <div className="pallette">
       {Object.keys(Species)
         .filter((x) => !Number.isInteger(Number.parseInt(x)))
-        .map((n) => ElementButton({ name: n, selectedElement, setSelected }))}
-      <ElementButton
+        .map((n) =>
+          ElementButton({
+            name: n,
+            selectedElement,
+            setSelected: (e) => {
+              window.u.set_stamp_state(0);
+              setSelected(e);
+            },
+          })
+        )}
+      {/* <ElementButton
         name={"Wind"}
         selectedElement={selectedElement}
         setSelected={() => setSelected(-1)}
-      />
+      /> */}
+      <button
+        className={-1 == selectedElement ? "selected" : ""}
+        key={name}
+        onClick={() => {
+          console.log(window.u.stamp_state());
+          window.u.set_stamp_state(1);
+
+          window.setTimeout(() => {
+            setSelected(-1);
+          }, 10);
+        }}
+      >
+        Stamp
+        {window.u?.stamp_state() === 1 && "GRAB AREA"}
+        {window.u?.stamp_state() === 2 && "READY!"}
+      </button>
     </div>
   );
 };
