@@ -1,3 +1,4 @@
+// extern crate console_error_panic_hook;
 extern crate cfg_if;
 extern crate js_sys;
 extern crate rand;
@@ -14,6 +15,7 @@ use species::Species;
 use std::collections::VecDeque;
 use wasm_bindgen::prelude::*;
 // use web_sys::console;
+static STAMP_SIZE: i32 = 40;
 
 #[wasm_bindgen]
 #[repr(C)]
@@ -61,10 +63,14 @@ pub struct Universe {
     width: i32,
     height: i32,
     cells: Vec<Cell>,
+    preview: Vec<Cell>,
+    blank_sheet: Vec<Cell>,
     undo_stack: VecDeque<Vec<Cell>>,
     winds: Vec<Wind>,
     burns: Vec<Wind>,
     generation: u8,
+    stamp_state: i32,
+    stamp: Vec<Cell>,
     rng: SplitMix64,
 }
 
@@ -242,12 +248,159 @@ impl Universe {
         self.cells.as_ptr()
     }
 
+    pub fn preview(&self) -> *const Cell {
+        self.preview.as_ptr()
+    }
+
     pub fn winds(&self) -> *const Wind {
         self.winds.as_ptr()
     }
 
     pub fn burns(&self) -> *const Wind {
         self.burns.as_ptr()
+    }
+    pub fn stamp_state(&self) -> i32 {
+        self.stamp_state
+    }
+
+    pub fn set_stamp_state(&mut self, v: i32) {
+        self.stamp_state = v;
+    }
+
+    
+
+    pub fn capture_stamp(&mut self, x: i32, y: i32, size: i32) {
+       
+        let size = size;
+        let radius: f64 = (size as f64) / 2.0;
+
+        let floor = (radius + 1.0) as i32;
+        let ciel = (radius + 1.5) as i32;
+
+        for dx in -floor..ciel {
+            for dy in -floor..ciel {
+                if (((dx * dx) + (dy * dy)) as f64) > (radius * radius) {
+                    continue;
+                };
+                let px = x + dx;
+                let py = y + dy;
+                let ci = self.get_index(px, py);
+                let si =  ((dx+STAMP_SIZE/2) * STAMP_SIZE + (dy+STAMP_SIZE/2)) as usize;
+                // if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
+                //     self.stamp[si] = EMPTY_CELL;
+                //     continue;
+                // }
+                    self.stamp[si] =self.cells[ci]
+            }
+        }
+    }
+
+    pub fn paint_stamp(&mut self, x: i32, y: i32, size: i32) {
+        let size = size;
+        let radius: f64 = (size as f64) / 2.0;
+
+        let floor = (radius + 1.0) as i32;
+        let ciel = (radius + 1.5) as i32;
+
+        for dx in -floor..ciel {
+            for dy in -floor..ciel {
+                if (((dx * dx) + (dy * dy)) as f64) > (radius * radius) {
+                    continue;
+                };
+                let px = x + dx;
+                let py = y + dy;
+                let i = self.get_index(px, py);
+                let si =  ((dx+STAMP_SIZE/2) * STAMP_SIZE + (dy+STAMP_SIZE/2)) as usize;
+
+                if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
+                    continue;
+                }
+                if self.get_cell(px, py).species == Species::Empty  {
+                    self.cells[i] = self.stamp[si]
+                }
+            }
+        }
+    }
+
+    // pub fn generation(&self) -> u8 {
+    //     self.generation
+    // }
+    
+    pub fn paint_preview(&mut self, x: i32, y: i32, size: i32, species: Species) {
+
+        
+    //    let mut s = (species as u8) as Species;
+    //     if (species as i32) <0 {
+    //        s = Species::Wall;
+    //    }
+        self.preview = self.blank_sheet.clone();
+
+        // for x in 0..self.width {
+        //     for y in 0..self.height {
+        //         let i = self.get_index(x, y);
+        //        self.preview[i] = EMPTY_CELL;
+        //     }
+        // }
+        let size = size;
+        let radius: f64 = (size as f64) / 2.0;
+
+        let floor = (radius + 1.0) as i32;
+        let ciel = (radius + 1.5) as i32;
+
+        if self.stamp_state ==2 {
+            let size = size;
+            let radius: f64 = (size as f64) / 2.0;
+    
+            let floor = (radius + 1.0) as i32;
+            let ciel = (radius + 1.5) as i32;
+    
+            for dx in -floor..ciel {
+                for dy in -floor..ciel {
+                    if (((dx * dx) + (dy * dy)) as f64) > (radius * radius) {
+                        continue;
+                    };
+                    let px = x + dx;
+                    let py = y + dy;
+                    let i = self.get_index(px, py);
+                    let si =  ((dx+STAMP_SIZE/2) * STAMP_SIZE + (dy+STAMP_SIZE/2)) as usize;
+        
+                    if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
+                        continue;
+                    }
+                    if self.get_cell(px, py).species == Species::Empty  {
+                        self.preview[i] = self.stamp[si]
+                    }
+                }
+            }
+            return
+        }
+        for dx in -floor..ciel {
+            for dy in -floor..ciel {
+                let r = ((dx * dx) + (dy * dy)) as f64 ;
+                if r > (radius * radius) || r < (((radius - 0.8) * (radius - 0.8))  ) {
+                    continue;
+                };
+                
+                let px = x + dx;
+                let py = y + dy;
+                let i = self.get_index(px, py);
+
+                if px < 0 || px > self.width - 1 || py < 0 || py > self.height - 1 {
+                    continue;
+                }
+                if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
+                    self.preview[i] = Cell {
+                        species: species,
+                        ra: 60
+                            + (size as u8)
+                            + (self.rng.gen::<f32>() * 30.) as u8
+                            + ((self.generation % 127) as i8 - 60).abs() as u8,
+                        rb: 0,
+                        clock: self.generation,
+                    }
+                }
+            }
+        }
     }
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let size = size;
@@ -301,7 +454,16 @@ impl Universe {
     }
 
     pub fn new(width: i32, height: i32) -> Universe {
-        let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
+        utils::set_panic_hook();
+        // console_error_panic_hook::set_once();
+
+        let cells: Vec<Cell> = (0..width * height).map(|_i| EMPTY_CELL).collect();
+        let blank_sheet= (0..width * height).map(|_i| EMPTY_CELL).collect();
+        let preview= (0..width * height).map(|_i| EMPTY_CELL).collect();
+        let stamp: Vec<Cell> = (0..STAMP_SIZE * STAMP_SIZE)
+        .map(|_i| EMPTY_CELL)
+        .collect();
+
         let winds: Vec<Wind> = (0..width * height)
             .map(|_i| Wind {
                 dx: 0,
@@ -324,9 +486,13 @@ impl Universe {
             width,
             height,
             cells,
+            preview,
+            blank_sheet,
             undo_stack: VecDeque::with_capacity(50),
             burns,
             winds,
+            stamp,
+            stamp_state:0,
             generation: 0,
             rng,
         }
@@ -350,9 +516,9 @@ impl Universe {
     }
 
     fn blow_wind(cell: Cell, wind: Wind, mut api: SandApi) {
-        if cell.clock - api.universe.generation == 1 {
-            return;
-        }
+        if cell.clock == api.universe.generation + 1 {
+            return
+        } 
         if cell.species == Species::Empty {
             return;
         }
@@ -431,7 +597,7 @@ impl Universe {
         }
     }
     fn update_cell(cell: Cell, api: SandApi) {
-        if cell.clock - api.universe.generation == 1 {
+        if cell.clock == api.universe.generation.wrapping_add(1) {
             return;
         }
 

@@ -25,7 +25,7 @@ import { fps } from "./fps";
 import {} from "./paint";
 import {} from "./app";
 import { startFluid } from "./fluid";
-import {} from "./layout";
+import { resize } from "./layout";
 
 const isBench = window.location.pathname === "/bench";
 if (window.safari) {
@@ -57,19 +57,19 @@ if (mobileAndTabletcheck()) {
   };
 }
 
-if ("serviceWorker" in navigator) {
-  window.addEventListener("load", () => {
-    navigator.serviceWorker
-      .register("/service-worker.js")
-      .then((registration) => {
-        console.log("SW registered: ", registration);
-        fetch("index.html"); // refresh cache (?)
-      })
-      .catch((registrationError) => {
-        console.log("SW registration failed: ", registrationError);
-      });
-  });
-}
+// if ("serviceWorker" in navigator) {
+//   window.addEventListener("load", () => {
+//     navigator.serviceWorker
+//       .register("/service-worker.js")
+//       .then((registration) => {
+//         console.log("SW registered: ", registration);
+//         fetch("index.html"); // refresh cache (?)
+//       })
+//       .catch((registrationError) => {
+//         console.log("SW registration failed: ", registrationError);
+//       });
+//   });
+// }
 
 let n = 300;
 const universe = isBench ? window.u : Universe.new(n, n);
@@ -131,6 +131,8 @@ document.addEventListener("keydown", function (event) {
     universe.pop_undo();
   }
 });
+
+resize();
 
 (adsbygoogle = window.adsbygoogle || []).push({});
 export { canvas, width, height, universe, reset };

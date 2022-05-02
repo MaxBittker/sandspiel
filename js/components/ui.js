@@ -5,55 +5,16 @@ import { memory } from "../../crate/pkg/sandtable_bg";
 import { Species } from "../../crate/pkg/sandtable";
 
 import { height, universe, width, reset } from "../index.js";
-import { snapshot, pallette } from "../render.js";
+import { snapshot, spriteSize } from "../render.js";
 import { functions, storage } from "../api.js";
 import SignInButton from "./signinButton.js";
-
+import ElementButtons from "./ElementButtons.js";
+import PlayPause from "./PlayPauseButton";
+import SizeButtons, { sizeMap } from "./SizeButtons";
+import { getLayout } from "../layout";
 import Menu from "./menu";
 
 window.species = Species;
-let pallette_data = pallette();
-
-const ElementButton = (name, selectedElement, setElement) => {
-  let elementID = Species[name];
-
-  let color = pallette_data[elementID];
-  let selected = elementID == selectedElement;
-
-  let background = "inherit";
-  if (elementID == 14) {
-    background = `linear-gradient(45deg, 
-    rgba(202, 121, 125, 0.25), 
-    rgba(169, 120, 200, 0.25), 
-    rgba(117, 118, 195, 0.25), 
-    rgba(117, 196, 193, 0.25), 
-    rgba(122, 203, 168, 0.25), 
-    rgba(185, 195, 117, 0.25), 
-    rgba(204, 186, 122, 0.25))`;
-    if (selected) {
-      background = background.replace(/0.25/g, "1.0");
-    }
-  }
-  return (
-    <button
-      className={selected ? "selected" : ""}
-      key={name}
-      onClick={() => {
-        setElement(elementID);
-      }}
-      style={{
-        background,
-        backgroundColor: selected ? color.replace("0.25", "1.5") : color,
-      }}
-    >
-      {"  "}
-      {name}
-      {"  "}
-    </button>
-  );
-};
-
-let sizeMap = [1, 3, 7, 19, 39];
 
 class Index extends React.Component {
   constructor(props) {
@@ -348,94 +309,106 @@ class Index extends React.Component {
       currentSubmission && currentSubmission.id
         ? `#${currentSubmission.id}`
         : "";
+
+    let landscape = getLayout() === "landscape";
+    let portrait = getLayout() === "portrait";
     return (
       <React.Fragment>
-        <button
-          onClick={() => this.togglePause()}
-          className={paused ? "selected" : ""}
-        >
-          {paused ? (
-            <svg height="20" width="20" id="d" viewBox="0 0 300 300">
-              <polygon id="play" points="0,0 , 300,150 0,300" />
-            </svg>
-          ) : (
-            <svg height="20" width="20" id="d" viewBox="0 0 300 300">
-              <polygon id="bar2" points="0,0 110,0 110,300 0,300" />
-              <polygon id="bar1" points="190,0 300,0 300,300 190,300" />
-            </svg>
+        <div id="topBar">
+          <Link
+            to={{
+              pathname: "/info/",
+              hash,
+            }}
+          >
+            <button>Info</button>
+          </Link>
+          {!window.location.pathname.includes("school") && (
+            <>
+              <Link
+                to={{
+                  pathname: "/browse/",
+                  hash,
+                }}
+              >
+                <button>Browse</button>
+              </Link>
+              <button onClick={() => this.upload()}>Post</button>
+            </>
           )}
-        </button>
-
-        {!window.location.pathname.includes("school") && (
-          <>
-            <button onClick={() => this.upload()}>Upload</button>
-            <Link
-              to={{
-                pathname: "/browse/",
-                hash,
-              }}
-            >
-              <button>Browse</button>
-            </Link>
-          </>
-        )}
-
-        <button onClick={() => this.reset()}>Reset</button>
-        <Link
-          to={{
-            pathname: "/info/",
-            hash,
-          }}
-        >
-          <button>Info</button>
-        </Link>
-
-        {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
-        <span className="sizes">
-          {sizeMap.map((v, i) => (
-            <button
-              key={i}
-              className={i == size ? "selected" : ""}
-              onClick={(e) => this.setSize(e, i)}
-              style={{ padding: "0px" }}
-            >
-              <svg height="23" width="23" id="d" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r={3 + v} />
-              </svg>
-            </button>
-          ))}
-        </span>
-        <button
-          onClick={() => {
-            reset();
-            universe.pop_undo();
-          }}
-          style={{ fontSize: 35 }}
-        >
-          ↜
-        </button>
-        <button
-          className={-1 == selectedElement ? "selected" : ""}
-          key={name}
-          onClick={() => {
-            this.setState({ selectedElement: -1 });
-          }}
-        >
-          Wind
-        </button>
-        {Object.keys(Species)
-          .filter((x) => !Number.isInteger(Number.parseInt(x)))
-          .map((n) =>
-            ElementButton(n, selectedElement, (id) =>
-              this.setState({ selectedElement: id })
-            )
+          <PlayPause paused={paused} togglePause={() => this.togglePause()} />
+        </div>
+        <div id="bottomBar">
+          <button onClick={() => this.reset()}>Reset</button>
+          {this.state.submissionMenuOpen && (
+            <Menu close={() => this.closeMenu()}>
+              <h4>
+                Share your creation with the people! (try using #hashtags)
+              </h4>
+              <p>
+                Please be nice. Users who post hateful or sexually explicit
+                content will be banned.
+              </p>
+              <img src={this.state.data.dataURL} className="submissionImg" />
+              <SignInButton>
+                <div style={{ display: "flex" }}>
+                  <input
+                    maxlength="200"
+                    placeholder="title"
+                    onChange={(e) => this.setState({ title: e.target.value })}
+                  />
+                  <button
+                    disabled={this.state.submitting || this.rateLimited()}
+                    onClick={() => this.submit()}
+                  >
+                    Submit
+                  </button>
+                </div>
+              </SignInButton>
+            </Menu>
           )}
-        <span className="promo">
+          {/* {paused && <button onClick={() => universe.tick()}>Tick</button>} */}
+          <button
+            onClick={() => {
+              reset();
+              universe.pop_undo();
+            }}
+          >
+            {/* ↜ */}
+            <svg
+              width="20"
+              height="11"
+              viewBox="0 0 20 11"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                fillRule="evenodd"
+                clipRule="evenodd"
+                d="M6 7.5V11H5V10H4V9H3V8H2V7H1V6H0V5H1V4H2V3H3V2H4V1H5V0H6V3.5H10V4.5H12V5.5H13V6.5H14V7.5H15V9.5H14V8.5H12V7.5H6Z"
+                fill="black"
+              />
+            </svg>
+            Undo
+          </button>
+          {portrait && (
+            <SizeButtons size={size} setSize={(e, i) => this.setSize(e, i)} />
+          )}
+          <ElementButtons
+            selectedElement={selectedElement}
+            setSelected={(id) => this.setState({ selectedElement: id })}
+          />
+          {landscape && (
+            <SizeButtons size={size} setSize={(e, i) => this.setSize(e, i)} />
+          )}
+          {/* <span className="promo">
           *new*{" "}
           <a href="https://orb.farm" target="_blank">
             orb.farm
           </a>
-        </span>
+        </span> */}
+        </div>
+
         {this.state.currentSubmission && (
           <div className="submission-title">
             <button onClick={() => this.incScore()}>
@@ -443,32 +416,6 @@ class Index extends React.Component {
             </button>
             {this.state.currentSubmission.data.title}
           </div>
-        )}
-
-        {this.state.submissionMenuOpen && (
-          <Menu close={() => this.closeMenu()}>
-            <h4>Share your creation with the people! (try using #hashtags)</h4>
-            <p>
-              Please be nice. Users who post hateful or sexually explicit
-              content will be banned.
-            </p>
-            <img src={this.state.data.dataURL} className="submissionImg" />
-            <SignInButton>
-              <div style={{ display: "flex" }}>
-                <input 
-                  maxlength="200"
-                  placeholder="title"
-                  onChange={(e) => this.setState({ title: e.target.value })}
-                />
-                <button
-                  disabled={this.state.submitting || this.rateLimited()}
-                  onClick={() => this.submit()}
-                >
-                  Submit
-                </button>
-              </div>
-            </SignInButton>
-          </Menu>
         )}
       </React.Fragment>
     );

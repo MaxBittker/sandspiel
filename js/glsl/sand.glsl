@@ -5,6 +5,7 @@ uniform vec2 resolution;
 uniform bool isSnapshot;
 uniform sampler2D backBuffer;
 uniform sampler2D data;
+uniform sampler2D previewData;
 
 varying vec2 uv;
 
@@ -26,6 +27,10 @@ void main() {
   // vec3 bb = texture2D(backBuffer, (uv * 0.5) + vec2(0.5)).rgb;
 
   vec4 data = texture2D(data, textCoord);
+  vec4 previewData = texture2D(previewData, textCoord);
+  if (previewData.g > 0.1 && int((data.r * 255.) + 0.1) == 0) {
+    data = previewData;
+  }
   int type = int((data.r * 255.) + 0.1);
   float hue = 0.0;
   float saturation = 0.6;
@@ -37,7 +42,7 @@ void main() {
     hue = 0.0;
     saturation = 0.1;
     lightness = 0.1;
-    a = 0.1;
+    a = 0.0;
     if (isSnapshot) {
       saturation = 0.05;
       lightness = 1.01;
@@ -54,8 +59,8 @@ void main() {
   } else if (type == 3) { // water
     hue = 0.6;
     lightness = 0.7 + data.g * 0.25 + noise * 0.1;
-    int polarity = int( mod(data.g * 255. ,2.) + 0.1);
-    if(polarity == 0){
+    int polarity = int(mod(data.g * 255., 2.) + 0.1);
+    if (polarity == 0) {
       lightness += 0.01;
     }
 
@@ -67,13 +72,13 @@ void main() {
     hue = 0.9;
     saturation = 0.3;
   } else if (type == 6) { // fire
-  
+
     hue = (data.g * 0.1);
     saturation = 0.7;
 
     lightness = 0.7 + (data.g * 0.3) + ((noise + 0.8) * 0.5);
-    if(isSnapshot){
-      lightness -=0.2;
+    if (isSnapshot) {
+      lightness -= 0.2;
     }
   } else if (type == 7) { // wood
     hue = (data.g * 0.1);
@@ -134,5 +139,10 @@ void main() {
     lightness *= (0.975 + snoise2(floor(uv * resolution / dpi)) * 0.025);
   }
   color = hsv2rgb(vec3(hue, saturation, lightness));
+  // color += previewData.rgb;
+  // if (previewData.r > 0.) {
+  //   a = 1.0;
+  // }
+
   gl_FragColor = vec4(color, a);
 }

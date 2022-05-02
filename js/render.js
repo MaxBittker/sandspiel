@@ -18,6 +18,14 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
   let cells = new Uint8Array(memory.buffer, cell_pointer, width * height * 4);
   const dataTexture = regl.texture({ width, height, data: cells });
 
+  let preview_pointer = universe.preview();
+  let preview = new Uint8Array(
+    memory.buffer,
+    preview_pointer,
+    width * height * 4
+  );
+  const dataTexture2 = regl.texture({ width, height, data: preview });
+
   let drawSand = regl({
     frag: fsh,
     uniforms: {
@@ -31,6 +39,16 @@ let startWebGL = ({ canvas, universe, isSnapshot = false }) => {
         // }
 
         return dataTexture({ width, height, data: cells });
+      },
+      previewData: () => {
+        let preview_pointer = universe.preview();
+        let preview = new Uint8Array(
+          memory.buffer,
+          preview_pointer,
+          width * height * 4
+        );
+
+        return dataTexture2({ width, height, data: preview });
       },
       resolution: ({ viewportWidth, viewportHeight }) => [
         viewportWidth,
@@ -69,7 +87,45 @@ let snapshot = (universe) => {
 
   return canvas.toDataURL("image/png");
 };
+export const spriteSize = 29;
+let sprites = () => {
+  let canvas = document.createElement("canvas");
+  // window.document.body.appendChild(canvas);
+  let species = Object.values(Species).filter((x) => Number.isInteger(x));
+  let range = Math.max(...species) + 1;
+  let size = spriteSize;
+  let universe = Universe.new(range * size, size * range);
+  canvas.width = size * range;
+  canvas.height = range * size;
+  canvas.style = `
+  
+  position: absolute;
+  z-index: 300;`;
+  universe.reset();
 
+  species.forEach((id) =>
+    universe.paint(Math.floor((id + 0.5) * size), size / 2, size * 0.6, id)
+  );
+
+  let render = startWebGL({ universe, canvas, isSnapshot: false });
+  render();
+  let camera = document.createElement("canvas");
+  camera.width = size;
+  camera.height = size;
+  let cameraCtx = camera.getContext("2d");
+
+  let sprites = {};
+
+  sprites[-1] = camera.toDataURL("image/png");
+  species.forEach((id) => {
+    let x = Math.floor(id * size);
+    cameraCtx.drawImage(canvas, x, 0, size, size, 0, 0, size, size);
+    sprites[id] = camera.toDataURL("image/png");
+  });
+  return sprites;
+};
+
+sprites();
 let pallette = () => {
   let canvas = document.createElement("canvas");
 
@@ -98,4 +154,4 @@ let pallette = () => {
   return colors;
 };
 
-export { startWebGL, snapshot, pallette };
+export { startWebGL, snapshot, pallette, sprites };

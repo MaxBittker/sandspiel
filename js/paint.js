@@ -1,5 +1,6 @@
 import { height, universe, width } from "./index.js";
 import { sizeMap } from "./components/ui";
+import { Species } from "../crate/pkg/sandtable_bg.js";
 const canvas = document.getElementById("sand-canvas");
 
 const eventDistance = (a, b) => {
@@ -94,6 +95,7 @@ function smoothPaint(event) {
   repeat = window.setInterval(() => paint(event), 100);
   let startEvent = { clientX: event.clientX, clientY: event.clientY };
   if (!painting) {
+    paint(startEvent);
     return;
   }
   let size = sizeMap[window.UI.state.size];
@@ -128,9 +130,6 @@ const handleTouches = (event) => {
 };
 
 const paint = (event) => {
-  if (!painting) {
-    return;
-  }
   const boundingRect = canvas.getBoundingClientRect();
 
   const scaleX =
@@ -143,11 +142,32 @@ const paint = (event) => {
 
   const x = Math.min(Math.floor(canvasLeft), width - 1);
   const y = Math.min(Math.floor(canvasTop), height - 1);
-  if (window.UI.state.selectedElement < 0) return;
-  universe.paint(
+
+  universe.paint_preview(
     x,
     y,
     sizeMap[window.UI.state.size],
-    window.UI.state.selectedElement
+    window.UI.state.selectedElement === -1 ? 1 : window.UI.state.selectedElement
   );
+  if (!painting) {
+  } else {
+    if (universe.stamp_state() === 1) {
+      universe.capture_stamp(x, y, sizeMap[window.UI.state.size]);
+      universe.set_stamp_state(2);
+      return;
+    }
+
+    if (universe.stamp_state() == 2 && window.UI.state.selectedElement == -1) {
+      universe.paint_stamp(x, y, sizeMap[window.UI.state.size]);
+      return;
+    }
+
+    if (window.UI.state.selectedElement < 0) return;
+    universe.paint(
+      x,
+      y,
+      sizeMap[window.UI.state.size],
+      window.UI.state.selectedElement
+    );
+  }
 };

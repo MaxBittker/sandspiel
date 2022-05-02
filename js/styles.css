@@ -1,7 +1,32 @@
+@font-face {
+  font-family: "Chicago";
+  src: url("./assets/ChiKareGo2.ttf");
+}
+
+@font-face {
+  font-family: "Mondwest";
+  src: url("./assets/PPMondwest-Regular.otf") format("truetype");
+  font-weight: 100;
+}
+@font-face {
+  font-family: "NeueBit";
+  src: url("./assets/PPNeueBit-Bold.otf") format("truetype");
+  font-weight: 500;
+}
+
 * {
   margin: 0;
+  box-sizing: border-box;
   /* font-family: monospace; */
-  font-family: "Inconsolata", monospace;
+  /* font-family: "Inconsolata", monospace; */
+  /* font-family: "Mondwest", sans-serif; */
+  font-family: "Mondwest", sans-serif;
+  /* font-smooth: antialiased; */
+
+  /* -webkit-font-smoothing: antialiased; */
+  /* -moz-osx-font-smoothing: grayscale; */
+  /* font-smooth: never; */
+  /* -webkit-font-smoothing: none; */
 }
 
 html,
@@ -19,20 +44,35 @@ body,
   width: 100%;
   height: 100%;
   /* background-color: rgba(00, 00, 00, 0.2); */
-  background-color: #f3f3f4;
+  /* background-color: #f3f3f4; */
+  background-color: #faf4ee;
+  display: flex;
+  flex-direction: column;
 }
-canvas {
+#canvases {
   position: absolute;
-  bottom: 0;
-  /* top: 0; */
+  /* width:100%; */
+  height: calc(100vw - 10px);
+  border: 1px solid black;
+  box-sizing: border-box;
+  overflow: hidden;
+  margin: 3px auto;
+}
+#canvases canvas {
+  position: absolute;
+  top: 0px;
+  box-sizing: border-box;
   right: 0px;
   left: 0px;
+  width: 100%;
+  height: 100%;
+  bottom: 0px;
   z-index: 1;
-  max-width: calc(100% - 3px);
+  /* max-width: calc(100% - 4px); */
   /* width: calc(100% - 0px); */
   /* max-width: ca100%; */
-  margin: auto;
-  box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.1);
+
+  /* box-shadow: 0px 0px 3px 3px rgba(0, 0, 0, 0.1); */
 }
 
 #sand-canvas {
@@ -57,7 +97,7 @@ img {
   position: relative;
   height: 30px;
   min-width: 30px;
-  font-size: 19px;
+  font-size: 20px;
   padding: 1px 5px;
   color: black;
   flex-grow: 1;
@@ -69,17 +109,17 @@ button {
   position: relative;
   height: 30px;
   min-width: 30px;
-  font-size: 19px;
-  padding: 1px 5px;
-  background-color: whitesmoke;
+  font-size: 20px;
+  padding: 4px 12px;
+  background-color: white;
   color: black;
-  border: 2px solid whitesmoke;
-  border-color: gainsboro;
-  flex-grow: 1;
-  max-width: 150px;
+  border: 1px solid black;
+
   fill: black;
   line-height: 0px;
   cursor: pointer;
+  margin: 4px;
+  border-radius: 10px;
 }
 .active button,
 button.active {
@@ -101,10 +141,52 @@ button.selected {
   border-color: grey;
   fill: whitesmoke;
   /* font-weight: bold; */
-  text-shadow: 1.6px 1.5px 0 grey, -1px -1px 0 grey, 1px -1px 0 grey,
-    -1px 1px 0 grey, 1px 1px 0 grey;
+  /* text-shadow: 1.6px 1.5px 0 grey, -1px -1px 0 grey, 1px -1px 0 grey, */
+  /* -1px 1px 0 grey, 1px 1px 0 grey; */
+}
+.pallette {
+  display: flex;
+  flex-wrap: wrap;
+  width: 100%;
+  justify-content: center;
 }
 
+.landscape .ebutton {
+  width: 25%;
+}
+@media only screen and (max-width: 1000px) {
+  .landscape .ebutton {
+    width: 20%;
+  }
+}
+
+.ebutton {
+  font-size: 0.9rem;
+  height: unset;
+  width: 12.5%;
+  margin: 0;
+  /* flex-grow: 1; */
+  padding: 0;
+  display: flex;
+  /* justify-content: space-between; */
+  align-items: center;
+  flex-direction: column;
+  border: none;
+  background-color: transparent !important;
+}
+.ebutton img {
+  width: 100%;
+}
+.ebutton.selected img {
+  /* filter: drop-shadow(0px 1px 0px black) drop-shadow(0px -1px 0px black) drop-shadow(1px 0px 0px black) drop-shadow(-1px 0px 0px black); */
+}
+
+.ebutton.selected {
+  color: black;
+  background-color: rgba(228, 218, 218, 0.493) !important;
+
+  /* border: 1px solid black; */
+}
 .submission-title {
   z-index: 3;
   position: relative;
@@ -112,12 +194,74 @@ button.selected {
   overflow: hidden;
 }
 #ui {
+  position: relative;
   display: flex;
   flex-wrap: wrap;
   float: right;
+  /* justify-content: space-between;; */
+  width: 100%;
+}
+#ui.landscape {
+  height: 100%;
+  flex-direction: column-reverse;
+  justify-content: space-between;
+}
+.landscape #topBar {
+  flex-direction: column-reverse;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+.landscape #topBar > button,
+.landscape #topBar > a {
+  margin: auto;
+  width: calc(100% - 1rem);
+  margin: 0.25rem 0.5rem;
+  display: block;
+}
+a > button {
+  width: 100%;
+  margin: 0;
+}
+#topBar {
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 42px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0px 2px;
+}
+.landscape #bottomBar {
+  justify-content: space-between;
+}
+#bottomBar {
+  left: 0;
+  display: flex;
+  flex-wrap: wrap;
+
+  justify-content: flex-start;
+
+  box-sizing: border-box;
+  padding: 0px 2px;
+}
+.landscape .pauseButton {
+  margin-bottom: 2rem !important;
+}
+.pauseButton {
+  width: 5em;
+  margin-left: auto;
 }
 
+.sizes {
+  margin-left: auto;
+}
+.landscape .sizes {
+  margin: 1rem auto;
+}
 #fps {
+  display: none;
   pointer-events: none;
 
   z-index: 3;
@@ -143,7 +287,7 @@ button.selected {
 }
 
 .menu {
-  position: absolute;
+  position: fixed;
   left: 10px;
   right: 10px;
   top: 10px;
@@ -279,6 +423,9 @@ img {
   filter: none;
   transform: scale(1.5);
 }
+.landscape .bottom-row a {
+  width: 100%;
+}
 .bottom-row {
   width: 100%;
   line-height: 19px;
@@ -355,8 +502,8 @@ img {
 
 .benchmark {
   position: absolute;
-  bottom:25px;
-  right:10px;
+  bottom: 25px;
+  right: 10px;
   background-color: white;
   font-size: 18px;
   z-index: 9999;

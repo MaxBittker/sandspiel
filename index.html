@@ -80,6 +80,7 @@
         z-index: 99;
         position: absolute;
         /* width: 320px; */
+        /* height: calc(100vh - 8px) !important; */
         height: 100%;
         pointer-events: none;
         /* background-color: rebeccapurple; */
@@ -109,8 +110,12 @@
 
     <div id="background">
       <div id="ui"></div>
-      <div id="fps"></div>
-      <canvas id="sand-canvas"></canvas> <canvas id="fluid-canvas"></canvas>
+      <div id="canvases">
+        <canvas id="fluid-canvas"></canvas>
+        <canvas id="sand-canvas"></canvas>
+
+        <div id="fps"></div>
+      </div>
     </div>
   </body>
 
