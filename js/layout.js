@@ -1,4 +1,3 @@
-
 const canvas = document.getElementById("sand-canvas");
 const canvas2 = document.getElementById("fluid-canvas");
 const ui = document.getElementById("ui");
@@ -12,12 +11,13 @@ let resize = () => {
   let uiStyle = "";
   let adStyle = "display:none;";
 
-
   if (screen_width > screen_height) {
     if (screen_width - window.innerHeight < 400) {
       // landscape compressed
       canvasStyle = `height: ${window.innerHeight}px; margin:3px`;
-      uiStyle = `width: ${screen_width - window.innerHeight - 12}px; margin: 2px;`;
+      uiStyle = `width: ${
+        screen_width - window.innerHeight - 12
+      }px; margin: 2px;`;
     } else {
       // landscape wide
       canvasStyle = `
@@ -27,7 +27,9 @@ let resize = () => {
        left: auto;
        right: 206px`;
       uiStyle = `width: 200px; margin: 2px;`;
-      adStyle = `width: ${        screen_width - window.innerHeight - (206 + 150)      }px; margin: 1px;`;
+      adStyle = `width: ${
+        screen_width - window.innerHeight - (206 + 150)
+      }px; margin: 1px;`;
     }
   } else {
     //portrait (mobile)
@@ -38,6 +40,8 @@ let resize = () => {
   canvas.style = canvasStyle;
   canvas2.style = canvasStyle;
   document.getElementsByClassName("adslot_1")[0].style = adStyle;
+  let btnHeight = ui.getBoundingClientRect().height;
+  document.getElementById("PullTab").style.top = btnHeight + "px";
 };
 
 resize();

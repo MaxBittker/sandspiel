@@ -8,6 +8,7 @@ import { height, universe, width, reset } from "../index.js";
 import { snapshot, pallette } from "../render.js";
 import { functions, storage } from "../api.js";
 import SignInButton from "./signinButton.js";
+import Promotab from "./promotab";
 
 import Menu from "./menu";
 
@@ -350,6 +351,7 @@ class Index extends React.Component {
         : "";
     return (
       <React.Fragment>
+        <Promotab />
         <button
           onClick={() => this.togglePause()}
           className={paused ? "selected" : ""}
@@ -430,12 +432,12 @@ class Index extends React.Component {
               this.setState({ selectedElement: id })
             )
           )}
-        <span className="promo">
+        {/* <span className="promo">
           *new*{" "}
           <a href="https://orb.farm" target="_blank">
             orb.farm
           </a>
-        </span>
+        </span> */}
         {this.state.currentSubmission && (
           <div className="submission-title">
             <button onClick={() => this.incScore()}>
@@ -455,7 +457,7 @@ class Index extends React.Component {
             <img src={this.state.data.dataURL} className="submissionImg" />
             <SignInButton>
               <div style={{ display: "flex" }}>
-                <input 
+                <input
                   maxlength="200"
                   placeholder="title"
                   onChange={(e) => this.setState({ title: e.target.value })}
