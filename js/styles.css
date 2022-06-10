@@ -414,13 +414,29 @@ img {
   box-sizing: border-box;
   position: absolute;
   margin: auto;
-  left: -82px;
+  left: -81.5px;
   transform: translateY(-30%);
   top: 10px;
   z-index: 7;
   width: 70px;
   border-top: none;
   font-size: 30px;
+}
+.CTA {
+  border: 2px solid #f3f3f4;
+  background-color: #5865f2;
+  color: rgba(255, 255, 255);
+  border-radius: 10px;
+  display: block;
+  margin: auto;
+  width: fit-content;
+  padding: 0.5em 1em;
+  margin-top: 0.5em;
+  text-decoration: none;
+}
+.CTA:hover {
+  transform: rotate(2deg) scale(1.01);
+  filter: drop-shadow(1px 3px 6px rgba(0, 0, 0, 0.1));
 }
 #PullTab img {
   width: 100%;

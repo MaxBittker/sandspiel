@@ -59,6 +59,7 @@
     "react-dom": "^16.12.0",
     "react-firebaseui": "4.1.0",
     "react-router-dom": "^5.1.2",
+    "react-youtube": "^9.0.2",
     "regl": "^1.3.13",
     "style-loader": "^2.0.0",
     "timeago.js": "^3.0.2"
