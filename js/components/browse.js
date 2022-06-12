@@ -219,14 +219,14 @@ class Browse extends React.Component {
           <button>Month</button>
         </NavLink>
         <NavLink exact to="/browse/top/">
-          <button>All </button>
+          <button>All</button>
         </NavLink>
         <span style={{ display: "inline-block" }}>
           <input
             value={search}
             onChange={(e) => this.setState({ search: e.target.value })}
             onKeyDown={(e) =>
-              e.keyCode == 13 && // I think that's enter
+              e.keyCode == 13 && // Can confirm this is enter -LL
               this.props.history.push(`/browse/search/?title=${search}`)
             }
             placeholder="search"
