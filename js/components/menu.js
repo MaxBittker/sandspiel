@@ -7,7 +7,7 @@ const Menu = ({ close, children }) => {
       <div className={"menu"}>
         {children}
         <Link to="/" className="x" onClick={close}>
-          <button> x</button>
+          <button title="Close"> x</button>
         </Link>
       </div>
     </div>
