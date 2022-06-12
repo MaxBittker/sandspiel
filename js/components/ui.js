@@ -123,7 +123,7 @@ class Index extends React.Component {
     });
   }
   reset() {
-    if (window.confirm("Reset?")) {
+    if (window.confirm("Are you sure you want to reset?")) {
       this.play();
       window.location = "#";
       this.setState({ currentSubmission: null });
