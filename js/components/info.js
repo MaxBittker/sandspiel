@@ -45,41 +45,43 @@ const Info = () => {
       <br />
       <h2>Element Information:</h2>
       <h4>Wall </h4>
-      Indestructible
+      Indestructible.
       <h4>Sand </h4>
-      Sinks in water
+      Sinks in water.
       <h4>Water </h4>
-      Puts out fire
+      Puts out fire.
       <h4>Stone </h4>
-      Forms arches, folds under pressure
+      Forms arches, turns into sand under pressure.
       <h4>Ice </h4>
       Freezes Water, slippery!
       <h4>Gas </h4>
       Highly Flammable!
       <h4>Cloner </h4>
-      Copies the first element it touches
+      Copies the first element it touches. 
       <h4>Mite </h4>
-      Eats wood and plant, but loves dust! Slides on ice
+      Eats wood and plant, but loves dust! Slides on ice..
       <h4>Wood </h4>
-      Sturdy, but biodegradable
+      Sturdy, but biodegradable.
       <h4>Plant </h4>
-      Thrives in wet enviroments
+      Thrives in wet enviroments.
       <h4>Fungus </h4>
-      Spreads over everything
+      Spreads over everything.
       <h4>Seed </h4>
-      Grows in sand
+      Grows on sand, plant, and fungus.
       <h4>Fire </h4>
       Hot!
       <h4>Lava </h4>
-      Flammable and heavy
+      Flammable and heavy.
       <h4>Acid </h4>
-      Corrodes other elements
+      Corrodes other elements.
       <h4>Dust </h4>
-      Pretty, but dangerously explosive
+      Pretty, but dangerously explosive.
       <h4>Oil </h4>
-      Produces smoke
+      Produces smoke when set on fire.
       <h4>Rocket </h4>
-      Explodes into copies of the first element it touches
+      Explodes into copies of the first element it touches.
+      <h4>Empty </h4>
+      Erases.
       <hr />
       <hr />
       <hr />
