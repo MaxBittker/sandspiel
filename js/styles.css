@@ -89,6 +89,7 @@ button.active {
 button:disabled {
   background-color: gainsboro;
   color: gray;
+  content: "Slow down! You're posting to fast!"
 }
 
 button:focus {
