@@ -188,7 +188,7 @@ class Browse extends React.Component {
       <React.Fragment>
         <SignInScreen />
         <p style={{ gridColumn: "auto / span 2", margin: "8px", fontSize: 16 }}>
-          <b> Sandspiel runs smoother now!</b> Tag #beta if you see an
+          <b> Sandspiel runs smoother now!</b> Tag <a href="https://sandspiel.club/browse/search/?title=beta">#beta</a> if you see an
           improvement or if you see bugs.
           <br></br>
           Check out ☞ <br></br>
