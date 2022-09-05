@@ -37,7 +37,7 @@ const Info = () => {
         Lastly, I want to say that if you enjoy this game or share your artwork
         on it, your opinion is important to me and I want to do my best to
         ensure sandspiel is a friendly and kind place to play, without bullying,
-        racism, transphobia, or homophobia. If something is wrong or there's some way I can
+        racism, transphobia, homophobia, or any other forms of bigotry. If something is wrong or there's some way I can
         help, feel free to contact me at <a href="mailto:maxbittker@gmail.com">maxbittker@gmail.com</a> or <a href="https://twitter.com/maxbittker">@maxbittker on twitter.</a>
       </p>
       <br />
