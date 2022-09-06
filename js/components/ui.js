@@ -441,7 +441,7 @@ class Index extends React.Component {
         {this.state.currentSubmission && (
           <div className="submission-title">
             <button onClick={() => this.incScore()}>
-              +♡{this.state.currentSubmission.data.score}{" "}
+              ♡{this.state.currentSubmission.data.score}{" "}
             </button>
             {this.state.currentSubmission.data.title}
           </div>
@@ -459,7 +459,7 @@ class Index extends React.Component {
               <div style={{ display: "flex" }}>
                 <input
                   maxlength="200"
-                  placeholder="title"
+                  placeholder="Title"
                   onChange={(e) => this.setState({ title: e.target.value })}
                 />
                 <button
