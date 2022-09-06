@@ -191,7 +191,7 @@ class Browse extends React.Component {
           <b> Sandspiel runs smoother now!</b> Tag <a href="https://sandspiel.club/browse/search/?title=beta">#beta</a> if you see an
           improvement or if you see bugs.
           <br></br>
-          Check out ☞ <br></br>
+          Check out ☟ <br></br>
           <br></br>
           <a href="https://www.youtube.com/watch?v=2qfjJ-0ZeVM" target="_blank">
             {" "}
