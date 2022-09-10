@@ -132,5 +132,13 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
+
+document.addEventListener("keydown", function (event) {
+  if (event.metaKey && event.key === "z") { // MacOS command key
+    reset();
+    universe.pop_undo();
+  }
+});
+
 (adsbygoogle = window.adsbygoogle || []).push({});
 export { canvas, width, height, universe, reset };
