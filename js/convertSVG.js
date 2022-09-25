@@ -73,7 +73,7 @@ export function rgbaToSpecies(r, g, b, a) {
     [ Species.Cloner, Species.Mite, null ], // Violet
   ];
 
-  const species = colorsToSpecies[hueIndex][lightnessIndex];
+  const species = colorsToSpecies?.[hueIndex]?.[lightnessIndex];
 
   return species ? species : Species.Empty;
 }
