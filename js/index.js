@@ -132,5 +132,13 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
+document.addEventListener("paste", function(event) {
+  const text = event.clipboardData.getData('text/plain');
+  if (text.includes("<svg")) {
+    event.preventDefault();
+    window.UI.loadSVG(text);
+  }
+});
+
 (adsbygoogle = window.adsbygoogle || []).push({});
 export { canvas, width, height, universe, reset };
