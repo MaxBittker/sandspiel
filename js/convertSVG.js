@@ -60,7 +60,7 @@ export function rgbaToSpecies(r, g, b, a) {
   }
 
   // Color options
-  let hueIndex = Math.floor((h+30) / 360 * 7);
+  let hueIndex = Math.floor((h + 25.7) / 360 * 7);
   let lightnessIndex = Math.floor(l * 4 - 0.25);
 
   const colorsToSpecies = [
@@ -83,15 +83,30 @@ export async function svgToImageData (svgString) {
   const height = 300;
 
   return new Promise((resolve, reject) => {
-    // To fit any SVG, we would need to parse the SVG string and set the width
-    // and height attributes to 300. It seems safer to not parse the SVG, and
-    // just load it in an image element.
-    const blob = new Blob([svgString], {type: 'image/svg+xml'});
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgString, "image/svg+xml");
+  
+    const errorNode = doc.querySelector("parsererror");
+    if (errorNode) {
+      reject("Error while parsing SVG.");
+      return;
+    } 
+    
+    // We want to fit any pasted SVG to the default Sandspiel universe size.
+    doc.documentElement.setAttribute("width", width + "px");
+    doc.documentElement.setAttribute("height", height + "px");
+  
+    const serializer = new XMLSerializer();
+    const svgStringSized = serializer.serializeToString(doc);
+
+    // Load the SVG into an image element
+    const blob = new Blob([svgStringSized], {type: 'image/svg+xml'});
     const img = document.createElement("img");
     img.width = width;
     img.height = height;
   
     img.addEventListener("load", () => {
+      // Then we write the image pixels to a canvas.
       const canvas = document.createElement("canvas");
       canvas.width = width;
       canvas.height = height;
