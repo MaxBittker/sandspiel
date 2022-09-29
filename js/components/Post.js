@@ -91,7 +91,7 @@ export function Post({
         <div style={{ width: "50%" }}>
           {hasParent && !redundent_parent_id && (
             <button
-              title="parent post"
+              title="Show replying to"
               className={classnames("parent", { active: nextPost })}
               onClick={fetchParent}
             >
@@ -132,7 +132,7 @@ export function Post({
           {submission.data.children > (redundent_child_id ? 1 : 0) && (
             <button
               className={classnames("children", { active: childrenPosts })}
-              title="show children"
+              title="Show replies"
               onClick={fetchChildren}
             >
               {submission.data.children}↓
