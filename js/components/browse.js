@@ -187,23 +187,29 @@ class Browse extends React.Component {
     return (
       <React.Fragment>
         <SignInScreen />
-        <p style={{ gridColumn: "auto / span 2", margin: "8px", fontSize: 16 }}>
-          <b> Sandspiel runs smoother now!</b> Tag <a href="https://sandspiel.club/browse/search/?title=beta">#beta</a> if you see an
-          improvement or if you see bugs.
-          <br></br>
-          Check out ☟ <br></br>
-          <br></br>
-          <a href="https://www.youtube.com/watch?v=2qfjJ-0ZeVM" target="_blank">
+        <p style={{ gridColumn: "auto / span 2", margin: "8px", fontSize: 16 }}
+          Check out ☞<br></br>
+          <a href="https://studio.sandspiel.club" target="_blank">
             {" "}
-            "Top 9 ways to make Water" (Lu Wilson)
+            <b> SANDSPIEL STUDIO: Make your own Elements!</b>
           </a>
           <br></br>
+          <a href="https://orb.farm" target="_blank">
+            {" "}
+            Orb.Farm
+          </a>
+          {"          \xa0        \xa0\xa0\xa0    "}
           <a
             href="https://www.roblox.com/games/7000824340/Melon-Rancher"
             target="_blank"
           >
             {" "}
-            Melon Rancher (Roblox Game by me)
+            Melon Rancher
+          </a>
+          {"          \xa0        \xa0\xa0\xa0    "}
+          <a href="https://www.youtube.com/watch?v=2qfjJ-0ZeVM" target="_blank">
+            {" "}
+            "Top 9 ways to make Water"
           </a>
         </p>
         <NavLink exact to="/browse/">
