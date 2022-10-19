@@ -126,18 +126,12 @@ function reset() {
 }
 
 document.addEventListener("keydown", function (event) {
-  if (event.ctrlKey && event.key === "z") {
+  if ((event.ctrlKey || event.metaKey) && event.key === "z") {
     reset();
     universe.pop_undo();
   }
 });
 
-document.addEventListener("keydown", function (event) {
-  if (event.metaKey && event.key === "z") { // MacOS command key
-    reset();
-    universe.pop_undo();
-  }
-});
 
 (adsbygoogle = window.adsbygoogle || []).push({});
 export { canvas, width, height, universe, reset };
