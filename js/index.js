@@ -132,6 +132,5 @@ document.addEventListener("keydown", function (event) {
   }
 });
 
-
 (adsbygoogle = window.adsbygoogle || []).push({});
 export { canvas, width, height, universe, reset };
