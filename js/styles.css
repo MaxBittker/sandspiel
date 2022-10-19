@@ -258,9 +258,9 @@ img {
   flex-grow: 0;
   margin-left: -4px;
   margin-bottom: -8px;
-  /* position: absolute; */
-  /* right: 35px; */
-  /* bottom: 0px; */
+  right: -2px;
+  bottom: 3px;
+  border: none;
 }
 .blocker {
   height: 23px;
