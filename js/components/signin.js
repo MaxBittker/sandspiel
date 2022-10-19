@@ -109,7 +109,7 @@ class SignInScreen extends React.Component {
           <button
             style={{ flexGrow: 0, margin: "0 10px" }}
             onClick={() => {
-              if (window.confirm("sign out?")) {
+              if (window.confirm("Sign out?")) {
                 firebase.auth().signOut();
               }
             }}

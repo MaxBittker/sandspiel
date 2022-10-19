@@ -123,7 +123,7 @@ class Index extends React.Component {
     });
   }
   reset() {
-    if (window.confirm("Reset?")) {
+    if (window.confirm("Are you sure you want to reset?")) {
       this.play();
       window.location = "#";
       this.setState({ currentSubmission: null });
@@ -459,7 +459,7 @@ class Index extends React.Component {
               <div style={{ display: "flex" }}>
                 <input
                   maxlength="200"
-                  placeholder="title"
+                  placeholder="Title"
                   onChange={(e) => this.setState({ title: e.target.value })}
                 />
                 <button
