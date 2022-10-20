@@ -153,11 +153,12 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
   const { uid } = req["user"];
   const user = await admin.auth().getUser(uid);
   if (!user.emailVerified) {
-    res.sendStatus(301);
+    res.sendStatus(301); //Why 301?
   }
 
   if (wordfilter.blacklisted(title)) {
-    res.sendStatus(418);
+    res.sendStatus(418); //I uh... sure? I don't think informing the user they can't brew coffee with a teapot is the most helpful thing here
+    console.log("wordfilter triggered, keep it clean!"
     return;
   }
   const trimmed_title = title.slice(0, 200);
