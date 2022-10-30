@@ -188,6 +188,8 @@ class Browse extends React.Component {
       <React.Fragment>
         <SignInScreen />
         <p style={{ gridColumn: "auto / span 2", margin: "8px", fontSize: 16 }}>
+          <b> Happy Halloween! 🎃</b>
+          <br></br>
           Check out ☞<br></br>
           <a href="https://studio.sandspiel.club" target="_blank">
             {" "}
