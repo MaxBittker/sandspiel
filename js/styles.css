@@ -309,6 +309,7 @@ img {
   /* margin-left: auto; */
   margin-right: -2px;
   /* margin-bottom: 15px; */
+  filter: saturate(0%) brightness(50%);
 }
 .heart:active {
   color: red;

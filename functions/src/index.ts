@@ -189,7 +189,7 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
     );
 
     if (banned.rows[0].exists) {
-      res.sendStatus(401).json({ id: "you're banned for two months" });
+      res.sendStatus(401).json({ id: "you're banned for two months, if you believe this is in error, contact me at maxbittker@gmail.com" });
       return;
     }
     const countRows = await pgPool.query(

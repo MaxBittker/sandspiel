@@ -187,7 +187,7 @@ class Browse extends React.Component {
     return (
       <React.Fragment>
         <SignInScreen />
-        <p style={{ gridColumn: "auto / span 2", margin: "8px", fontSize: 16 }}>
+        <p style={{ gridColumn: "auto / span 2", margin: "8px", fontSize: 16 }}
           Check out ☞<br></br>
           <a href="https://studio.sandspiel.club" target="_blank">
             {" "}
@@ -225,14 +225,14 @@ class Browse extends React.Component {
           <button>Month</button>
         </NavLink>
         <NavLink exact to="/browse/top/">
-          <button>All </button>
+          <button>All</button>
         </NavLink>
         <span style={{ display: "inline-block" }}>
           <input
             value={search}
             onChange={(e) => this.setState({ search: e.target.value })}
             onKeyDown={(e) =>
-              e.keyCode == 13 && // I think that's enter
+              e.keyCode == 13 && // Can confirm this is enter -LL
               this.props.history.push(`/browse/search/?title=${search}`)
             }
             placeholder="search"
