@@ -191,7 +191,7 @@ class Browse extends React.Component {
           Check out ☞<br></br>
           <a href="https://studio.sandspiel.club" target="_blank">
             {" "}
-            <b> SANDSPIEL STUDIO: Make your own Elements!</b>
+            <b> SANDSPIEL STUDIO: Invent New Elements!</b>
           </a>
           <br></br>
           <a href="https://orb.farm" target="_blank">
@@ -206,7 +206,7 @@ class Browse extends React.Component {
             {" "}
             Melon Rancher
           </a>
-          {"          \xa0        \xa0\xa0\xa0    "}
+          <br></br>
           <a href="https://www.youtube.com/watch?v=2qfjJ-0ZeVM" target="_blank">
             {" "}
             "Top 9 ways to make Water"

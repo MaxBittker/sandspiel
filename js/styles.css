@@ -421,6 +421,7 @@ img {
   width: 70px;
   border-top: none;
   font-size: 30px;
+  filter: drop-shadow(-3px 0px 2px #5865f2);
 }
 .CTA {
   border: 2px solid #f3f3f4;
