@@ -19,7 +19,7 @@
     "@types/twit": "^2.2.28",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
-    "express": "^4.16.4",
+    "express": "^4.17.3",
     "firebase": "^5.7.0",
     "firebase-admin": "^8.2.0",
     "firebase-functions": "^3.13.1",
