@@ -68,7 +68,7 @@ impl Species {
 }
 
 pub fn update_sand(cell: Cell, ctx: &mut UniverseContext) {
-    let dx = ctx.rand_dir_2();
+    let dx = ctx.rand_vec1(false);
 
     let nbr = ctx.get(0, 1);
     if nbr.species == Species::Empty {
@@ -90,7 +90,7 @@ pub fn update_sand(cell: Cell, ctx: &mut UniverseContext) {
 }
 
 pub fn update_dust(cell: Cell, ctx: &mut UniverseContext) {
-    let dx = ctx.rand_dir();
+    let dx = ctx.rand_vec1(true);
     let fluid = ctx.get_fluid();
 
     if fluid.pressure > 120 {
@@ -134,7 +134,7 @@ pub fn update_stone(cell: Cell, ctx: &mut UniverseContext) {
     }
     let fluid = ctx.get_fluid();
 
-    if fluid.pressure > 120 && ctx.rand_int(1) == 0 {
+    if fluid.pressure > 120 && ctx.once_in(2) {
         ctx.set(
             0,
             0,
@@ -166,7 +166,7 @@ pub fn update_stone(cell: Cell, ctx: &mut UniverseContext) {
 }
 
 pub fn update_water(cell: Cell, ctx: &mut UniverseContext) {
-    let mut dx = ctx.rand_dir();
+    let mut dx = ctx.rand_vec1(true);
     let below = ctx.get(0, 1);
     let dx1 = ctx.get(dx, 1);
     // let mut dx0 = ctx.get(dx, 0);
@@ -176,7 +176,7 @@ pub fn update_water(cell: Cell, ctx: &mut UniverseContext) {
         let mut ra = cell.ra;
         if ctx.once_in(20) {
             //randomize direction when falling sometimes
-            ra = 100 + ctx.rand_int(50) as u8;
+            ra = 100 + ctx.rand_int(0..50) as u8;
         }
         ctx.set(0, 1, Cell { ra, ..cell });
 
@@ -200,7 +200,7 @@ pub fn update_water(cell: Cell, ctx: &mut UniverseContext) {
         // scoot double
         ctx.set(0, 0, dxd);
         ctx.set(2 * dx, 0, Cell { rb: 6, ..cell });
-        let (dx, dy) = ctx.rand_vec_8();
+        let (dx, dy) = ctx.rand_vec2(false);
         let nbr = ctx.get(dx, dy);
 
         // spread opinion
@@ -219,7 +219,7 @@ pub fn update_water(cell: Cell, ctx: &mut UniverseContext) {
     } else if dx0.species == Species::Empty || dx0.species == Species::Oil {
         ctx.set(0, 0, dx0);
         ctx.set(dx, 0, Cell { rb: 3, ..cell });
-        let (dx, dy) = ctx.rand_vec_8();
+        let (dx, dy) = ctx.rand_vec2(false);
         let nbr = ctx.get(dx, dy);
         if nbr.species == Species::Water {
             if nbr.ra % 2 != cell.ra % 2 {
@@ -257,7 +257,7 @@ pub fn update_water(cell: Cell, ctx: &mut UniverseContext) {
         );
     }
     // if ctx.once_in(8) {
-    //     let (dx, dy) = ctx.rand_vec_8();
+    //     let (dx, dy) = ctx.rand_vec2(false);
     //     let nbr = ctx.get(dx, dy);
     //     if nbr.species == Species::Water {
     //         if nbr.ra % 2 != cell.ra % 2 {
@@ -266,7 +266,7 @@ pub fn update_water(cell: Cell, ctx: &mut UniverseContext) {
     //     }
     // }
 
-    // let (dx, dy) = ctx.rand_vec_8();
+    // let (dx, dy) = ctx.rand_vec2(false);
     // let nbr = ctx.get(dx, dy);
     // if nbr.species == Species::Water {
     //     if nbr.ra % 2 != cell.ra % 2 && ctx.once_in(2) {
@@ -284,7 +284,7 @@ pub fn update_water(cell: Cell, ctx: &mut UniverseContext) {
 
 pub fn update_oil(cell: Cell, ctx: &mut UniverseContext) {
     let rb = cell.rb;
-    let (dx, dy) = ctx.rand_vec();
+    let (dx, dy) = ctx.rand_vec2(true);
 
     let mut new_cell = cell;
     let nbr = ctx.get(dx, dy);
@@ -314,7 +314,7 @@ pub fn update_oil(cell: Cell, ctx: &mut UniverseContext) {
             density: 180,
         });
         if rb % 4 != 0 && nbr.species == Species::Empty && nbr.species != Species::Water {
-            let ra = 20 + ctx.rand_int(30) as u8;
+            let ra = 20 + ctx.rand_int(0..30) as u8;
             ctx.set(
                 dx,
                 dy,
@@ -369,7 +369,7 @@ pub fn update_oil(cell: Cell, ctx: &mut UniverseContext) {
 }
 
 pub fn update_gas(cell: Cell, ctx: &mut UniverseContext) {
-    let (dx, dy) = ctx.rand_vec();
+    let (dx, dy) = ctx.rand_vec2(true);
 
     let nbr = ctx.get(dx, dy);
     // ctx.set_fluid(Wind {
@@ -413,7 +413,7 @@ pub fn update_gas(cell: Cell, ctx: &mut UniverseContext) {
     }
 }
 // pub fn update_x(cell: Cell, ctx: &mut UniverseContext) {
-//     let (dx, dy) = ctx.rand_vec_8();
+//     let (dx, dy) = ctx.rand_vec2(false);
 
 //     let nbr = ctx.get(dx, dy);
 
@@ -452,8 +452,8 @@ pub fn update_cloner(cell: Cell, ctx: &mut UniverseContext) {
                     break;
                 }
             } else {
-                if ctx.rand_int(100) > 90 && ctx.get(dx, dy).species == Species::Empty {
-                    let ra = 80 + ctx.rand_int(30) as u8 + ((g % 127) as i8 - 60).abs() as u8;
+                if ctx.rand_int(0..100) > 90 && ctx.get(dx, dy).species == Species::Empty {
+                    let ra = 80 + ctx.rand_int(0..30) as u8 + ((g % 127) as i8 - 60).abs() as u8;
                     ctx.set(
                         dx,
                         dy,
@@ -495,7 +495,7 @@ pub fn update_rocket(cell: Cell, ctx: &mut UniverseContext) {
         Species::Sand
     };
 
-    let (sx, sy) = ctx.rand_vec();
+    let (sx, sy) = ctx.rand_vec2(true);
     let sample = ctx.get(sx, sy);
 
     if cell.rb == 100 //the type is unset
@@ -520,7 +520,7 @@ pub fn update_rocket(cell: Cell, ctx: &mut UniverseContext) {
 
     if ra == 0 {
         //falling (dormant)
-        let dx = ctx.rand_dir();
+        let dx = ctx.rand_vec1(true);
         let nbr = ctx.get(0, 1);
         if nbr.species == Species::Empty {
             ctx.set(0, 0, EMPTY_CELL);
@@ -542,7 +542,7 @@ pub fn update_rocket(cell: Cell, ctx: &mut UniverseContext) {
         //launch
         ctx.set(0, 0, Cell { ra: 2, ..cell });
     } else if ra == 2 {
-        let (mut dx, mut dy) = ctx.rand_vec_8();
+        let (mut dx, mut dy) = ctx.rand_vec2(false);
         let nbr = ctx.get(dx, dy);
         if nbr.species != Species::Empty {
             dx *= -1;
@@ -568,7 +568,7 @@ pub fn update_rocket(cell: Cell, ctx: &mut UniverseContext) {
             ctx.set(0, 0, Cell::new(clone_species));
             ctx.set(0, dy, Cell::new(clone_species));
 
-            let (ndx, ndy) = match ctx.rand_int(100) % 5 {
+            let (ndx, ndy) = match ctx.rand_int(0..100) % 5 {
                 0 => adjacency_left((dx, dy)),
                 1 => adjacency_right((dx, dy)),
                 // 2 => adjacency_right((dx, dy)),
@@ -592,9 +592,9 @@ pub fn update_rocket(cell: Cell, ctx: &mut UniverseContext) {
 pub fn update_fire(cell: Cell, ctx: &mut UniverseContext) {
     let ra = cell.ra;
     let mut degraded = cell.clone();
-    degraded.ra = ra - (2 + ctx.rand_dir()) as u8;
+    degraded.ra = ra - (2 + ctx.rand_vec1(true)) as u8;
 
-    let (dx, dy) = ctx.rand_vec();
+    let (dx, dy) = ctx.rand_vec2(true);
 
     ctx.set_fluid(Wind {
         dx: 0,
@@ -637,7 +637,7 @@ pub fn update_lava(cell: Cell, ctx: &mut UniverseContext) {
         pressure: 0,
         density: 60,
     });
-    let (dx, dy) = ctx.rand_vec();
+    let (dx, dy) = ctx.rand_vec2(true);
 
     if ctx.get(dx, dy).species == Species::Gas || ctx.get(dx, dy).species == Species::Dust {
         ctx.set(
@@ -681,7 +681,7 @@ pub fn update_lava(cell: Cell, ctx: &mut UniverseContext) {
 pub fn update_wood(cell: Cell, ctx: &mut UniverseContext) {
     let rb = cell.rb;
 
-    let (dx, dy) = ctx.rand_vec();
+    let (dx, dy) = ctx.rand_vec2(true);
 
     let nbr_species = ctx.get(dx, dy).species;
     if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
@@ -710,7 +710,7 @@ pub fn update_wood(cell: Cell, ctx: &mut UniverseContext) {
         );
 
         if rb % 4 == 0 && nbr_species == Species::Empty {
-            let ra = 30 + ctx.rand_int(60) as u8;
+            let ra = 30 + ctx.rand_int(0..60) as u8;
             ctx.set(
                 dx,
                 dy,
@@ -754,13 +754,13 @@ pub fn update_wood(cell: Cell, ctx: &mut UniverseContext) {
     }
 }
 pub fn update_ice(cell: Cell, ctx: &mut UniverseContext) {
-    let (dx, dy) = ctx.rand_vec();
+    let (dx, dy) = ctx.rand_vec2(true);
 
-    let i = ctx.rand_int(100);
+    let i = ctx.rand_int(0..100);
 
     let fluid = ctx.get_fluid();
 
-    if fluid.pressure > 120 && ctx.rand_int(1) == 0 {
+    if fluid.pressure > 120 && ctx.once_in(2) {
         ctx.set(
             0,
             0,
@@ -803,8 +803,8 @@ pub fn update_ice(cell: Cell, ctx: &mut UniverseContext) {
 pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
     let rb = cell.rb;
 
-    let mut i = ctx.rand_int(100);
-    let (dx, dy) = ctx.rand_vec();
+    let mut i = ctx.rand_int(0..100);
+    let (dx, dy) = ctx.rand_vec2(true);
 
     let nbr_species = ctx.get(dx, dy).species;
     if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
@@ -820,7 +820,7 @@ pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
         );
     }
     if nbr_species == Species::Wood {
-        let (dx, dy) = ctx.rand_vec();
+        let (dx, dy) = ctx.rand_vec2(true);
 
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
@@ -837,14 +837,14 @@ pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
             );
         }
     }
-    if ctx.rand_int(100) > 80
+    if ctx.once_in(5)
         && (nbr_species == Species::Water
             || nbr_species == Species::Fungus
                 && (ctx.get(-dx, dy).species == Species::Empty
                     || ctx.get(-dx, dy).species == Species::Water
                     || ctx.get(-dx, dy).species == Species::Fungus))
     {
-        i = ctx.rand_int(100);
+        i = ctx.rand_int(0..100);
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
         ctx.set(
@@ -871,7 +871,7 @@ pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
         );
 
         if nbr_species == Species::Empty {
-            let ra = 20 + ctx.rand_int(30) as u8;
+            let ra = 20 + ctx.rand_int(0..30) as u8;
             ctx.set(
                 dx,
                 dy,
@@ -904,7 +904,7 @@ pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
     {
         if ctx.get(0, 1).species == Species::Empty {
             let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
-            let dec = ctx.rand_int(30) - 20;
+            let dec = ctx.rand_int(0..30) - 20;
             if (i + ra as i32) > 165 {
                 ctx.set(
                     0,
@@ -932,7 +932,7 @@ pub fn update_seed(cell: Cell, ctx: &mut UniverseContext) {
     let rb = cell.rb;
     let ra = cell.ra;
 
-    let (dx, dy) = ctx.rand_vec();
+    let (dx, dy) = ctx.rand_vec2(true);
 
     let nbr_species = ctx.get(dx, dy).species;
     if nbr_species == Species::Fire || nbr_species == Species::Lava {
@@ -952,13 +952,13 @@ pub fn update_seed(cell: Cell, ctx: &mut UniverseContext) {
     if rb == 0 {
         //falling
 
-        let dxf = ctx.rand_dir(); //falling dx
+        let dxf = ctx.rand_vec1(true); //falling dx
         let nbr_species_below = ctx.get(dxf, 1).species;
         if nbr_species_below == Species::Sand
             || nbr_species_below == Species::Plant
             || nbr_species_below == Species::Fungus
         {
-            let rb = (ctx.rand_int(253) + 1) as u8;
+            let rb = ctx.rand_int(1..254) as u8;
             ctx.set(0, 0, Cell { rb, ..cell });
             return;
         }
@@ -983,17 +983,17 @@ pub fn update_seed(cell: Cell, ctx: &mut UniverseContext) {
     } else {
         if ra > 60 {
             //stem
-            let dxr = ctx.rand_dir(); //raising dx
-            if ctx.rand_int(100) > 75 {
+            let dxr = ctx.rand_vec1(true); //raising dx
+            if ctx.once_in(4) {
                 if (ctx.get(dxr, -1).species == Species::Empty
                     || ctx.get(dxr, -1).species == Species::Sand
                     || ctx.get(dxr, -1).species == Species::Seed)
                     && ctx.get(1, -1).species != Species::Plant
                     && ctx.get(-1, -1).species != Species::Plant
                 {
-                    let ra = (ra as i32 - ctx.rand_int(10)) as u8;
+                    let ra = (ra as i32 - ctx.rand_int(0..10)) as u8;
                     ctx.set(dxr, -1, Cell { ra, ..cell });
-                    let ra2 = 80 + ctx.rand_int(30) as u8;
+                    let ra2 = ctx.rand_int(80..110) as u8;
                     ctx.set(
                         0,
                         0,
@@ -1012,7 +1012,7 @@ pub fn update_seed(cell: Cell, ctx: &mut UniverseContext) {
             if ra > 40 {
                 //petals
 
-                let (mdx, mdy) = ctx.rand_vec();
+                let (mdx, mdy) = ctx.rand_vec2(true);
 
                 let (ldx, ldy) = adjacency_left((mdx, mdy));
                 let (rdx, rdy) = adjacency_right((mdx, mdy));
@@ -1023,7 +1023,7 @@ pub fn update_seed(cell: Cell, ctx: &mut UniverseContext) {
                         || ctx.get(rdx, rdy).species == Species::Empty)
                 {
                     let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
-                    let dec = 9 - ctx.rand_int(3);
+                    let dec = 9 - ctx.rand_int(0..3);
                     if (i + ra as i32) > 100 {
                         ctx.set(
                             mdx,
@@ -1047,7 +1047,7 @@ pub fn update_seed(cell: Cell, ctx: &mut UniverseContext) {
 pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
     let rb = cell.rb;
 
-    let (dx, dy) = ctx.rand_vec();
+    let (dx, dy) = ctx.rand_vec2(true);
 
     let nbr_species = ctx.get(dx, dy).species;
     if rb == 0 && nbr_species == Species::Fire || nbr_species == Species::Lava {
@@ -1062,14 +1062,14 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
             },
         );
     }
-    let mut i = ctx.rand_int(100);
+    let mut i = ctx.rand_int(0..100);
 
     if nbr_species != Species::Empty
         && nbr_species != Species::Fungus
         && nbr_species != Species::Fire
         && nbr_species != Species::Ice
     {
-        let (dx, dy) = ctx.rand_vec();
+        let (dx, dy) = ctx.rand_vec2(true);
 
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
@@ -1093,7 +1093,7 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
         && ctx.get(dx, -dy).species == Species::Wood
         && ctx.get(dx, dy).ra % 4 != 0
     {
-        i = ctx.rand_int(100);
+        i = ctx.rand_int(0..100);
         let drift = (i % 15) - 7;
         let newra = (cell.ra as i32 + drift) as u8;
         ctx.set(
@@ -1118,7 +1118,7 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
             },
         );
         if nbr_species == Species::Empty {
-            let ra = 10 + ctx.rand_int(10) as u8;
+            let ra = 10 + ctx.rand_int(0..10) as u8;
             ctx.set(
                 dx,
                 dy,
@@ -1148,7 +1148,7 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
     let ra = cell.ra;
 
     if ra > 120 {
-        let (mdx, mdy) = ctx.rand_vec();
+        let (mdx, mdy) = ctx.rand_vec2(true);
 
         let (ldx, ldy) = adjacency_left((mdx, mdy));
         let (rdx, rdy) = adjacency_right((mdx, mdy));
@@ -1157,7 +1157,7 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
             && ctx.get(rdx, rdy).species != Species::Fungus
         {
             let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
-            let dec = 15 - ctx.rand_int(20);
+            let dec = 15 - ctx.rand_int(0..20);
             if (i + ra as i32) > 165 {
                 ctx.set(
                     mdx,
@@ -1173,7 +1173,7 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
 }
 
 pub fn update_acid(cell: Cell, ctx: &mut UniverseContext) {
-    let dx = ctx.rand_dir();
+    let dx = ctx.rand_vec1(true);
 
     let ra = cell.ra;
     let mut degraded = cell.clone();
@@ -1217,7 +1217,7 @@ pub fn update_acid(cell: Cell, ctx: &mut UniverseContext) {
 }
 
 pub fn update_mite(cell: Cell, ctx: &mut UniverseContext) {
-    let mut i = ctx.rand_int(100);
+    let mut i = ctx.rand_int(0..100);
     let mut dx = 0;
     if cell.ra < 20 {
         dx = (cell.ra as i32) - 1;
@@ -1239,7 +1239,7 @@ pub fn update_mite(cell: Cell, ctx: &mut UniverseContext) {
     let nbr = ctx.get(dx, dy);
 
     let sx = (i % 3) - 1;
-    i = ctx.rand_int(1000);
+    i = ctx.rand_int(0..1000);
     let sy = (i % 3) - 1;
     let sample = ctx.get(sx, sy).species;
     if sample == Species::Fire
@@ -1264,7 +1264,7 @@ pub fn update_mite(cell: Cell, ctx: &mut UniverseContext) {
         ctx.set(0, 0, EMPTY_CELL);
         ctx.set(dx, dy, mite);
     } else if dy == 1 && i > 800 {
-        i = ctx.rand_int(100);
+        i = ctx.rand_int(0..100);
         let mut ndx = (i % 3) - 1;
         if i < 6 {
             //switch direction
