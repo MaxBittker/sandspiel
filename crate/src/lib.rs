@@ -13,6 +13,12 @@ use species::Species;
 use universe::UniverseContext;
 use wasm_bindgen::prelude::*;
 
+/// An inter-cell force that can ignite cells and move them.
+///
+/// - `dx` is the x position of the force.
+/// - `dy` is the y position of the force.
+/// - `pressure` is the "force" of the force; species have a `pressure` threshold above which they are blown.
+/// - `density` is a purely-visual attribute of the force that specifies it's darkness.
 #[wasm_bindgen]
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -23,6 +29,11 @@ pub struct Wind {
     density: u8,
 }
 
+/// A cell that has a species and update logic.
+///
+/// - `ra` is a value, defined by the updation logic that stores state and can pass color data to WebGL.
+/// - `rb` is a  secondary `rb`.
+/// - `clock` is a field used to ensure that the cell is not updated twice in one tick.
 #[wasm_bindgen]
 #[repr(C)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -34,7 +45,13 @@ pub struct Cell {
 }
 
 impl Cell {
-    #[must_use] pub fn new(species: Species) -> Cell {
+    /// Create a new `Cell` with some species
+    ///
+    /// `ra` is initialized to a random value, for color noise.
+    /// `rb` is initialized to zero.
+    /// `clock` is initialized to zero.
+    #[must_use]
+    pub fn new(species: Species) -> Cell {
         Cell {
             species,
             ra: 100 + (js_sys::Math::random() * 50.) as u8,
@@ -42,11 +59,14 @@ impl Cell {
             clock: 0,
         }
     }
+
+    /// Updates the `Cell` using the logic defined in `Species::update`
     pub fn update(&self, ctx: &mut UniverseContext) {
         self.species.update(*self, ctx);
     }
 }
 
+/// Defines an empty cell (one with `Species::Empty`), that also doesn't have `ra`/ `rb` set
 const EMPTY_CELL: Cell = Cell {
     species: Species::Empty,
     ra: 0,
