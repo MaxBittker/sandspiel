@@ -12,6 +12,9 @@ use wasm_bindgen::prelude::wasm_bindgen;
 
 use crate::{species::Species, Cell, Wind, EMPTY_CELL};
 
+/// A `Universe`!
+///
+/// Contains a 2d rectangle of cells whether cellular automata processes take place; the cornerstone Sandspiel struct.
 #[wasm_bindgen]
 pub struct Universe {
     width: i32,
@@ -26,6 +29,9 @@ pub struct Universe {
 
 #[wasm_bindgen]
 impl Universe {
+    /// Create a new `Universe`.
+    ///
+    /// `width` and `height` must both be positive. Note that the larger these get, the more computations are done per frame.
     pub fn new(width: i32, height: i32) -> Universe {
         let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
         let winds: Vec<Wind> = (0..width * height)
@@ -58,6 +64,9 @@ impl Universe {
         }
     }
 
+    /// Reset's the `Universe` to a empty state.
+    ///
+    /// Note that this does not affect the undo-stack (subject to change).
     pub fn reset(&mut self) {
         // TODO: don't calculate index every time
         for x in 0..self.width {
@@ -68,6 +77,11 @@ impl Universe {
         }
     }
 
+    /// Updates the `Universe`.
+    ///
+    /// Applies two operations to every cell:
+    /// - Firstly, moves every cell according to the wind under it.
+    /// - Secondly, calls each cell's update method. ([`Species::update`])
     pub fn tick(&mut self) {
         // let mut next = self.cells.clone();
         // let dx = self.winds[(self.width * self.height / 2) as usize].dx;
@@ -126,29 +140,41 @@ impl Universe {
         self.generation = self.generation.wrapping_add(1);
     }
 
+    /// Returns the width of the `Universe`.
     pub fn width(&self) -> i32 {
         self.width
     }
 
+    /// Returns the height of the `Universe`.
     pub fn height(&self) -> i32 {
         self.height
     }
 
+    /// Returns a raw pointer to the `Universe`'s cells.
     // TODO: change this method to `cells_ptr`
     pub fn cells(&self) -> *const Cell {
         self.cells.as_ptr()
     }
 
+    /// Returns a raw pointer to the `Universe`'s winds
     // TODO: change this method to `winds_ptr`
     pub fn winds(&self) -> *const Wind {
         self.winds.as_ptr()
     }
 
+    /// Returns a raw pointer to the `Universe`'s burns
     // TODO: change this method to `burns_ptr`
     pub fn burns(&self) -> *const Wind {
         self.burns.as_ptr()
     }
 
+    /// Draw a circle of a certain `Species` into the `Universe`
+    ///
+    /// - `x` and `y` refer to the center of the circle.
+    /// - `size` is the diameter of the circle.
+    /// - `species` is the kind of cell you want to paint.
+    ///
+    /// Note that each painted cell has it's own `ra` generated semi-randomly. This causes a noise effect on the resulting circle.
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let size = size;
         let radius: f64 = (size as f64) / 2.0;
@@ -183,11 +209,17 @@ impl Universe {
         }
     }
 
+    /// Save the current `Universe`'s cells to the undo stack
+    ///
+    /// Note that the undo stack's size is capped at 50.
     pub fn push_undo(&mut self) {
         self.undo_stack.push_front(self.cells.clone());
         self.undo_stack.truncate(50);
     }
 
+    /// Pop a state from the undo stack and apply it
+    ///
+    /// Does nothing is the undo stack is empty.
     pub fn pop_undo(&mut self) {
         let old_state = self.undo_stack.pop_front();
         match old_state {
@@ -196,6 +228,7 @@ impl Universe {
         };
     }
 
+    /// Clear the undo stack
     pub fn flush_undos(&mut self) {
         self.undo_stack.clear();
     }
@@ -203,20 +236,27 @@ impl Universe {
 
 //private methods
 impl Universe {
+    /// Converts a xy coord to an index into the `cells` vec
     fn get_index(&self, x: i32, y: i32) -> usize {
         (x * self.height + y) as usize
     }
 
+    /// Returns the [`Copy`]ed cell at the given coords
     fn get_cell(&self, x: i32, y: i32) -> Cell {
         let i = self.get_index(x, y);
         return self.cells[i];
     }
 
+    /// Returns the [`Copy`]ed wind at the given coords
     fn get_wind(&self, x: i32, y: i32) -> Wind {
         let i = self.get_index(x, y);
         return self.winds[i];
     }
 
+    /// Moves a cell based on some wind
+    ///
+    /// Each cell has a threshold for movement, they are hardcoded here.
+    /// Also does not update if the cell has already been moved, checked with `cell.clock`.
     fn blow_wind(cell: Cell, wind: Wind, ctx: &mut UniverseContext) {
         if cell.clock - ctx.universe.generation == 1 {
             return;
@@ -299,6 +339,9 @@ impl Universe {
         }
     }
 
+    /// Updates a cell with the logic for each species
+    ///
+    /// Does not update if the cell has already been moved, checked with `cell.clock`.
     fn update_cell(cell: Cell, ctx: &mut UniverseContext) {
         if cell.clock - ctx.universe.generation == 1 {
             return;
@@ -307,15 +350,23 @@ impl Universe {
         cell.update(ctx);
     }
 
+    /// Returns the `Universe`'s internal clock
+    ///
+    /// This is used for checking whether a cell has already been updated.
     pub fn generation(&self) -> u8 {
         self.generation
     }
 
+    /// Returns the `Universe`'s P-RNG object
     pub fn rng_mut(&mut self) -> &mut SplitMix64 {
         &mut self.rng
     }
 }
 
+/// A context passed to cells when they are updated
+///
+/// This provides an API for cells to modify their neighbours and change the `Universe`.
+/// The context is also passed the xy coord of the cell being updated, so that relative positions can be used in cell update logic.
 pub struct UniverseContext<'a> {
     x: i32,
     y: i32,
@@ -323,6 +374,10 @@ pub struct UniverseContext<'a> {
 }
 
 impl<'a> UniverseContext<'a> {
+    /// [`Copy`] and return a cell at the *relative* xy coords
+    ///
+    /// Currently this implementation is arbitrarily limited to 2 units in each direction; the function panics if further offsets are used.
+    /// If the resulting position is outside of the `Universe`'s bounds, then a `Species::Wall` is returned.
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
         if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
             panic!("oob set");
@@ -340,6 +395,11 @@ impl<'a> UniverseContext<'a> {
         self.universe.get_cell(nx, ny)
     }
 
+    /// Sets a cell at the *relative* xy coords
+    ///
+    /// Currently this implementation is arbitrarily limited to 2 units in each direction; the function panics if further offsets are used.
+    /// If the resulting position is outside of the `Universe`'s bounds, then the function silently exits.
+    /// Also note that cells set with this function will *not* be updated in the same tick again.
     pub fn set(&mut self, dx: i32, dy: i32, v: Cell) {
         if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
             panic!("oob set");
@@ -356,32 +416,45 @@ impl<'a> UniverseContext<'a> {
         self.universe.cells[i].clock = self.universe.generation.wrapping_add(1);
     }
 
+    /// Gets the fluid ([`Wind`]) at the `UniverseContext`'s position
     pub fn get_fluid(&mut self) -> Wind {
         let idx = self.universe.get_index(self.x, self.y);
 
         self.universe.winds[idx]
     }
 
+    /// Sets the fluid ([`Wind`]) at the `UniverseContext`'s position
     pub fn set_fluid(&mut self, v: Wind) {
         let idx = self.universe.get_index(self.x, self.y);
 
         self.universe.burns[idx] = v;
     }
 
+    /// Returns a mutable reference to the `Universe`.
+    ///
+    /// This can be used to make further changes, outside of the `UniverseContext` capabilities.
     pub fn universe_mut(&mut self) -> &mut Universe {
         &mut self.universe
     }
 }
 
+/// P-RNG helper functions that internally use the `Universe`'s RNG instance
 impl UniverseContext<'_> {
+    /// Generates a random integer in the given range
     pub fn rand_int<R: SampleRange<i32>>(&mut self, range: R) -> i32 {
         self.universe_mut().rng_mut().gen_range(range)
     }
 
+    /// Returns true on average every 1/n times
+    ///
+    /// In other words, checks whether a random integer in range `0..n` is zero.
     pub fn once_in(&mut self, n: i32) -> bool {
         self.rand_int(0..n) == 0
     }
 
+    /// Returns a random 1d unit vector (i.e a single number)
+    ///
+    /// The `include_zero` flag expands the possible outputs to include `0`.
     pub fn rand_vec1(&mut self, include_zero: bool) -> i32 {
         if include_zero {
             self.rand_int(-1..=1)
@@ -394,6 +467,9 @@ impl UniverseContext<'_> {
         }
     }
 
+    /// Returns a random 2d unit vector (i.e a xy direction)
+    ///
+    /// The `include_zero` flag expands the possible outputs to include `(0, 0)`.
     pub fn rand_vec2(&mut self, include_zero: bool) -> (i32, i32) {
         let i = self.rand_int(if include_zero { 0..=8 } else { 0..=7 });
         match i {
