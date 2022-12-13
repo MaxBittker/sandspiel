@@ -5,10 +5,8 @@ use Cell;
 use Wind;
 use EMPTY_CELL;
 
-// use std::cmp;
 use std::{cmp::Ordering, mem};
 use wasm_bindgen::prelude::*;
-// use web_sys::console;
 
 #[wasm_bindgen]
 #[repr(u8)]
@@ -18,7 +16,6 @@ pub enum Species {
     Wall = 1,
     Sand = 2,
     Water = 3,
-    // X = 21,
     Stone = 13,
     Ice = 9,
     Gas = 4,
@@ -38,31 +35,31 @@ pub enum Species {
 }
 
 impl Species {
+    /// Updates a cell based on it's `Species`
+    ///
+    /// Requires a `UniverseContext`, initialized to the `Cell`'s position.
     pub fn update(&self, cell: Cell, ctx: &mut UniverseContext) {
         match self {
             Species::Empty => {}
             Species::Wall => {}
             Species::Sand => update_sand(cell, ctx),
-            Species::Dust => update_dust(cell, ctx),
             Species::Water => update_water(cell, ctx),
-            Species::Stone => update_stone(cell, ctx),
             Species::Gas => update_gas(cell, ctx),
             Species::Cloner => update_cloner(cell, ctx),
-            Species::Rocket => update_rocket(cell, ctx),
             Species::Fire => update_fire(cell, ctx),
             Species::Wood => update_wood(cell, ctx),
             Species::Lava => update_lava(cell, ctx),
             Species::Ice => update_ice(cell, ctx),
-            // Species::Snow => update_ice(cell, ctx),
-            //lightning
             // Species::Sink => update_sink(cell, ctx),
             Species::Plant => update_plant(cell, ctx),
             Species::Acid => update_acid(cell, ctx),
+            Species::Stone => update_stone(cell, ctx),
+            Species::Dust => update_dust(cell, ctx),
             Species::Mite => update_mite(cell, ctx),
             Species::Oil => update_oil(cell, ctx),
+            Species::Rocket => update_rocket(cell, ctx),
             Species::Fungus => update_fungus(cell, ctx),
             Species::Seed => update_seed(cell, ctx),
-            // Species::X => update_x(cell, ctx),
         }
     }
 }

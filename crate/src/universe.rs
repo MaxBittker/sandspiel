@@ -22,6 +22,7 @@ pub struct Universe {
 }
 
 #[wasm_bindgen]
+/// Public methods on `Universe`, many of these are called by JS
 impl Universe {
     /// Create a new `Universe`.
     ///
@@ -227,7 +228,7 @@ impl Universe {
     }
 }
 
-//private methods
+/// Private helper methods
 impl Universe {
     /// Converts a xy coord to an index into the `cells` vec
     fn get_index(&self, x: i32, y: i32) -> usize {
@@ -357,6 +358,7 @@ pub struct UniverseContext<'a> {
     universe: &'a mut Universe,
 }
 
+/// Defines important public function for cell usage.
 impl<'a> UniverseContext<'a> {
     /// [`Copy`] and return a cell at the *relative* xy coords
     ///
@@ -364,7 +366,7 @@ impl<'a> UniverseContext<'a> {
     /// If the resulting position is outside of the `Universe`'s bounds, then a `Species::Wall` is returned.
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
         if !(-2..=2).contains(&dx) || !(-2..=2).contains(&dy) {
-            panic!("oob set");
+            panic!("tried to get cell outside of allowed bounds");
         }
         let nx = self.x + dx;
         let ny = self.y + dy;
@@ -386,7 +388,7 @@ impl<'a> UniverseContext<'a> {
     /// Also note that cells set with this function will *not* be updated in the same tick again.
     pub fn set(&mut self, dx: i32, dy: i32, v: Cell) {
         if !(-2..=2).contains(&dx) || !(-2..=2).contains(&dy) {
-            panic!("oob set");
+            panic!("tried to set cell outside of allowed bounds");
         }
         let nx = self.x + dx;
         let ny = self.y + dy;

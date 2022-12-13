@@ -34,7 +34,6 @@ pub fn split_dy_dx(s: u8) -> (i32, i32) {
     let s: i32 = i32::from(s);
 
     let dx: i32 = (s / 3) - 1;
-
     let dy: i32 = (s % 3) - 1;
 
     (dx, dy)
