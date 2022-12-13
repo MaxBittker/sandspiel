@@ -1,12 +1,6 @@
-use std::{
-    collections::VecDeque,
-    ops::{Range, RangeBounds, RangeInclusive},
-};
+use std::collections::VecDeque;
 
-use rand::{
-    distributions::uniform::{SampleBorrow, SampleRange},
-    Rng, SeedableRng,
-};
+use rand::{distributions::uniform::SampleRange, Rng, SeedableRng};
 use rand_xoshiro::SplitMix64;
 use wasm_bindgen::prelude::wasm_bindgen;
 
@@ -51,7 +45,7 @@ impl Universe {
                 density: 0,
             })
             .collect();
-        let rng: SplitMix64 = SeedableRng::seed_from_u64(0x734f6b89de5f83cc);
+        let rng: SplitMix64 = SeedableRng::seed_from_u64(0x734f_6b89_de5f_83cc);
         Universe {
             width,
             height,
@@ -177,14 +171,14 @@ impl Universe {
     /// Note that each painted cell has it's own `ra` generated semi-randomly. This causes a noise effect on the resulting circle.
     pub fn paint(&mut self, x: i32, y: i32, size: i32, species: Species) {
         let size = size;
-        let radius: f64 = (size as f64) / 2.0;
+        let radius: f64 = f64::from(size) / 2.0;
 
         let floor = (radius + 1.0) as i32;
         let ciel = (radius + 1.5) as i32;
 
         for dx in -floor..ciel {
             for dy in -floor..ciel {
-                if (((dx * dx) + (dy * dy)) as f64) > (radius * radius) {
+                if f64::from((dx * dx) + (dy * dy)) > (radius * radius) {
                     continue;
                 };
                 let px = x + dx;
@@ -196,11 +190,11 @@ impl Universe {
                 }
                 if self.get_cell(px, py).species == Species::Empty || species == Species::Empty {
                     self.cells[i] = Cell {
-                        species: species,
+                        species,
                         ra: 60
                             + (size as u8)
                             + (self.rng.gen::<f32>() * 30.) as u8
-                            + ((self.generation % 127) as i8 - 60).abs() as u8,
+                            + ((self.generation % 127) as i8 - 60).unsigned_abs(),
                         rb: 0,
                         clock: self.generation,
                     }
@@ -222,10 +216,9 @@ impl Universe {
     /// Does nothing is the undo stack is empty.
     pub fn pop_undo(&mut self) {
         let old_state = self.undo_stack.pop_front();
-        match old_state {
-            Some(state) => self.cells = state,
-            None => (),
-        };
+        if let Some(state) = old_state {
+            self.cells = state
+        }
     }
 
     /// Clear the undo stack
@@ -244,13 +237,13 @@ impl Universe {
     /// Returns the [`Copy`]ed cell at the given coords
     fn get_cell(&self, x: i32, y: i32) -> Cell {
         let i = self.get_index(x, y);
-        return self.cells[i];
+        self.cells[i]
     }
 
     /// Returns the [`Copy`]ed wind at the given coords
     fn get_wind(&self, x: i32, y: i32) -> Wind {
         let i = self.get_index(x, y);
-        return self.winds[i];
+        self.winds[i]
     }
 
     /// Moves a cell based on some wind
@@ -268,16 +261,11 @@ impl Universe {
         let mut dy = 0;
 
         let threshold = match cell.species {
-            Species::Empty => 500,
-            Species::Wall => 500,
-            Species::Cloner => 500,
+            Species::Empty | Species::Wall | Species::Cloner => i32::MAX,
 
-            Species::Stone => 70,
-            Species::Wood => 70,
+            Species::Stone | Species::Wood => 70,
 
-            Species::Plant => 60,
-            Species::Lava => 60,
-            Species::Ice => 60,
+            Species::Plant | Species::Lava | Species::Ice => 60,
 
             Species::Fungus => 54,
 
@@ -288,13 +276,10 @@ impl Universe {
             // Species::Acid => 40,
             Species::Seed => 35,
 
-            Species::Sand => 30,
-            Species::Mite => 30,
-            Species::Rocket => 30,
+            Species::Sand | Species::Mite | Species::Rocket => 30,
 
             Species::Dust => 10,
-            Species::Fire => 5,
-            Species::Gas => 5,
+            Species::Fire | Species::Gas => 5,
             /*
              Some hacked species values exist outside of the enum values.
              Making sure the default case is emitted allows "BELP" to have a defined wind threshold.
@@ -304,8 +289,8 @@ impl Universe {
             _ => 40,
         };
 
-        let wx = (wind.dy as i32) - 126;
-        let wy = (wind.dx as i32) - 126;
+        let wx = i32::from(wind.dy) - 126;
+        let wy = i32::from(wind.dx) - 126;
 
         if wx > threshold {
             dx = 1;
@@ -335,7 +320,6 @@ impl Universe {
                 dy = -2;
             }
             ctx.set(dx, dy, cell);
-            return;
         }
     }
 
@@ -379,7 +363,7 @@ impl<'a> UniverseContext<'a> {
     /// Currently this implementation is arbitrarily limited to 2 units in each direction; the function panics if further offsets are used.
     /// If the resulting position is outside of the `Universe`'s bounds, then a `Species::Wall` is returned.
     pub fn get(&mut self, dx: i32, dy: i32) -> Cell {
-        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
+        if !(-2..=2).contains(&dx) || !(-2..=2).contains(&dy) {
             panic!("oob set");
         }
         let nx = self.x + dx;
@@ -401,7 +385,7 @@ impl<'a> UniverseContext<'a> {
     /// If the resulting position is outside of the `Universe`'s bounds, then the function silently exits.
     /// Also note that cells set with this function will *not* be updated in the same tick again.
     pub fn set(&mut self, dx: i32, dy: i32, v: Cell) {
-        if dx > 2 || dx < -2 || dy > 2 || dy < -2 {
+        if !(-2..=2).contains(&dx) || !(-2..=2).contains(&dy) {
             panic!("oob set");
         }
         let nx = self.x + dx;
@@ -434,7 +418,7 @@ impl<'a> UniverseContext<'a> {
     ///
     /// This can be used to make further changes, outside of the `UniverseContext` capabilities.
     pub fn universe_mut(&mut self) -> &mut Universe {
-        &mut self.universe
+        self.universe
     }
 }
 

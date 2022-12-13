@@ -1,12 +1,12 @@
 use crate::universe::UniverseContext;
 
-use super::utils::*;
+use super::utils::{adjacency_left, adjacency_right, join_dy_dx, split_dy_dx};
 use Cell;
 use Wind;
 use EMPTY_CELL;
 
 // use std::cmp;
-use std::mem;
+use std::{cmp::Ordering, mem};
 use wasm_bindgen::prelude::*;
 // use web_sys::console;
 
@@ -99,7 +99,7 @@ pub fn update_dust(cell: Cell, ctx: &mut UniverseContext) {
             0,
             Cell {
                 species: Species::Fire,
-                ra: (150 + (cell.ra / 10)) as u8,
+                ra: (150 + (cell.ra / 10)),
                 rb: 0,
                 clock: 0,
             },
@@ -204,34 +204,30 @@ pub fn update_water(cell: Cell, ctx: &mut UniverseContext) {
         let nbr = ctx.get(dx, dy);
 
         // spread opinion
-        if nbr.species == Species::Water {
-            if nbr.ra % 2 != cell.ra % 2 {
-                ctx.set(
-                    dx,
-                    dy,
-                    Cell {
-                        ra: cell.ra,
-                        ..cell
-                    },
-                )
-            }
+        if nbr.species == Species::Water && nbr.ra % 2 != cell.ra % 2 {
+            ctx.set(
+                dx,
+                dy,
+                Cell {
+                    ra: cell.ra,
+                    ..cell
+                },
+            )
         }
     } else if dx0.species == Species::Empty || dx0.species == Species::Oil {
         ctx.set(0, 0, dx0);
         ctx.set(dx, 0, Cell { rb: 3, ..cell });
         let (dx, dy) = ctx.rand_vec2(false);
         let nbr = ctx.get(dx, dy);
-        if nbr.species == Species::Water {
-            if nbr.ra % 2 != cell.ra % 2 {
-                ctx.set(
-                    dx,
-                    dy,
-                    Cell {
-                        ra: cell.ra,
-                        ..cell
-                    },
-                )
-            }
+        if nbr.species == Species::Water && nbr.ra % 2 != cell.ra % 2 {
+            ctx.set(
+                dx,
+                dy,
+                Cell {
+                    ra: cell.ra,
+                    ..cell
+                },
+            )
         }
     } else if cell.rb == 0 {
         if ctx.get(-dx, 0).species == Species::Empty {
@@ -240,7 +236,7 @@ pub fn update_water(cell: Cell, ctx: &mut UniverseContext) {
                 0,
                 0,
                 Cell {
-                    ra: ((cell.ra as i32) + dx) as u8,
+                    ra: (i32::from(cell.ra) + dx) as u8,
                     ..cell
                 },
             );
@@ -300,52 +296,56 @@ pub fn update_oil(cell: Cell, ctx: &mut UniverseContext) {
         };
     }
 
-    if rb > 1 {
-        new_cell = Cell {
-            species: Species::Oil,
-            ra: cell.ra,
-            rb: rb - 1,
-            clock: 0,
-        };
-        ctx.set_fluid(Wind {
-            dx: 0,
-            dy: 10,
-            pressure: 10,
-            density: 180,
-        });
-        if rb % 4 != 0 && nbr.species == Species::Empty && nbr.species != Species::Water {
-            let ra = 20 + ctx.rand_int(0..30) as u8;
+    match rb.cmp(&1) {
+        Ordering::Less => (),
+        Ordering::Equal => {
             ctx.set(
-                dx,
-                dy,
+                0,
+                0,
                 Cell {
-                    species: Species::Fire,
-                    ra,
-                    rb: 0,
+                    species: Species::Empty,
+                    ra: cell.ra,
+                    rb: 90,
                     clock: 0,
                 },
             );
+            return;
         }
-        if nbr.species == Species::Water {
+        Ordering::Greater => {
             new_cell = Cell {
                 species: Species::Oil,
-                ra: 50,
-                rb: 0,
+                ra: cell.ra,
+                rb: rb - 1,
                 clock: 0,
             };
+            ctx.set_fluid(Wind {
+                dx: 0,
+                dy: 10,
+                pressure: 10,
+                density: 180,
+            });
+            if rb % 4 != 0 && nbr.species == Species::Empty && nbr.species != Species::Water {
+                let ra = 20 + ctx.rand_int(0..30) as u8;
+                ctx.set(
+                    dx,
+                    dy,
+                    Cell {
+                        species: Species::Fire,
+                        ra,
+                        rb: 0,
+                        clock: 0,
+                    },
+                );
+            }
+            if nbr.species == Species::Water {
+                new_cell = Cell {
+                    species: Species::Oil,
+                    ra: 50,
+                    rb: 0,
+                    clock: 0,
+                };
+            }
         }
-    } else if rb == 1 {
-        ctx.set(
-            0,
-            0,
-            Cell {
-                species: Species::Empty,
-                ra: cell.ra,
-                rb: 90,
-                clock: 0,
-            },
-        );
-        return;
     }
 
     if ctx.get(0, 1).species == Species::Empty {
@@ -427,10 +427,10 @@ pub fn update_gas(cell: Cell, ctx: &mut UniverseContext) {
 // }
 
 pub fn update_cloner(cell: Cell, ctx: &mut UniverseContext) {
-    let mut clone_species = unsafe { mem::transmute(cell.rb as u8) };
+    let mut clone_species = unsafe { mem::transmute(cell.rb) };
     let g = ctx.universe_mut().generation();
-    for dx in [-1, 0, 1].iter().cloned() {
-        for dy in [-1, 0, 1].iter().cloned() {
+    for dx in [-1, 0, 1].iter().copied() {
+        for dy in [-1, 0, 1].iter().copied() {
             if cell.rb == 0 {
                 let nbr_species = ctx.get(dx, dy).species;
                 if nbr_species != Species::Empty
@@ -451,21 +451,19 @@ pub fn update_cloner(cell: Cell, ctx: &mut UniverseContext) {
 
                     break;
                 }
-            } else {
-                if ctx.rand_int(0..100) > 90 && ctx.get(dx, dy).species == Species::Empty {
-                    let ra = 80 + ctx.rand_int(0..30) as u8 + ((g % 127) as i8 - 60).abs() as u8;
-                    ctx.set(
-                        dx,
-                        dy,
-                        Cell {
-                            species: clone_species,
-                            ra,
-                            rb: 0,
-                            clock: 0,
-                        },
-                    );
-                    break;
-                }
+            } else if ctx.rand_int(0..100) > 90 && ctx.get(dx, dy).species == Species::Empty {
+                let ra = 80 + ctx.rand_int(0..30) as u8 + ((g % 127) as i8 - 60).unsigned_abs();
+                ctx.set(
+                    dx,
+                    dy,
+                    Cell {
+                        species: clone_species,
+                        ra,
+                        rb: 0,
+                        clock: 0,
+                    },
+                );
+                break;
             }
         }
     }
@@ -490,7 +488,7 @@ pub fn update_rocket(cell: Cell, ctx: &mut UniverseContext) {
     }
 
     let clone_species = if cell.rb != 100 {
-        unsafe { mem::transmute(cell.rb as u8) }
+        unsafe { mem::transmute(cell.rb) }
     } else {
         Species::Sand
     };
@@ -591,7 +589,7 @@ pub fn update_rocket(cell: Cell, ctx: &mut UniverseContext) {
 
 pub fn update_fire(cell: Cell, ctx: &mut UniverseContext) {
     let ra = cell.ra;
-    let mut degraded = cell.clone();
+    let mut degraded = cell;
     degraded.ra = ra - (2 + ctx.rand_vec1(true)) as u8;
 
     let (dx, dy) = ctx.rand_vec2(true);
@@ -823,7 +821,7 @@ pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
         let (dx, dy) = ctx.rand_vec2(true);
 
         let drift = (i % 15) - 7;
-        let newra = (cell.ra as i32 + drift) as u8;
+        let newra = (i32::from(cell.ra) + drift) as u8;
         if ctx.get(dx, dy).species == Species::Empty {
             ctx.set(
                 dx,
@@ -846,7 +844,7 @@ pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
     {
         i = ctx.rand_int(0..100);
         let drift = (i % 15) - 7;
-        let newra = (cell.ra as i32 + drift) as u8;
+        let newra = (i32::from(cell.ra) + drift) as u8;
         ctx.set(
             dx,
             dy,
@@ -905,12 +903,12 @@ pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
         if ctx.get(0, 1).species == Species::Empty {
             let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
             let dec = ctx.rand_int(0..30) - 20;
-            if (i + ra as i32) > 165 {
+            if (i + i32::from(ra)) > 165 {
                 ctx.set(
                     0,
                     1,
                     Cell {
-                        ra: (ra as i32 + dec) as u8,
+                        ra: (i32::from(ra) + dec) as u8,
                         ..cell
                     },
                 );
@@ -920,7 +918,7 @@ pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
                 0,
                 0,
                 Cell {
-                    ra: (ra - 1) as u8,
+                    ra: (ra - 1),
                     ..cell
                 },
             );
@@ -980,67 +978,61 @@ pub fn update_seed(cell: Cell, ctx: &mut UniverseContext) {
         } else {
             ctx.set(0, 0, cell);
         }
-    } else {
-        if ra > 60 {
-            //stem
-            let dxr = ctx.rand_vec1(true); //raising dx
-            if ctx.once_in(4) {
-                if (ctx.get(dxr, -1).species == Species::Empty
-                    || ctx.get(dxr, -1).species == Species::Sand
-                    || ctx.get(dxr, -1).species == Species::Seed)
-                    && ctx.get(1, -1).species != Species::Plant
-                    && ctx.get(-1, -1).species != Species::Plant
-                {
-                    let ra = (ra as i32 - ctx.rand_int(0..10)) as u8;
-                    ctx.set(dxr, -1, Cell { ra, ..cell });
-                    let ra2 = ctx.rand_int(80..110) as u8;
-                    ctx.set(
-                        0,
-                        0,
-                        Cell {
-                            species: Species::Plant,
-                            ra: ra2,
-                            rb: 0,
-                            clock: 0,
-                        },
-                    )
-                } else {
-                    ctx.set(0, 0, EMPTY_CELL);
-                }
-            }
-        } else {
-            if ra > 40 {
-                //petals
-
-                let (mdx, mdy) = ctx.rand_vec2(true);
-
-                let (ldx, ldy) = adjacency_left((mdx, mdy));
-                let (rdx, rdy) = adjacency_right((mdx, mdy));
-
-                if (ctx.get(mdx, mdy).species == Species::Empty
-                    || ctx.get(mdx, mdy).species == Species::Plant)
-                    && (ctx.get(ldx, ldy).species == Species::Empty
-                        || ctx.get(rdx, rdy).species == Species::Empty)
-                {
-                    let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
-                    let dec = 9 - ctx.rand_int(0..3);
-                    if (i + ra as i32) > 100 {
-                        ctx.set(
-                            mdx,
-                            mdy,
-                            Cell {
-                                ra: (ra as i32 - dec) as u8,
-                                ..cell
-                            },
-                        );
-                    }
-                }
+    } else if ra > 60 {
+        //stem
+        let dxr = ctx.rand_vec1(true); //raising dx
+        if ctx.once_in(4) {
+            if (ctx.get(dxr, -1).species == Species::Empty
+                || ctx.get(dxr, -1).species == Species::Sand
+                || ctx.get(dxr, -1).species == Species::Seed)
+                && ctx.get(1, -1).species != Species::Plant
+                && ctx.get(-1, -1).species != Species::Plant
+            {
+                let ra = (i32::from(ra) - ctx.rand_int(0..10)) as u8;
+                ctx.set(dxr, -1, Cell { ra, ..cell });
+                let ra2 = ctx.rand_int(80..110) as u8;
+                ctx.set(
+                    0,
+                    0,
+                    Cell {
+                        species: Species::Plant,
+                        ra: ra2,
+                        rb: 0,
+                        clock: 0,
+                    },
+                )
             } else {
-                if nbr_species == Species::Water {
-                    ctx.set(dx, dy, Cell::new(Species::Seed))
-                }
+                ctx.set(0, 0, EMPTY_CELL);
             }
         }
+    } else if ra > 40 {
+        //petals
+
+        let (mdx, mdy) = ctx.rand_vec2(true);
+
+        let (ldx, ldy) = adjacency_left((mdx, mdy));
+        let (rdx, rdy) = adjacency_right((mdx, mdy));
+
+        if (ctx.get(mdx, mdy).species == Species::Empty
+            || ctx.get(mdx, mdy).species == Species::Plant)
+            && (ctx.get(ldx, ldy).species == Species::Empty
+                || ctx.get(rdx, rdy).species == Species::Empty)
+        {
+            let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
+            let dec = 9 - ctx.rand_int(0..3);
+            if (i + i32::from(ra)) > 100 {
+                ctx.set(
+                    mdx,
+                    mdy,
+                    Cell {
+                        ra: (i32::from(ra) - dec) as u8,
+                        ..cell
+                    },
+                );
+            }
+        }
+    } else if nbr_species == Species::Water {
+        ctx.set(dx, dy, Cell::new(Species::Seed))
     }
 }
 
@@ -1072,7 +1064,7 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
         let (dx, dy) = ctx.rand_vec2(true);
 
         let drift = (i % 15) - 7;
-        let newra = (cell.ra as i32 + drift) as u8;
+        let newra = (i32::from(cell.ra) + drift) as u8;
         if ctx.get(dx, dy).species == Species::Empty {
             ctx.set(
                 dx,
@@ -1095,7 +1087,7 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
     {
         i = ctx.rand_int(0..100);
         let drift = (i % 15) - 7;
-        let newra = (cell.ra as i32 + drift) as u8;
+        let newra = (i32::from(cell.ra) + drift) as u8;
         ctx.set(
             dx,
             dy,
@@ -1158,12 +1150,12 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
         {
             let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
             let dec = 15 - ctx.rand_int(0..20);
-            if (i + ra as i32) > 165 {
+            if (i + i32::from(ra)) > 165 {
                 ctx.set(
                     mdx,
                     mdy,
                     Cell {
-                        ra: (ra as i32 - dec) as u8,
+                        ra: (i32::from(ra) - dec) as u8,
                         ..cell
                     },
                 );
@@ -1176,7 +1168,7 @@ pub fn update_acid(cell: Cell, ctx: &mut UniverseContext) {
     let dx = ctx.rand_vec1(true);
 
     let ra = cell.ra;
-    let mut degraded = cell.clone();
+    let mut degraded = cell;
     degraded.ra = ra - 60;
     // i = ctx.rand_int(100);
     if degraded.ra < 80 {
@@ -1191,28 +1183,23 @@ pub fn update_acid(cell: Cell, ctx: &mut UniverseContext) {
     } else if ctx.get(-dx, 0).species == Species::Empty {
         ctx.set(0, 0, EMPTY_CELL);
         ctx.set(-dx, 0, cell);
+    } else if ctx.get(0, 1).species != Species::Wall && ctx.get(0, 1).species != Species::Acid {
+        ctx.set(0, 0, EMPTY_CELL);
+        ctx.set(0, 1, degraded);
+    } else if ctx.get(dx, 0).species != Species::Wall && ctx.get(dx, 0).species != Species::Acid {
+        ctx.set(0, 0, EMPTY_CELL);
+        ctx.set(dx, 0, degraded);
+    } else if ctx.get(-dx, 0).species != Species::Wall && ctx.get(-dx, 0).species != Species::Acid {
+        ctx.set(0, 0, EMPTY_CELL);
+        ctx.set(-dx, 0, degraded);
+    } else if ctx.get(0, -1).species != Species::Wall
+        && ctx.get(0, -1).species != Species::Acid
+        && ctx.get(0, -1).species != Species::Empty
+    {
+        ctx.set(0, 0, EMPTY_CELL);
+        ctx.set(0, -1, degraded);
     } else {
-        if ctx.get(0, 1).species != Species::Wall && ctx.get(0, 1).species != Species::Acid {
-            ctx.set(0, 0, EMPTY_CELL);
-            ctx.set(0, 1, degraded);
-        } else if ctx.get(dx, 0).species != Species::Wall && ctx.get(dx, 0).species != Species::Acid
-        {
-            ctx.set(0, 0, EMPTY_CELL);
-            ctx.set(dx, 0, degraded);
-        } else if ctx.get(-dx, 0).species != Species::Wall
-            && ctx.get(-dx, 0).species != Species::Acid
-        {
-            ctx.set(0, 0, EMPTY_CELL);
-            ctx.set(-dx, 0, degraded);
-        } else if ctx.get(0, -1).species != Species::Wall
-            && ctx.get(0, -1).species != Species::Acid
-            && ctx.get(0, -1).species != Species::Empty
-        {
-            ctx.set(0, 0, EMPTY_CELL);
-            ctx.set(0, -1, degraded);
-        } else {
-            ctx.set(0, 0, cell);
-        }
+        ctx.set(0, 0, cell);
     }
 }
 
@@ -1220,10 +1207,10 @@ pub fn update_mite(cell: Cell, ctx: &mut UniverseContext) {
     let mut i = ctx.rand_int(0..100);
     let mut dx = 0;
     if cell.ra < 20 {
-        dx = (cell.ra as i32) - 1;
+        dx = i32::from(cell.ra) - 1;
     }
     let mut dy = 1;
-    let mut mite = cell.clone();
+    let mut mite = cell;
 
     if cell.rb > 10 {
         // /
@@ -1275,21 +1262,17 @@ pub fn update_mite(cell: Cell, ctx: &mut UniverseContext) {
         mite.rb = 10 + (i % 10) as u8; //hop height
 
         ctx.set(0, 0, mite);
-    } else {
-        if ctx.get(-1, 0).species == Species::Mite
-            && ctx.get(1, 0).species == Species::Mite
-            && ctx.get(0, -1).species == Species::Mite
-        {
+    } else if ctx.get(-1, 0).species == Species::Mite
+        && ctx.get(1, 0).species == Species::Mite
+        && ctx.get(0, -1).species == Species::Mite
+    {
+        ctx.set(0, 0, EMPTY_CELL);
+    } else if ctx.get(0, 1).species == Species::Ice {
+        if ctx.get(dx, 0).species == Species::Empty {
             ctx.set(0, 0, EMPTY_CELL);
-        } else {
-            if ctx.get(0, 1).species == Species::Ice {
-                if ctx.get(dx, 0).species == Species::Empty {
-                    ctx.set(0, 0, EMPTY_CELL);
-                    ctx.set(dx, 0, mite);
-                }
-            } else {
-                ctx.set(0, 0, mite);
-            }
+            ctx.set(dx, 0, mite);
         }
+    } else {
+        ctx.set(0, 0, mite);
     }
 }

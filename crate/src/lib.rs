@@ -9,13 +9,9 @@ mod species;
 mod universe;
 mod utils;
 
-use rand::{Rng, SeedableRng};
-use rand_xoshiro::SplitMix64;
 use species::Species;
-use std::collections::VecDeque;
 use universe::UniverseContext;
 use wasm_bindgen::prelude::*;
-// use web_sys::console;
 
 #[wasm_bindgen]
 #[repr(C)]
@@ -38,9 +34,9 @@ pub struct Cell {
 }
 
 impl Cell {
-    pub fn new(species: Species) -> Cell {
+    #[must_use] pub fn new(species: Species) -> Cell {
         Cell {
-            species: species,
+            species,
             ra: 100 + (js_sys::Math::random() * 50.) as u8,
             rb: 0,
             clock: 0,
@@ -51,7 +47,7 @@ impl Cell {
     }
 }
 
-static EMPTY_CELL: Cell = Cell {
+const EMPTY_CELL: Cell = Cell {
     species: Species::Empty,
     ra: 0,
     rb: 0,
