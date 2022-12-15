@@ -2,6 +2,8 @@ mod species;
 mod universe;
 mod utils;
 
+use rand::Rng;
+use rand_xoshiro::SplitMix64;
 use species::Species;
 use universe::UniverseContext;
 use wasm_bindgen::prelude::*;
@@ -44,10 +46,11 @@ impl Cell {
     /// `rb` is initialized to zero.
     /// `clock` is initialized to zero.
     #[must_use]
-    pub fn new(species: Species) -> Cell {
+    // TODO: `rng` bad, should take reference instead.
+    pub fn new(species: Species, mut rng: SplitMix64) -> Cell {
         Cell {
             species,
-            ra: 100 + (js_sys::Math::random() * 50.) as u8,
+            ra: 100 + (rng.gen_range(0..=50)) as u8,
             rb: 0,
             clock: 0,
         }

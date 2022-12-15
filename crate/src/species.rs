@@ -557,8 +557,8 @@ pub fn update_rocket(cell: Cell, ctx: &mut UniverseContext) {
             || nbr.species == Species::Fire
             || nbr.species == Species::Rocket
         {
-            ctx.set(0, 0, Cell::new(clone_species));
-            ctx.set(0, dy, Cell::new(clone_species));
+            ctx.set(0, 0, Cell::new(clone_species, ctx.universe().rng_cloned()));
+            ctx.set(0, dy, Cell::new(clone_species, ctx.universe().rng_cloned()));
 
             let (ndx, ndy) = match ctx.rand_int(0..100) % 5 {
                 0 => adjacency_left((dx, dy)),
@@ -895,7 +895,7 @@ pub fn update_plant(cell: Cell, ctx: &mut UniverseContext) {
         && ctx.get(-1, 1).species != Species::Plant
     {
         if ctx.get(0, 1).species == Species::Empty {
-            let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
+            let i = ctx.rand_int(0..=100);
             let dec = ctx.rand_int(0..30) - 20;
             if (i + i32::from(ra)) > 165 {
                 ctx.set(
@@ -1012,7 +1012,7 @@ pub fn update_seed(cell: Cell, ctx: &mut UniverseContext) {
             && (ctx.get(ldx, ldy).species == Species::Empty
                 || ctx.get(rdx, rdy).species == Species::Empty)
         {
-            let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
+            let i = ctx.rand_int(0..=100);
             let dec = 9 - ctx.rand_int(0..3);
             if (i + i32::from(ra)) > 100 {
                 ctx.set(
@@ -1026,7 +1026,11 @@ pub fn update_seed(cell: Cell, ctx: &mut UniverseContext) {
             }
         }
     } else if nbr_species == Species::Water {
-        ctx.set(dx, dy, Cell::new(Species::Seed))
+        ctx.set(
+            dx,
+            dy,
+            Cell::new(Species::Seed, ctx.universe().rng_cloned()),
+        )
     }
 }
 
@@ -1142,7 +1146,7 @@ pub fn update_fungus(cell: Cell, ctx: &mut UniverseContext) {
             && ctx.get(ldx, ldy).species != Species::Fungus
             && ctx.get(rdx, rdy).species != Species::Fungus
         {
-            let i = (js_sys::Math::random() * js_sys::Math::random() * 100.) as i32;
+            let i = ctx.rand_int(0..=100);
             let dec = 15 - ctx.rand_int(0..20);
             if (i + i32::from(ra)) > 165 {
                 ctx.set(

@@ -346,6 +346,11 @@ impl Universe {
     pub fn rng_mut(&mut self) -> &mut SplitMix64 {
         &mut self.rng
     }
+
+    /// [`Clone`]s and returns the `Universe`'s P-RNG object
+    pub fn rng_cloned(&self) -> SplitMix64 {
+        self.rng.clone()
+    }
 }
 
 /// A context passed to cells when they are updated
@@ -420,6 +425,11 @@ impl<'a> UniverseContext<'a> {
     ///
     /// This can be used to make further changes, outside of the `UniverseContext` capabilities.
     pub fn universe_mut(&mut self) -> &mut Universe {
+        self.universe
+    }
+
+    /// Returns a shared (immutable) reference to the `Universe`.
+    pub fn universe(&self) -> &Universe {
         self.universe
     }
 }
