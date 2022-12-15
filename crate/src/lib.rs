@@ -1,5 +1,5 @@
-mod species;
-mod universe;
+pub mod species;
+pub mod universe;
 mod utils;
 
 use rand::Rng;

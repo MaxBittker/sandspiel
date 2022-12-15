@@ -21,7 +21,7 @@ pub struct Universe {
     rng: SplitMix64,
 }
 
-#[wasm_bindgen]
+#[cfg_attr(target_arch = "wasm32", wasm_bindgen)]
 /// Public methods on `Universe`, many of these are called by JS
 impl Universe {
     /// Create a new `Universe`.
