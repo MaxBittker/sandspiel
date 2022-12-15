@@ -28,24 +28,18 @@ impl Universe {
     ///
     /// `width` and `height` must both be positive. Note that the larger these get, the more computations are done per frame.
     pub fn new(width: i32, height: i32) -> Universe {
-        let cells = (0..width * height).map(|_i| EMPTY_CELL).collect();
-        let winds: Vec<Wind> = (0..width * height)
-            .map(|_i| Wind {
-                dx: 0,
-                dy: 0,
-                pressure: 0,
-                density: 0,
-            })
-            .collect();
+        let cells = vec![EMPTY_CELL; (width * height) as usize];
 
-        let burns: Vec<Wind> = (0..width * height)
-            .map(|_i| Wind {
-                dx: 0,
-                dy: 0,
-                pressure: 0,
-                density: 0,
-            })
-            .collect();
+        let empty_wind = Wind {
+            dx: 0,
+            dy: 0,
+            pressure: 0,
+            density: 0,
+        };
+
+        let winds = vec![empty_wind; (width * height) as usize];
+        let burns = vec![empty_wind; (width * height) as usize];
+
         let rng: SplitMix64 = SeedableRng::seed_from_u64(0x734f_6b89_de5f_83cc);
         Universe {
             width,
@@ -63,12 +57,8 @@ impl Universe {
     ///
     /// Note that this does not affect the undo-stack (subject to change).
     pub fn reset(&mut self) {
-        // TODO: don't calculate index every time
-        for x in 0..self.width {
-            for y in 0..self.height {
-                let idx = self.get_index(x, y);
-                self.cells[idx] = EMPTY_CELL;
-            }
+        for i in 0..(self.width * self.height) as usize {
+            self.cells[i] = EMPTY_CELL;
         }
     }
 
