@@ -1,9 +1,6 @@
-use crate::universe::UniverseContext;
+use crate::{universe::UniverseContext, Cell, Wind, EMPTY_CELL};
 
 use super::utils::{adjacency_left, adjacency_right, join_dy_dx, split_dy_dx};
-use Cell;
-use Wind;
-use EMPTY_CELL;
 
 use std::{cmp::Ordering, mem};
 use wasm_bindgen::prelude::*;

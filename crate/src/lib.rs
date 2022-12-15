@@ -1,10 +1,3 @@
-extern crate cfg_if;
-extern crate js_sys;
-extern crate rand;
-extern crate rand_xoshiro;
-extern crate wasm_bindgen;
-extern crate web_sys;
-
 mod species;
 mod universe;
 mod utils;

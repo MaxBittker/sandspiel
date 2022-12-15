@@ -2,6 +2,7 @@
 name = "sandtable"
 version = "0.1.0"
 authors = ["maxbittker"]
+edition = "2021"
 
 [lib]
 crate-type = ["cdylib", "rlib"]
