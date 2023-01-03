@@ -11,6 +11,9 @@ import SignInButton from "./signinButton.js";
 import Promotab from "./promotab";
 import { svgToImageData, rgbaToSpecies } from "../convertSVG"
 
+import { captureException } from "@sentry/react";
+const Sentry = require("@sentry/react");
+
 import Menu from "./menu";
 
 window.species = Species;
