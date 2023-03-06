@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.4c09b361feb4bf993d22d1eac0ef212a.js"
+  "/precache-manifest.c7b98e0c8b47a91eacae99917e9d2d60.js"
 );
 
 self.addEventListener('message', (event) => {
@@ -32,3 +32,6 @@ self.__precacheManifest = [].concat(self.__precacheManifest || []);
 workbox.precaching.precacheAndRoute(self.__precacheManifest, {});
 
 workbox.routing.registerNavigationRoute(workbox.precaching.getCacheKeyForURL("index.html"));
+
+workbox.routing.registerRoute(/\.html$/, new workbox.strategies.StaleWhileRevalidate(), 'GET');
+workbox.routing.registerRoute(/\.(?:png|jpg|jpeg|svg)$/, new workbox.strategies.CacheFirst({ "cacheName":"images", plugins: [new workbox.expiration.Plugin({ maxEntries: 300, purgeOnQuotaError: false })] }), 'GET');

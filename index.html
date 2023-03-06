@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
+  <meta http-equiv="cache-control" content="max-age=3600" />
+  <meta http-equiv="cache-control" content="stale-while-revalidate=864000" />
+
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1, user-scalable=no"
   />
   <meta
     name="Description"
-    content="Sandspiel is a falling sand game that provides a relaxing and creative place to play with elements like sand, water, plant, and fire. Enjoy on your phone or computer, and share drawings with your friends!"
+    content="Sandspiel is a falling sand game that provides a relaxing and creative place to play with elements like sand, water, plant, and fire. Enjoy on your phone, tablet or computer, and share your creations with your friends!"
   />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -51,8 +54,22 @@
     <script>
       (adsbygoogle = window.adsbygoogle || []).push({
         google_ad_client: "ca-pub-9933377295988485",
-        enable_page_level_ads: true
+        enable_page_level_ads: true,
       });
+    </script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=UA-54922012-3"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "UA-54922012-3");
     </script>
   </head>
 
@@ -64,7 +81,11 @@
         position: absolute;
         /* width: 320px; */
         height: 100%;
+        pointer-events: none;
         /* background-color: rebeccapurple; */
+      }
+      .adslot_1 * {
+        pointer-events: all;
       }
       /*   @media screen and (max-width: 1000px) {
         .adslot_1 {
@@ -75,7 +96,7 @@
     <!-- left-sidebar -->
     <ins
       class="adsbygoogle adslot_1"
-      style="display:block"
+      style="display: block"
       data-ad-client="ca-pub-9933377295988485"
       data-ad-slot="2593942396"
       data-ad-format="vertical"
@@ -91,17 +112,8 @@
       <div id="fps"></div>
       <canvas id="sand-canvas"></canvas> <canvas id="fluid-canvas"></canvas>
     </div>
-  <script type="text/javascript" src="/main.b1320cd1c9040c901620.js"></script></body>
-  <script
-    src="https://browser.sentry-cdn.com/4.2.3/bundle.min.js"
-    crossorigin="anonymous"
-  ></script>
-  <script>
-    Sentry.init({
-      dsn: "https://4bf8c3ab764f40569d573fc4021efe40@sentry.io/1331284",
-      release: "1.1.0"
-    });
-  </script>
+  <script type="text/javascript" src="/main.7a79c3a07fa24d631c1f.js"></script></body>
+
   <script async defer src="https://a.sandspiel.club/app.js"></script>
-  <noscript><img src="https://a.sandspiel.club/image.gif" alt=""/></noscript>
+  <noscript><img src="https://a.sandspiel.club/image.gif" alt="" /></noscript>
 </html>
