@@ -1,6 +1,9 @@
 <meta charset="utf-8"/>
 
-# sandspiel
+# sandspiel (server side ratelimit testing)
+
+**using https://www.freesqldatabase.com/ for testing**
+#
 
 "Imagine the cool phenomenon when the wind blows the falling leaves. This game simulates the phenomenon with powder (dots)!" -DAN-BALL
 
