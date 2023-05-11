@@ -34,7 +34,7 @@ pub enum Species {
     Dust = 14,
     Oil = 16,
     Rocket = 17,
-	Deleter = 20,
+    Deleter = 20,
 }
 
 impl Species {
