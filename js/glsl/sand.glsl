@@ -131,8 +131,8 @@ void main() {
     lightness = 0.9 * (data.g + 0.9);
   } else if (type == 20) { // deleter
     hue = 0.0;
-    saturation = 0.7;
-    lightness += 0.3 +  data.g * 0.3;
+    saturation = 0.9;
+    lightness += 0.5 +  data.g * 0.5;
   }
   if (isSnapshot == false) {
     lightness *= (0.975 + snoise2(floor(uv * resolution / dpi)) * 0.025);
