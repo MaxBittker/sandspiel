@@ -114,7 +114,7 @@ void main() {
 
     saturation = 0.2;
     lightness = 0.3;
-  } else if (type == 17) { // Rocket
+  } else if (type == 17) { // rocket
     hue = 0.0;
     saturation = 0.4 + data.b;
     lightness = 0.9;
@@ -129,7 +129,7 @@ void main() {
     hue = fract(fract(data.b * 2.) * 0.5) - 0.3;
     saturation = 0.7 * (data.g + 0.4) + data.b * 0.2;
     lightness = 0.9 * (data.g + 0.9);
-  } else if (type == 20) {
+  } else if (type == 20) { // deleter
     hue = 0.0;
     saturation = 0.7;
     lightness += 0.3 +  data.g * 0.3;
