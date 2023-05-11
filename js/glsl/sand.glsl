@@ -129,6 +129,10 @@ void main() {
     hue = fract(fract(data.b * 2.) * 0.5) - 0.3;
     saturation = 0.7 * (data.g + 0.4) + data.b * 0.2;
     lightness = 0.9 * (data.g + 0.9);
+  } else if (type == 20) {
+    hue = 0.0;
+    saturation = 0.7;
+    lightness += 0.3 +  data.g * 0.3;
   }
   if (isSnapshot == false) {
     lightness *= (0.975 + snoise2(floor(uv * resolution / dpi)) * 0.025);
