@@ -1,6 +1,6 @@
 <meta charset="utf-8"/>
 
-# sandspiel
+# sandspiel (BLOCKING WIP)
 
 "Imagine the cool phenomenon when the wind blows the falling leaves. This game simulates the phenomenon with powder (dots)!" -DAN-BALL
 
