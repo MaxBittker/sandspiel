@@ -1,7 +1,7 @@
 <meta charset="utf-8"/>
 
 # sandspiel
-
+(fixing exploits)
 "Imagine the cool phenomenon when the wind blows the falling leaves. This game simulates the phenomenon with powder (dots)!" -DAN-BALL
 
 ![](Screenshot.png)
