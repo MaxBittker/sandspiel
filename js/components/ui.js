@@ -486,7 +486,7 @@ class Index extends React.Component {
             <h4>Share your creation with the people! (try using #hashtags)</h4>
             <p>
               Please be nice. Users who post hateful or sexually explicit
-              content will be banned.
+              content will be banned. <b><a href="https://tiny.cc/SPCoE">(Rules)</a></b>
             </p>
             <img src={this.state.data.dataURL} className="submissionImg" />
             <SignInButton>
