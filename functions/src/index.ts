@@ -400,7 +400,8 @@ app.get("/creations", async (req: express.Request, res) => {
     const filteredCreations = browse.rows.filter((row) => {
       const reportcount = row.reportcount || 0;
       const score = row.score;
-      return reportcount < 2 || score + 1 > reportcount * 3;
+      // return reportcount < 2 || score + 1 > reportcount * 3;
+      return true
     });
 
     const creations = filteredCreations.map((row) => {
