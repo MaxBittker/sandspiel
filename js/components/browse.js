@@ -199,13 +199,6 @@ class Browse extends React.Component {
             Orb.Farm
           </a>
           {"          \xa0        \xa0\xa0\xa0    "}
-          <a
-            href="https://www.roblox.com/games/7000824340/Melon-Rancher"
-            target="_blank"
-          >
-            {" "}
-            Melon Rancher
-          </a>
           <br></br>
           <a href="https://www.youtube.com/watch?v=2qfjJ-0ZeVM" target="_blank">
             {" "}

@@ -15,6 +15,7 @@
     "@firebase/util": "^0.2.50",
     "@google-cloud/language": "^2.0.0",
     "@google-cloud/storage": "^2.5.0",
+    "@sentry/serverless": "^7.10.0",
     "@types/pg": "^7.14.10",
     "@types/twit": "^2.2.28",
     "cookie-parser": "^1.4.5",
@@ -22,12 +23,10 @@
     "express": "^4.16.4",
     "firebase": "^5.7.0",
     "firebase-admin": "^8.2.0",
-    "firebase-functions": "^3.13.1",
-    "firebase-tools": "^9.4.0",
     "ip-range-check": "^0.2.0",
     "pg": "^7.18.2",
     "twit": "^2.2.11",
-    "uuid": "^3.4.0",
+    "uuid": "8.3.2",
     "wordfilter": "^0.2.6"
   },
   "devDependencies": {
@@ -36,6 +35,6 @@
   },
   "private": true,
   "engines": {
-    "node": "10"
+    "node": "16"
   }
 }

@@ -9,8 +9,7 @@ import * as wordfilter from "wordfilter";
 const Sentry = require("@sentry/serverless");
 
 Sentry.GCPFunction.init({
-  dsn:
-    "https://700bf2d8e80445c78e5ed7e5a0ad95cc@o40136.ingest.sentry.io/1756959",
+  dsn: "https://700bf2d8e80445c78e5ed7e5a0ad95cc@o40136.ingest.sentry.io/1756959",
   tracesSampleRate: 0.01,
 });
 
@@ -400,7 +399,7 @@ app.get("/creations", async (req: express.Request, res) => {
     const filteredCreations = browse.rows.filter((row) => {
       const reportcount = row.reportcount || 0;
       const score = row.score;
-      return reportcount < 2 || score + 1 > reportcount * 3;
+      return reportcount < 100 || score + 1 > reportcount * 3;
     });
 
     const creations = filteredCreations.map((row) => {
@@ -620,12 +619,12 @@ app.put("/creations/:id/report", validateFirebaseIdToken, async (req, res) => {
         SELECT COUNT(id) 
         FROM reports
          WHERE ip = $1 and
-        timestamp > NOW() - INTERVAL '2 hours'
+        timestamp > NOW() - INTERVAL '20 hours'
          `,
         [ip]
       );
-      if (countRows[0] && countRows[0].count > 100) {
-        res.sendStatus(302);
+      if (countRows[0] && countRows[0].count > 10) {
+        res.sendStatus(200);
         return;
       }
     } catch (err) {

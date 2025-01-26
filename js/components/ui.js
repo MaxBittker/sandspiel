@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import * as Sentry from "@sentry/browser";
 
 import { memory } from "../../crate/pkg/sandtable_bg";
 import { Species } from "../../crate/pkg/sandtable";
@@ -9,10 +10,7 @@ import { snapshot, pallette } from "../render.js";
 import { functions, storage } from "../api.js";
 import SignInButton from "./signinButton.js";
 import Promotab from "./promotab";
-import { svgToImageData, rgbaToSpecies } from "../convertSVG"
-
-import { captureException } from "@sentry/react";
-const Sentry = require("@sentry/react");
+import { svgToImageData, rgbaToSpecies } from "../convertSVG";
 
 import Menu from "./menu";
 
@@ -240,7 +238,7 @@ class Index extends React.Component {
     });
   }
 
-  async loadSVG (svgString) {
+  async loadSVG(svgString) {
     const imgData = await svgToImageData(svgString);
 
     const cellsData = new Uint8Array(
@@ -254,15 +252,15 @@ class Index extends React.Component {
 
     for (let i = 0, len = width * height * 4; i < len; i += 4) {
       const species = rgbaToSpecies(
-        imgData.data[i], 
-        imgData.data[i + 1], 
-        imgData.data[i + 2], 
+        imgData.data[i],
+        imgData.data[i + 1],
+        imgData.data[i + 2],
         imgData.data[i + 3]
-      )
+      );
       cellsData[i] = species; // should be 0 to 19
-      cellsData[i+1] = Math.floor(100 + Math.random() * 50); // register A
-      cellsData[i+2] = 0; // register B
-      cellsData[i+3] = 0; // clock
+      cellsData[i + 1] = Math.floor(100 + Math.random() * 50); // register A
+      cellsData[i + 2] = 0; // register B
+      cellsData[i + 3] = 0; // clock
     }
     universe.flush_undos();
     universe.push_undo();

@@ -29,11 +29,15 @@ export default function PullTab() {
       </a>
       <br></br>
       <p>
-        See also:{" "}
+        See also: <br></br>
         <a href="https://orb.farm" target="_blank">
           orb.farm
         </a>
         <img src="https://orb.farm/assets/favicon.ico" className="link-icon" />
+        <br></br>
+        <a href="https://websim.ai" target="_blank">
+          Websim: Make and play games
+        </a>
       </p>
       <div
         id="PullTab"
