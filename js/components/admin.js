@@ -100,7 +100,7 @@ class Submissions extends React.Component {
                   <button
                     className="BAN"
                     title="ban"
-                    onClick={() => judge(submission.id, 2)}
+                    onClick={() => if(confirm("ban this user?")){judge(submission.id, 2)}}
                   >
                     ban 🤾🏽‍♂️
                   </button>
