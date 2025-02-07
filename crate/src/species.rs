@@ -34,6 +34,7 @@ pub enum Species {
     Dust = 14,
     Oil = 16,
     Rocket = 17,
+    Deleter = 20,
 }
 
 impl Species {
@@ -62,6 +63,7 @@ impl Species {
             Species::Fungus => update_fungus(cell, api),
             Species::Seed => update_seed(cell, api),
             // Species::X => update_x(cell, api),
+			Species::Deleter => update_deleter(cell, api),
         }
     }
 }
@@ -1288,6 +1290,17 @@ pub fn update_mite(cell: Cell, mut api: SandApi) {
                 }
             } else {
                 api.set(0, 0, mite);
+            }
+        }
+    }
+}
+
+pub fn update_deleter(cell: Cell, mut api: SandApi) {
+    for dx in [-1, 0, 1].iter().cloned() {
+        for dy in [-1, 0, 1].iter().cloned() {
+            let nbr_species = api.get(dx, dy).species;
+            if nbr_species != Species::Empty && nbr_species != Species::Deleter && nbr_species != Species::Wall {
+                api.set(dx, dy, EMPTY_CELL);
             }
         }
     }
