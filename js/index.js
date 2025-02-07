@@ -17,6 +17,19 @@ if (!window.location.host.startsWith("localhost")) {
   });
 }
 
+
+// patch post spam (for now)
+// im sure this is a likely a violation of some policy but i couldnt find anything in specific stating this so it might be fine
+// todo: figure out a way to prevent changing the postlist outside of the ratelimit function from ui.js
+
+localStorage['clear'] = function(test) {
+  localStorage.setItem("postlist",localStorage.getItem("postlist"))
+}
+
+localStorage['remove'] = function(test) {
+  localStorage.setItem("postlist",localStorage.getItem("postlist"))
+}
+
 import "./api";
 import { Universe } from "../crate/pkg";
 
