@@ -1,0 +1,22 @@
+{
+    "twitter": {
+      "consumer_secret": "uhWgoOVVf4QTc3N7HYYKUvbs3dSYUbO0bb09Azaeuk90JekPLY",
+      "access_token": "1070598172999790593-xGxmNWknXB8cXF7sI1rvRiH6jMIecO",
+      "access_token_secret": "ev0c2ATOB1628jWhdTNFqG3sa3fwWSC66xvLE7L8RWASb",
+      "consumer_key": {
+        "key": "EBjxGFjqy6EOvlKocTZS5BPJU"
+      }
+    },
+    "pg": {
+      "connection_name": "sandtable-8d0f7:us-central1:sandspiel-db",
+      "name": "sandspiel",
+      "user": "postgres",
+      "password": "098098777"
+    },
+    "firebase": {
+      "projectId": "sandtable-8d0f7",
+      "databaseURL": "https://sandtable-8d0f7.firebaseio.com",
+      "storageBucket": "sandtable-8d0f7.appspot.com",
+      "locationId": "us-central"
+    }
+  }

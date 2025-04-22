@@ -1,17 +1,11 @@
 import * as cookieParser from "cookie-parser";
 import * as c from "cors";
 import * as crypto from "crypto";
-import * as functions from "firebase-functions";
+import * as functions from "firebase-functions/v1";
 import * as pg from "pg";
-import * as Twit from "twit";
 import * as wordfilter from "wordfilter";
-
-const Sentry = require("@sentry/serverless");
-
-Sentry.GCPFunction.init({
-  dsn: "https://700bf2d8e80445c78e5ed7e5a0ad95cc@o40136.ingest.sentry.io/1756959",
-  tracesSampleRate: 0.01,
-});
+import * as admin from "firebase-admin";
+import * as express from "express";
 
 import admins from "./admin";
 
@@ -35,60 +29,9 @@ if (process.env.NODE_ENV === "production") {
 // and handle dropped or expired connections automatically.
 const pgPool: pg.Pool = new pg.Pool(pgConfig);
 
-const T = new Twit({
-  consumer_key: functions.config().twitter.consumer_key.key,
-  consumer_secret: functions.config().twitter.consumer_secret,
-  access_token: functions.config().twitter.access_token,
-  access_token_secret: functions.config().twitter.access_token_secret,
-  timeout_ms: 60 * 1000, // optional HTTP request timeout to apply to all requests.
-  strictSSL: false, // optional - requires SSL certificates to be valid.
-});
-
-function Tweet(b64content, title, id) {
-  // first we must post the media to Twitter
-  T.post(
-    "media/upload",
-    { media_data: b64content },
-    function (err, res_data, response) {
-      // now we can assign alt text to the media, for use by screen readers
-      // and other text-based presentations and interpreters
-      const mediaIdStr = res_data["media_id_string"];
-      const altText = title;
-      const meta_params = { media_id: mediaIdStr, alt_text: { text: altText } };
-
-      T.post(
-        "media/metadata/create",
-        meta_params,
-        function (post_err, post_data) {
-          if (!err) {
-            // now we can reference the media and post a tweet (media will
-            // attach to the tweet)
-            const params = {
-              status: `${title.replace(
-                /@/g,
-                ""
-              )}\n https://sandspiel.club/#${id}`,
-              media_ids: [mediaIdStr],
-            };
-
-            T.post("statuses/update", params, function (_, _data) {
-              console.log("TWEETED" + JSON.stringify(_data));
-            });
-          } else {
-            console.error("twitter api error" + err);
-          }
-        }
-      );
-    }
-  );
-}
-
 const cors = c({ origin: true });
 
-import * as admin from "firebase-admin";
 admin.initializeApp();
-
-import * as express from "express";
 
 const app = express();
 app.use(cors);
@@ -200,12 +143,17 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
        `,
       [ip]
     );
-    if (countRows[0] && countRows[0].count > 28) {
+    if (countRows[0] && countRows[0].count > 40) {
       res.sendStatus(302);
       return;
     }
 
-    const data = { title: trimmed_title, id, score: 0, timestamp: Date.now() };
+    const data = {
+      title: trimmed_title,
+      id,
+      score: 0,
+      timestamp: Date.now(),
+    };
 
     // Upload the image to the bucket
     function uploadPNG(pngData, suffix) {
@@ -343,6 +291,7 @@ app.get("/creations", async (req: express.Request, res) => {
         FROM rulings as r
         WHERE r.id = c.id and r.bad = 'yes'
       )
+      AND c.timestamp > NOW() - INTERVAL '1 year'
       ORDER BY score DESC
       LIMIT 85
     )
@@ -360,6 +309,41 @@ app.get("/creations", async (req: express.Request, res) => {
     group by cs.id
     ORDER BY score DESC
         `);
+    } else if (q === "score") {
+      browse = await pgPool.query(`
+      WITH SUBSET AS(
+        SELECT 
+          C.ID,
+          C.data_id,
+          C.title,
+          C.timestamp,
+          C.score,
+          C.children,
+          C.parent_id          
+        FROM creations c 
+        WHERE NOT EXISTS(
+          SELECT
+          FROM rulings as r
+          WHERE r.id = c.id and r.bad = 'yes'
+        )
+        AND c.timestamp > NOW() - INTERVAL '1 year'
+        ORDER BY score desc
+        LIMIT 85
+      )
+      SELECT 
+        cs.ID,
+        MAX(cs.data_id) as data_id,
+        MAX(cs.title) as title ,
+        MAX(cs.timestamp) as timestamp ,
+        MAX(cs.score) as score ,
+        MAX(cs.children) as children,
+        MAX(cs.parent_id) as parent_id,
+        COUNT(RP.id) AS reportcount
+      from SUBSET cs
+      Left JOIN reports AS RP ON RP.id = cs.ID
+      group by cs.id
+      ORDER BY score desc
+     `);
     } else {
       browse = await pgPool.query(`
       WITH SUBSET AS(
@@ -477,12 +461,6 @@ app.get("/reports", async (req: express.Request, res) => {
 app.get("/creations/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    //todo:
-    // WHERE NOT EXISTS(
-    //   SELECT
-    //   FROM rulings as r
-    //   WHERE r.id = c.id and r.bad = 'yes'
-    // )
     const get = await pgPool.query("SELECT *  FROM creations WHERE id = $1", [
       id,
     ]);
@@ -619,12 +597,12 @@ app.put("/creations/:id/report", validateFirebaseIdToken, async (req, res) => {
         SELECT COUNT(id) 
         FROM reports
          WHERE ip = $1 and
-        timestamp > NOW() - INTERVAL '20 hours'
+        timestamp > NOW() - INTERVAL '2 hours'
          `,
         [ip]
       );
-      if (countRows[0] && countRows[0].count > 10) {
-        res.sendStatus(200);
+      if (countRows[0] && countRows[0].count > 100) {
+        res.sendStatus(302);
         return;
       }
     } catch (err) {

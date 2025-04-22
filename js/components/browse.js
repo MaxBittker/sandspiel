@@ -218,7 +218,7 @@ class Browse extends React.Component {
           <button>Month</button>
         </NavLink>
         <NavLink exact to="/browse/top/">
-          <button>All </button>
+          <button>Year </button>
         </NavLink>
         <span style={{ display: "inline-block" }}>
           <input
