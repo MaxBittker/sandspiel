@@ -31,10 +31,9 @@ pub fn join_dy_dx(dx: i32, dy: i32) -> u8 {
 }
 
 pub fn split_dy_dx(s: u8) -> (i32, i32) {
-    let s: i32 = s as i32;
+    let s: i32 = i32::from(s);
 
     let dx: i32 = (s / 3) - 1;
-
     let dy: i32 = (s % 3) - 1;
 
     (dx, dy)
@@ -48,10 +47,9 @@ cfg_if! {
     // For more details see
     // https://github.com/rustwasm/console_error_panic_hook#readme
     if #[cfg(feature = "console_error_panic_hook")] {
-        extern crate console_error_panic_hook;
-        pub use self::console_error_panic_hook::set_once as set_panic_hook;
+        pub use console_error_panic_hook::set_once as set_panic_hook;
     } else {
         #[inline]
-         pub fn set_panic_hook() {}
+        pub fn set_panic_hook() {}
     }
 }
