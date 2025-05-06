@@ -285,7 +285,7 @@ impl Universe {
 
     pub fn push_undo(&mut self) {
         self.undo_stack.push_front(self.cells.clone());
-        self.undo_stack.truncate(50);
+        self.undo_stack.truncate(256);
     }
 
     pub fn pop_undo(&mut self) {
