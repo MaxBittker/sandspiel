@@ -24,7 +24,7 @@ body,
 canvas {
   position: absolute;
   bottom: 0;
-  /* top: 0; */
+  top: 0;
   right: 0px;
   left: 0px;
   z-index: 1;
