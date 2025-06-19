@@ -147,6 +147,16 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
       res.sendStatus(302);
       return;
     }
+    
+    const userCountRows = await pgPool.query(
+      `SELECT COUNT(id) FROM creations 
+       WHERE user_id = $1 AND timestamp > NOW() - INTERVAL '5 minutes'`,
+      [uid]
+    );
+    if (userCountRows.rows[0].count >= 5) {
+      res.sendStatus(429);
+      return;
+    }
 
     const data = {
       title: trimmed_title,
@@ -383,6 +393,7 @@ app.get("/creations", async (req: express.Request, res) => {
     const filteredCreations = browse.rows.filter((row) => {
       const reportcount = row.reportcount || 0;
       const score = row.score;
+      return true;
       return reportcount < 100 || score + 1 > reportcount * 3;
     });
 
