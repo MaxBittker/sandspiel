@@ -1,0 +1,21 @@
+{
+    "name": "sandspiel",
+    "short_name": "sandspiel",
+    "start_url": "https://sandspiel.club/",
+    "scope": "https://sandspiel.club/",
+    "icons": [
+        {
+            "src": "/assets/android-chrome-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/android-chrome-256x256.png",
+            "sizes": "256x256",
+            "type": "image/png"
+        }
+    ],
+    "theme_color": "#ccbcbc",
+    "background_color": "#ccbcbc",
+    "display": "standalone"
+}
