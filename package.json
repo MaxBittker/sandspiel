@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode=production",
-    "start": "webpack-dev-server -d --host 0.0.0.0",
+    "start": "NODE_OPTIONS=--openssl-legacy-provider webpack-dev-server -d --host 0.0.0.0",
     "deploy": "webpack --mode=production && gh-pages -d dist"
   },
   "repository": {
@@ -20,6 +20,10 @@
   ],
   "author": "Max Bittker",
   "license": "(MIT OR Apache-2.0)",
+  "overrides": {
+    "@webassemblyjs/wasm-parser": "^1.14.1",
+    "@webassemblyjs/helper-api-error": "^1.14.1"
+  },
   "devDependencies": {
     "@babel/core": "^7.7.7",
     "@babel/plugin-syntax-dynamic-import": "^7.7.4",
@@ -42,9 +46,11 @@
     "@babel/plugin-proposal-class-properties": "^7.7.4",
     "@babel/plugin-transform-runtime": "^7.13.15",
     "@sentry/browser": "^6.2.5",
+    "@sentry/react": "^7.28.1",
     "@sentry/tracing": "^6.2.5",
     "@sentry/wasm": "^6.2.5",
-    "@sentry/react": "^7.28.1",
+    "@webassemblyjs/helper-api-error": "^1.14.1",
+    "@webassemblyjs/wasm-parser": "^1.14.1",
     "classnames": "^2.2.6",
     "clean-webpack-plugin": "^4.0.0",
     "css-loader": "^5.0.2",
