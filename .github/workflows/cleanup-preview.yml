@@ -1,0 +1,46 @@
+name: Cleanup Preview
+
+on:
+  pull_request:
+    types: [closed]
+  delete:
+    branches:
+      - '**'
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Remove preview directory
+        run: |
+          BRANCH_NAME="${{ github.event.pull_request.head.ref || github.event.ref }}"
+          BRANCH_NAME=$(echo "$BRANCH_NAME" | sed 's/refs\/heads\///')
+
+          if [ -d "preview/$BRANCH_NAME" ]; then
+            rm -rf "preview/$BRANCH_NAME"
+            echo "Removed preview/$BRANCH_NAME"
+          else
+            echo "Preview directory preview/$BRANCH_NAME does not exist"
+          fi
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git add .
+            git commit -m "Clean up preview for ${{ github.event.pull_request.head.ref || github.event.ref }}"
+            git push
+          else
+            echo "No changes to commit"
+          fi
