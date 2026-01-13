@@ -93,11 +93,8 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
   const ip = req.header("x-appengine-user-ip");
 
   const { uid } = req["user"];
-  const user = await admin.auth().getUser(uid);
-  if (!user.emailVerified) {
-    res.sendStatus(301);
-  }
 
+  // Early validation checks (synchronous, cheap operations)
   if (wordfilter.blacklisted(title)) {
     res.sendStatus(418);
     return;
@@ -108,51 +105,78 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
     const bucket = admin.storage().bucket();
 
     const id = crypto.createHash("md5").update(cells).digest("hex");
-
     const publicId = id.slice(0, 20);
 
-    const exists = await pgPool.query(
-      "SELECT exists( SELECT 1 FROM creations WHERE id = $1 )",
-      [publicId]
-    );
+    // Run all validation checks in parallel
+    const [
+      user,
+      exists,
+      banned,
+      ipBanned,
+      countRows,
+      userCountRows
+    ] = await Promise.all([
+      admin.auth().getUser(uid),
+      pgPool.query(
+        "SELECT exists( SELECT 1 FROM creations WHERE id = $1 )",
+        [publicId]
+      ),
+      pgPool.query(
+        `SELECT exists(
+          SELECT 1 FROM bans
+          WHERE user_id = $1 and
+          timestamp > NOW() - INTERVAL '60 days'
+        )`,
+        [uid]
+      ),
+      pgPool.query(
+        `SELECT exists(
+          SELECT 1 FROM ip_bans
+          WHERE ip = $1 and
+          timestamp > NOW() - INTERVAL '60 days'
+        )`,
+        [ip]
+      ),
+      pgPool.query(
+        `SELECT COUNT(id)
+        FROM creations
+        WHERE ip = $1 and
+        timestamp > NOW() - INTERVAL '24 hours'`,
+        [ip]
+      ),
+      pgPool.query(
+        `SELECT COUNT(id) FROM creations
+        WHERE user_id = $1 AND timestamp > NOW() - INTERVAL '5 minutes'`,
+        [uid]
+      )
+    ]);
+
+    // Check all validation results
+    if (!user.emailVerified) {
+      res.sendStatus(301);
+      return;
+    }
 
     if (exists.rows[0].exists) {
       res.sendStatus(202).json({ id: "already exists" });
       return;
     }
-    const banned = await pgPool.query(
-      `
-      SELECT exists(
-      SELECT 1 FROM bans 
-      WHERE user_id = $1 and 
-      timestamp > NOW() - INTERVAL '60 days'
-      )`,
-      [uid]
-    );
 
     if (banned.rows[0].exists) {
       res.sendStatus(401).json({ id: "you're banned for two months" });
       return;
     }
-    const countRows = await pgPool.query(
-      `
-      SELECT COUNT(id)
-      FROM creations
-       WHERE ip = $1 and
-      timestamp > NOW() - INTERVAL '24 hours'
-       `,
-      [ip]
-    );
-    if (countRows[0] && countRows[0].count > 40) {
+
+    if (ipBanned.rows[0].exists) {
+      res.sendStatus(401).json({ id: "your IP is banned for two months" });
+      return;
+    }
+
+    if (countRows.rows[0] && countRows.rows[0].count > 40) {
       res.sendStatus(302);
       return;
     }
-    
-    const userCountRows = await pgPool.query(
-      `SELECT COUNT(id) FROM creations 
-       WHERE user_id = $1 AND timestamp > NOW() - INTERVAL '5 minutes'`,
-      [uid]
-    );
+
     if (userCountRows.rows[0].count >= 5) {
       res.sendStatus(429);
       return;
@@ -186,12 +210,7 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
       });
     }
 
-    await Promise.all([
-      uploadPNG(cells, ".data.png"),
-      uploadPNG(image, ".png"),
-    ]);
-
-    const text = `INSERT INTO 
+    const text = `INSERT INTO
        creations(id, data_id, user_id, parent_id, title, score, ip, timestamp)
        VALUES($1, $2, $3, $4, $5, $6, $7, to_timestamp( $8 / 1000.0) )`;
 
@@ -205,15 +224,26 @@ app.post("/creations", validateFirebaseIdToken, async (req, res) => {
       ip,
       data.timestamp,
     ];
+
     try {
-      await pgPool.query(text, values);
+      // Run image uploads and DB insert in parallel
+      await Promise.all([
+        uploadPNG(cells, ".data.png"),
+        uploadPNG(image, ".png"),
+        pgPool.query(text, values)
+      ]);
+
+      // Send response immediately
       res.status(201).json({ id });
 
+      // Update parent count in background (fire-and-forget)
       if (parent_id) {
         const update =
           "UPDATE creations SET children=COALESCE(children, 0)+1 WHERE id = $1";
 
-        await pgPool.query(update, [parent_id.slice(0, 20)]);
+        pgPool.query(update, [parent_id.slice(0, 20)]).catch((err) => {
+          console.error("error updating parent count", err.message);
+        });
       }
     } catch (err) {
       console.error(
@@ -663,7 +693,7 @@ app.put("/creations/:id/judge", validateFirebaseIdToken, async (req, res) => {
           console.log("ban", others.rows);
           others.rows.forEach(async (row) => {
             await pgPool.query(
-              `INSERT INTO rulings(id, bad) VALUES($1, $2) 
+              `INSERT INTO rulings(id, bad) VALUES($1, $2)
                ON CONFLICT (id)
                DO NOTHING;`,
               [row.id, true]
@@ -683,6 +713,59 @@ app.put("/creations/:id/judge", validateFirebaseIdToken, async (req, res) => {
   } catch (error) {
     console.error("Error making ruling post", id, error.message);
     console.error(error.stack);
+  }
+});
+
+app.put("/creations/:id/ban-ip", validateFirebaseIdToken, async (req, res) => {
+  const id = req.params.id;
+  const { email } = req["user"];
+  if (!admins.includes(email)) {
+    res.status(403).send("Not Admin");
+    return;
+  }
+
+  try {
+    const get = await pgPool.query("SELECT *  FROM creations WHERE id = $1", [
+      id,
+    ]);
+
+    if (get.rowCount > 0) {
+      const { ip, user_id } = get.rows[0];
+      if (ip) {
+        // Ban the IP
+        await pgPool.query("INSERT INTO ip_bans(ip) VALUES($1)", [ip]);
+
+        // Also ban the user
+        if (user_id) {
+          await pgPool.query("INSERT INTO bans(user_id) VALUES($1)", [user_id]);
+        }
+
+        // Hide all creations from this IP
+        const others = await pgPool.query(
+          "SELECT *  FROM creations WHERE ip = $1",
+          [ip]
+        );
+        console.log("ip ban", others.rows);
+        others.rows.forEach(async (row) => {
+          await pgPool.query(
+            `INSERT INTO rulings(id, bad) VALUES($1, $2)
+             ON CONFLICT (id)
+             DO NOTHING;`,
+            [row.id, true]
+          );
+        });
+
+        res.status(200).json({ result: "success", ip, banned_count: others.rowCount });
+      } else {
+        res.status(404).json({ error: "No IP found for this creation" });
+      }
+    } else {
+      res.status(404).json({ error: "Creation not found" });
+    }
+  } catch (error) {
+    console.error("Error banning IP", id, error.message);
+    console.error(error.stack);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

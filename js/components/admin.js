@@ -23,7 +23,7 @@ class Submissions extends React.Component {
     );
   }
   render() {
-    let { submissions, voteFromBrowse, browseVotes, judge } = this.props;
+    let { submissions, voteFromBrowse, browseVotes, judge, banIP } = this.props;
 
     if (!submissions) {
       return <div style={{ height: "90vh" }}>Loading Submissions...</div>;
@@ -98,25 +98,32 @@ class Submissions extends React.Component {
                 </h3>
                 <div className="adminButtons">
                   <button
+                    className="IPBAN"
+                    title="ban IP and user"
+                    onClick={() => banIP(submission.id)}
+                  >
+                    IP
+                  </button>
+                  <button
                     className="BAN"
-                    title="ban"
+                    title="ban user"
                     onClick={() => judge(submission.id, 2)}
                   >
-                    ban 🤾🏽‍♂️
+                    ban 
                   </button>
                   <button
                     className="delete"
                     title="delete"
                     onClick={() => judge(submission.id, true)}
                   >
-                    delete 💥
+                    delete
                   </button>
                   <button
                     className="pardon"
                     title="pardon"
                     onClick={() => judge(submission.id, false)}
                   >
-                    pardon 🐣
+                    pardon
                   </button>
                 </div>
               </div>
@@ -223,6 +230,40 @@ class AdminBrowse extends React.Component {
           });
       });
   }
+  banIP(id) {
+    if (!confirm("Ban this IP address? This will ban ALL content from this IP.")) {
+      return;
+    }
+    this.setState(({ decidedIds }) => ({
+      decidedIds: [...decidedIds, id],
+    }));
+    firebase
+      .auth()
+      .currentUser.getIdToken()
+      .then((token) => {
+        fetch(functions._url(`api/creations/${id}/ban-ip`), {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + token,
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("IP ban result:", data);
+            alert(`Successfully banned IP ${data.ip}. Removed ${data.banned_count} creations.`);
+            n++;
+            if (n > 20) {
+              this.loadSubmissions();
+              n = 0;
+            }
+          })
+          .catch((e) => {
+            console.error(e);
+            alert("Error banning IP");
+          });
+      });
+  }
   doSignInWithGoogle() {
     var provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithRedirect(provider);
@@ -247,6 +288,7 @@ class AdminBrowse extends React.Component {
           voteFromBrowse={(submission) => this.voteFromBrowse(submission)}
           browseVotes={browseVotes}
           judge={(id, ruling) => this.judge(id, ruling)}
+          banIP={(id) => this.banIP(id)}
         />
       </React.Fragment>
     );

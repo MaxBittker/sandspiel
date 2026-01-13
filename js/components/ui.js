@@ -2,8 +2,9 @@ import React from "react";
 import { Link } from "react-router-dom";
 import * as Sentry from "@sentry/browser";
 
-import { memory } from "../../crate/pkg/sandtable_bg";
+import * as wasm from "../../crate/pkg/sandtable_bg.wasm";
 import { Species } from "../../crate/pkg/sandtable";
+const memory = wasm.memory;
 
 import { height, universe, width, reset } from "../index.js";
 import { snapshot, pallette } from "../render.js";

@@ -1,8 +1,10 @@
-const canvas = document.getElementById("sand-canvas");
-const canvas2 = document.getElementById("fluid-canvas");
-const ui = document.getElementById("ui");
-
 let resize = () => {
+  const canvas = document.getElementById("sand-canvas");
+  const canvas2 = document.getElementById("fluid-canvas");
+  const ui = document.getElementById("ui");
+
+  if (!canvas || !canvas2 || !ui) return;
+
   let screen_width = window.innerWidth;
   let uiheight = 50;
   let screen_height = window.innerHeight - uiheight;
@@ -39,11 +41,17 @@ let resize = () => {
   ui.style = uiStyle;
   canvas.style = canvasStyle;
   canvas2.style = canvasStyle;
-  document.getElementsByClassName("adslot_1")[0].style = adStyle;
+  const adSlot = document.getElementsByClassName("adslot_1")[0];
+  if (adSlot) adSlot.style = adStyle;
   let btnHeight = ui.getBoundingClientRect().height;
-  document.getElementById("PullTab").style.top = btnHeight + "px";
+  const pullTab = document.getElementById("PullTab");
+  if (pullTab) pullTab.style.top = btnHeight + "px";
 };
 
-resize();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', resize);
+} else {
+  resize();
+}
 window.addEventListener("deviceorientation", resize, true);
 window.addEventListener("resize", resize);

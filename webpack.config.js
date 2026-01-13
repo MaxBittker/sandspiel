@@ -8,60 +8,68 @@ const { CleanWebpackPlugin } = require("clean-webpack-plugin");
 
 const { GenerateSW } = require("workbox-webpack-plugin");
 
-module.exports = {
-  entry: "./js/bootstrap.js",
-  output: {
-    path: dist,
-    filename: "[name].[contenthash].js",
-    publicPath: "/",
-  },
-  devServer: {
-    contentBase: dist,
-    disableHostCheck: true,
-    publicPath: "/",
-    historyApiFallback: true,
-  },
+module.exports = (env, argv) => {
+  const isProduction = argv.mode === "production";
 
-  mode: "development",
-  devtool: "source-map",
-  plugins: [
+  const plugins = [
     new CleanWebpackPlugin(),
-    new WasmPackPlugin({ crateDirectory: path.resolve(__dirname, "crate") }),
-    new CopyWebpackPlugin([
-      "index.html",
-      "js/styles.css",
-      "manifest.json",
-      "assets/*",
-    ]),
-    new HtmlWebpackPlugin({ template: "index.html" }),
-    new GenerateSW({
-      navigateFallback: "index.html",
-      // Define runtime caching rules.
-      runtimeCaching: [
-        {
-          urlPattern: /\.html$/,
-          handler: "StaleWhileRevalidate",
-        },
-        {
-          // Match any request that ends with .png, .jpg, .jpeg or .svg.
-          urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
-
-          // Apply a cache-first strategy.
-          handler: "CacheFirst",
-
-          options: {
-            // Use a custom cache name.
-            cacheName: "images",
-
-            // Only cache 300 images.
-            expiration: {
-              maxEntries: 300,
-            },
-          },
-        },
+    new WasmPackPlugin({
+      crateDirectory: path.resolve(__dirname, "crate"),
+      extraArgs: "--target bundler",
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        "js/styles.css",
+        "manifest.json",
+        { from: "assets/*" },
       ],
     }),
-  ],
+    new HtmlWebpackPlugin({ template: "index.html" }),
+  ];
+
+  // Only add service worker in production to avoid watch mode warnings
+  if (isProduction) {
+    plugins.push(
+      new GenerateSW({
+        navigateFallback: "index.html",
+        runtimeCaching: [
+          {
+            urlPattern: /\.html$/,
+            handler: "StaleWhileRevalidate",
+          },
+          {
+            urlPattern: /\.(?:png|jpg|jpeg|svg)$/,
+            handler: "CacheFirst",
+            options: {
+              cacheName: "images",
+              expiration: {
+                maxEntries: 300,
+              },
+            },
+          },
+        ],
+      })
+    );
+  }
+
+  return {
+    entry: "./js/bootstrap.js",
+    output: {
+      path: dist,
+      filename: "[name].[contenthash].js",
+      publicPath: "/",
+    },
+    devServer: {
+      static: dist,
+      allowedHosts: "all",
+      historyApiFallback: true,
+    },
+    experiments: {
+      asyncWebAssembly: true,
+    },
+    mode: isProduction ? "production" : "development",
+    devtool: "source-map",
+    plugins,
   module: {
     rules: [
       {
@@ -92,4 +100,5 @@ module.exports = {
       },
     ],
   },
+  };
 };

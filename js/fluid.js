@@ -21,8 +21,9 @@
 // SOFTWARE.
 "use strict";
 import * as dat from "dat.gui";
-import { memory } from "../crate/pkg/sandtable_bg";
+import * as wasm from "../crate/pkg/sandtable_bg.wasm";
 import { compileShaders } from "./fluidShaders";
+const memory = wasm.memory;
 const canvas = document.getElementById("fluid-canvas");
 const sandCanvas = document.getElementById("sand-canvas");
 
