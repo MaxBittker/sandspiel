@@ -34,6 +34,9 @@ const Info = () => {
       </p>
       <br />
       <p>
+          <b><a href="https://tiny.cc/SPCoE">RULES</a></b>
+          </p>
+      <p>
         Lastly, I want to say that if you enjoy this game or share your artwork
         on it, your opinion is important to me and I want to do my best to
         ensure sandspiel is a friendly and kind place to play, without bullying,
