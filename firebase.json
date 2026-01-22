@@ -11,9 +11,10 @@
   },
   "hosting": {
     "public": "dist",
-    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "ignore": ["firebase.json", "**/node_modules/**"],
     "rewrites": [
       { "source": "/ads.txt", "destination": "/assets/ads.txt" },
+      { "source": "/privacy", "destination": "/privacy.html" },
       {
         "source": "**",
         "destination": "/index.html"

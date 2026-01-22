@@ -416,7 +416,6 @@ img {
   margin: auto;
   left: -81.5px;
   transform: translateY(-30%);
-  top: 10px;
   z-index: 7;
   width: 70px;
   border-top: none;
@@ -441,6 +440,7 @@ img {
 }
 #PullTab img {
   width: 100%;
+  transform: translate(0px, -100px);
 }
 .discord {
   margin: auto;
@@ -460,6 +460,12 @@ img {
   height: 1em;
   vertical-align: bottom;
   margin-left: 0.5em;
+}
+.app-store-badge {
+  height: 40px;
+  width: auto;
+  display: block;
+  margin: 0.5em auto;
 }
 .arrow-icon {
   /* width: 2em; */

@@ -44,8 +44,8 @@ let resize = () => {
   const adSlot = document.getElementsByClassName("adslot_1")[0];
   if (adSlot) adSlot.style = adStyle;
   let btnHeight = ui.getBoundingClientRect().height;
-  const pullTab = document.getElementById("PullTab");
-  if (pullTab) pullTab.style.top = btnHeight + "px";
+  const pullTabContent = document.getElementById("PullTabContent");
+  if (pullTabContent) pullTabContent.style.top = btnHeight + "px";
 };
 
 if (document.readyState === 'loading') {

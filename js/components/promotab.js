@@ -1,43 +1,22 @@
 import React, { useState } from "react";
-// import "./styles.css";
-import YouTube from "react-youtube";
 
 export default function PullTab() {
   let [open, setOpen] = useState("");
   return (
     <div id="PullTabContent" className={open}>
-      {/* <img
-        id="logo"
-        src="assets/SSStudio ColorLined Big.svg"
-        alt="SANDSPIEL STUDIO"
-      /> */}
-      <YouTube
-        videoId="ecCVor7mJ6o"
-        opts={{
-          height: "255",
-          width: "455",
-          playerVars: {
-            // https://developers.google.com/youtube/player_parameters
-          },
-        }}
-      />{" "}
-      Explore infinite new elements and create your own worlds in Sandspiel
-      Studio!
-      <a className="CTA" href="https://studio.sandspiel.club/">
-        {" "}
-        Try Sandspiel Studio
+      <a href="https://apps.apple.com/app/id6757886943" target="_blank">
+        <img src="assets/App_Store_Badge.svg.png" alt="Download on the App Store" className="app-store-badge" />
       </a>
-      <br></br>
       <p>
         See also: <br></br>
+        <a href="https://studio.sandspiel.club/" target="_blank">
+          Sandspiel Studio
+        </a>
+        <br></br>
         <a href="https://orb.farm" target="_blank">
           orb.farm
         </a>
         <img src="https://orb.farm/assets/favicon.ico" className="link-icon" />
-        <br></br>
-        <a href="https://websim.ai" target="_blank">
-          Websim: Make and play games
-        </a>
       </p>
       <div
         id="PullTab"

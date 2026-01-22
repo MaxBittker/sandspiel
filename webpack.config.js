@@ -21,6 +21,7 @@ module.exports = (env, argv) => {
       patterns: [
         "js/styles.css",
         "manifest.json",
+        "privacy.html",
         { from: "assets/*" },
       ],
     }),
