@@ -28,14 +28,15 @@ const fps = new (class {
     }
 
     // Find the max, min, and mean of our 100 latest timings.
-    let min = Infinity;
-    let max = -Infinity;
+    //let min = Infinity;
+    //let max = -Infinity;
     let sum = 0;
     for (let i = 0; i < this.frames.length; i++) {
       sum += this.frames[i];
-      min = Math.min(this.frames[i], min);
-      max = Math.max(this.frames[i], max);
+      //min = Math.min(this.frames[i], min);
+      //max = Math.max(this.frames[i], max);
     }
+
     let mean = sum / this.frames.length;
     samples--;
     if (samples === 0) {
