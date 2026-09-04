@@ -54,7 +54,7 @@ impl Species {
             Species::Ice => update_ice(cell, api),
             // Species::Snow => update_ice(cell, api),
             //lightning
-            // Species::Sink => update_sink(cell, api),
+            // Species::Sink => {}
             Species::Plant => update_plant(cell, api),
             Species::Acid => update_acid(cell, api),
             Species::Mite => update_mite(cell, api),
