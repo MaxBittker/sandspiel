@@ -387,6 +387,7 @@ impl Universe {
             Species::Dust => 10,
             Species::Fire => 5,
             Species::Gas => 5,
+            Species::Deleter => 500,
             /*
              Some hacked species values exist outside of the enum values.
              Making sure the default case is emitted allows "BELP" to have a defined wind threshold.
